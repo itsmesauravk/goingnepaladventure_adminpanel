@@ -18,25 +18,41 @@ import LocationInput from "./addForm/LocationForm"
 import GroupSizeInput from "./addForm/GroupSizeForm"
 import StartingEndingPointInput from "./addForm/StartEndPointForm"
 import FAQList from "./addForm/FaqForm"
-import Highlights from "./addForm/HighlightsForm"
 import { nanoid } from "nanoid"
 import { useRouter } from "next/navigation"
 
+import { Button } from "../ui/button"
+import HighlightForm from "./addForm/HighlightsForm"
+import ItineraryForm from "./addForm/ItineraryForm"
+import FAQForm from "./addForm/FaqForm"
+
 interface FAQ {
-  id: string
   question: string
   answer: string
 }
-
 type FAQField = "question" | "answer"
+
+interface Highlight {
+  content: string
+  links: { text: string; url: string }[]
+}
 
 interface Link {
   text: string
   url: string
 }
 
-interface Highlight {
-  content: string
+interface Itinerary {
+  day: number
+  title: string
+  details: string
+  links: Link[]
+}
+
+interface Itinerary {
+  day: number
+  title: string
+  details: string
   links: Link[]
 }
 
@@ -61,8 +77,13 @@ const AddTrekForm: React.FC = () => {
   const [images, setImages] = useState<string[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [video, setVideo] = useState<File | null>(null)
-  const [faqs, setFaqs] = useState<FAQ[]>([])
-  const [highlights, setHighlights] = useState<Highlight[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
+  const [highlights, setHighlights] = useState<Highlight[]>([
+    { content: "", links: [{ text: "", url: "" }] },
+  ])
+  const [itineraries, setItineraries] = useState<Itinerary[]>([
+    { day: 1, title: "", details: "", links: [{ text: "", url: "" }] },
+  ])
 
   // name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,78 +215,65 @@ const AddTrekForm: React.FC = () => {
     setVideo(null)
   }
   // faq
-  const handleFaqChange = useCallback(
-    (id: string, field: FAQField, value: string) => {
-      setFaqs((prevFaqs) =>
-        prevFaqs.map((faq) =>
-          faq.id === id ? { ...faq, [field]: value } : faq
-        )
-      )
-    },
-    []
-  )
-  const addFaq = useCallback(() => {
-    setFaqs((prevFaqs) => [
-      ...prevFaqs,
-      { id: nanoid(), question: "", answer: "" },
-    ])
-  }, [])
-  const removeFaq = useCallback((id: string) => {
-    setFaqs((prevFaqs) => prevFaqs.filter((faq) => faq.id !== id))
-  }, [])
+  const addFAQ = () => {
+    setFaqs([...faqs, { question: "", answer: "" }])
+  }
+  const updateFAQ = (index: number, updatedFAQ: FAQ) => {
+    const newFaqs = [...faqs]
+    newFaqs[index] = updatedFAQ
+    setFaqs(newFaqs)
+  }
+  const removeFAQ = (index: number) => {
+    const newFaqs = [...faqs]
+    newFaqs.splice(index, 1)
+    setFaqs(newFaqs)
+  }
   // highlights
-  const handleContentChange = (index: number, value: string) => {
-    setHighlights((prev) => {
-      const updated = [...prev]
-      updated[index] = { ...updated[index], content: value }
-      return updated
-    })
+  const addHighlight = () => {
+    setHighlights([
+      ...highlights,
+      { content: "", links: [{ text: "", url: "" }] },
+    ])
   }
-
-  const handleLinkChange = (
-    highlightIndex: number,
-    linkIndex: number,
-    key: keyof Link,
-    value: string
-  ) => {
-    setHighlights((prev) => {
-      const updated = [...prev]
-      updated[highlightIndex].links[linkIndex] = {
-        ...updated[highlightIndex].links[linkIndex],
-        [key]: value,
-      }
-      return updated
-    })
+  const updateHighlights = (index: number, updatedHighlight: Highlight) => {
+    const newHighlights = [...highlights]
+    newHighlights[index] = updatedHighlight
+    setHighlights(newHighlights)
   }
-
-  const addNewLink = (highlightIndex: number) => {
-    setHighlights((prev) => {
-      const updated = [...prev]
-      updated[highlightIndex].links.push({ text: "", url: "" })
-      return updated
-    })
-  }
-
-  const addNewHighlight = () => {
-    const newHighlight: Highlight = {
-      content: "",
-      links: [{ text: "", url: "" }],
-    }
-    setHighlights((prev) => [...prev, newHighlight])
-  }
-
   const removeHighlight = (index: number) => {
-    setHighlights((prev) => prev.filter((_, i) => i !== index))
+    const newHighlights = [...highlights]
+    newHighlights.splice(index, 1)
+    setHighlights(newHighlights)
+  }
+  // itineraries
+  const addItinerary = () => {
+    setItineraries([
+      ...itineraries,
+      {
+        day: itineraries.length + 1,
+        title: "",
+        details: "",
+        links: [{ text: "", url: "" }],
+      },
+    ])
   }
 
-  const removeLink = (highlightIndex: number, linkIndex: number) => {
-    setHighlights((prev) => {
-      const updated = [...prev]
-      updated[highlightIndex].links = updated[highlightIndex].links.filter(
-        (_, i) => i !== linkIndex
-      )
-      return updated
-    })
+  const updateItineraries = (index: number, updatedItinerary: Itinerary) => {
+    const newItineraries = [...itineraries]
+    newItineraries[index] = updatedItinerary
+    setItineraries(newItineraries)
+  }
+
+  const removeItinerary = (index: number) => {
+    const newItineraries = [...itineraries]
+    newItineraries.splice(index, 1)
+
+    // Recalculate days after removing
+    const recalculatedItineraries = newItineraries.map((itinerary, i) => ({
+      ...itinerary,
+      day: i + 1,
+    }))
+    setItineraries(recalculatedItineraries)
   }
 
   // function
@@ -386,7 +394,7 @@ const AddTrekForm: React.FC = () => {
       <hr className="border-gray-300 mb-6" />
 
       <form onSubmit={handleSubmit} className=" items-center px-10">
-        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 1 (Basic Information)
         </h1>
 
@@ -460,29 +468,86 @@ const AddTrekForm: React.FC = () => {
           handleRemoveAccommodation={handleRemoveAccommodation}
         />
 
-        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 2 (highlights, Itenaries & faq)
         </h1>
 
-        {/* Highlights */}
-        <Highlights
-          highlights={highlights}
-          onContentChange={handleContentChange}
-          onLinkChange={handleLinkChange}
-          onAddLink={addNewLink}
-          onAddHighlight={addNewHighlight}
-          onRemoveHighlight={removeHighlight}
-          onRemoveLink={removeLink}
-        />
-        {/* FAQ */}
-        <FAQList
-          faqs={faqs}
-          onFaqChange={handleFaqChange}
-          onAddFaq={addFaq}
-          onRemoveFaq={removeFaq}
-        />
+        {/* Highlight */}
 
-        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+        <div>
+          <h1 className="mb-4 text-2xl font-bold">Highlight</h1>
+
+          {highlights.map((highlight, index) => (
+            <HighlightForm
+              key={index}
+              index={index}
+              highlight={highlight}
+              updateHighlight={(updatedHighlight) =>
+                updateHighlights(index, updatedHighlight)
+              }
+              removeHighlight={() => removeHighlight(index)}
+            />
+          ))}
+
+          <Button
+            type="button"
+            onClick={addHighlight}
+            className="flex items-center"
+          >
+            Add Highlight
+          </Button>
+        </div>
+
+        {/* Itinerary */}
+
+        <div className="mt-5">
+          <h1 className="mb-4 text-2xl font-bold">Itineraries</h1>
+
+          {itineraries.map((itinerary, index) => (
+            <ItineraryForm
+              key={index}
+              index={index}
+              itinerary={itinerary}
+              updateItinerary={(updatedItinerary) =>
+                updateItineraries(index, updatedItinerary)
+              }
+              removeItinerary={() => removeItinerary(index)}
+            />
+          ))}
+
+          <Button
+            type="button"
+            onClick={addItinerary}
+            className="flex items-center mt-4"
+          >
+            Add New Itinerary
+          </Button>
+        </div>
+
+        {/* FAQ */}
+        <div className="mt-5">
+          <h1 className="mb-4 text-2xl font-bold">FAQs</h1>
+
+          {faqs.map((faq, index) => (
+            <FAQForm
+              key={index}
+              index={index}
+              faq={faq}
+              updateFAQ={(updatedFAQ) => updateFAQ(index, updatedFAQ)}
+              removeFAQ={() => removeFAQ(index)}
+            />
+          ))}
+
+          <Button
+            type="button"
+            onClick={addFAQ}
+            className="flex items-center mt-4"
+          >
+            Add New Question
+          </Button>
+        </div>
+
+        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 3 (images & video)
         </h1>
 
@@ -500,10 +565,10 @@ const AddTrekForm: React.FC = () => {
           removeVideo={removeVideo}
         />
         {/* Submit Button */}
-        <div className="mt-4">
+        <div className="flex justify-center items-center mt-16 mb-16">
           <button
             type="submit"
-            className="px-4 py-2 bg-primary text-white font-semibold rounded
+            className="px-8 py-4 bg-primary text-white font-semibold rounded
                      hover:bg-primary transition-colors duration-200
                      focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >

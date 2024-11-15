@@ -1,149 +1,111 @@
-"use client"
-
 import React from "react"
+import { Camera, Trash2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
-// Types
-export interface Link {
+interface Link {
   text: string
   url: string
 }
 
-export interface Highlight {
+interface Highlight {
   content: string
   links: Link[]
 }
 
-interface HighlightsProps {
-  highlights: Highlight[]
-  onContentChange: (index: number, value: string) => void
-  onLinkChange: (
-    highlightIndex: number,
-    linkIndex: number,
-    key: keyof Link,
-    value: string
-  ) => void
-  onAddLink: (highlightIndex: number) => void
-  onAddHighlight: () => void
-  onRemoveHighlight: (index: number) => void
-  onRemoveLink: (highlightIndex: number, linkIndex: number) => void
+interface HighlightChildProps {
+  index: number
+  highlight: Highlight
+  updateHighlight: (updatedHighlight: Highlight) => void
+  removeHighlight: () => void
 }
 
-const Highlights: React.FC<HighlightsProps> = ({
-  highlights,
-  onContentChange,
-  onLinkChange,
-  onAddLink,
-  onAddHighlight,
-  onRemoveHighlight,
-  onRemoveLink,
+const HighlightForm: React.FC<HighlightChildProps> = ({
+  index,
+  highlight,
+  updateHighlight,
+  removeHighlight,
 }) => {
+  const updateContent = (content: string) => {
+    updateHighlight({ ...highlight, content })
+  }
+
+  const addLink = () => {
+    const updatedLinks = [...highlight.links, { text: "", url: "" }]
+    updateHighlight({ ...highlight, links: updatedLinks })
+  }
+
+  const updateLink = (
+    linkIndex: number,
+    key: "text" | "url",
+    value: string
+  ) => {
+    const updatedLinks = [...highlight.links]
+    updatedLinks[linkIndex][key] = value
+    updateHighlight({ ...highlight, links: updatedLinks })
+  }
+
+  const removeLink = (linkIndex: number) => {
+    const updatedLinks = [...highlight.links]
+    updatedLinks.splice(linkIndex, 1)
+    updateHighlight({ ...highlight, links: updatedLinks })
+  }
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Highlights</h2>
-        <button
+    <div className="mb-4 border-b pb-4">
+      <div className="flex items-center justify-between">
+        <Input
+          type="text"
+          placeholder="Highlight Content"
+          value={highlight.content}
+          onChange={(e) => updateContent(e.target.value)}
+          className="flex-grow"
+        />
+        <Button
           type="button"
-          onClick={onAddHighlight}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors"
+          onClick={removeHighlight}
+          className="ml-4 text-red-500 hover:text-red-700"
         >
-          Add New Highlight
-        </button>
+          <Trash2 size={18} />
+        </Button>
       </div>
 
-      <div className="space-y-6">
-        {highlights.map((highlight, highlightIndex) => (
-          <div
-            key={highlightIndex}
-            className="border border-gray-200 p-6 rounded-lg shadow-sm bg-white"
+      {highlight.links.map((link, linkIndex) => (
+        <div key={linkIndex} className="mt-2 flex items-center">
+          <Input
+            type="text"
+            placeholder="Key (text)"
+            value={link.text}
+            onChange={(e) => updateLink(linkIndex, "text", e.target.value)}
+            className="flex-grow mr-2"
+          />
+          <Input
+            type="text"
+            placeholder="Value (url)"
+            value={link.url}
+            onChange={(e) => updateLink(linkIndex, "url", e.target.value)}
+            className="flex-grow mr-2"
+          />
+          <Button
+            type="button"
+            onClick={() => removeLink(linkIndex)}
+            className="text-red-500 hover:text-red-700"
           >
-            {/* Content Section */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Content
-                </label>
-                <button
-                  type="button"
-                  onClick={() => onRemoveHighlight(highlightIndex)}
-                  className="text-red-500 hover:text-red-700 text-sm transition-colors"
-                >
-                  Remove Highlight
-                </button>
-              </div>
-              <textarea
-                value={highlight.content}
-                onChange={(e) =>
-                  onContentChange(highlightIndex, e.target.value)
-                }
-                placeholder="Enter highlight content"
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                rows={3}
-              />
-            </div>
+            <Trash2 size={18} />
+          </Button>
+        </div>
+      ))}
 
-            {/* Links Section */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700">
-                  Links
-                </label>
-                <button
-                  type="button"
-                  onClick={() => onAddLink(highlightIndex)}
-                  className="text-blue-500 hover:text-blue-700 text-sm transition-colors"
-                >
-                  Add New Link
-                </button>
-              </div>
-
-              {highlight.links.map((link, linkIndex) => (
-                <div
-                  key={linkIndex}
-                  className="flex items-center gap-3 bg-gray-50 p-3 rounded-md"
-                >
-                  <input
-                    type="text"
-                    value={link.text}
-                    onChange={(e) =>
-                      onLinkChange(
-                        highlightIndex,
-                        linkIndex,
-                        "text",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Link text"
-                    className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <input
-                    type="url"
-                    value={link.url}
-                    onChange={(e) =>
-                      onLinkChange(
-                        highlightIndex,
-                        linkIndex,
-                        "url",
-                        e.target.value
-                      )
-                    }
-                    placeholder="URL"
-                    className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => onRemoveLink(highlightIndex, linkIndex)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <Button
+        type="button"
+        onClick={addLink}
+        className="mt-2 flex items-center"
+      >
+        <Camera size={18} className="mr-2" />
+        Add Link
+      </Button>
     </div>
   )
 }
 
-export default Highlights
+export default HighlightForm
