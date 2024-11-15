@@ -385,7 +385,11 @@ const AddTrekForm: React.FC = () => {
       {/* Separator */}
       <hr className="border-gray-300 mb-6" />
 
-      <form onSubmit={handleSubmit} className="px-10">
+      <form onSubmit={handleSubmit} className=" items-center px-10">
+        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+          Part 1 (Basic Information)
+        </h1>
+
         {/* Name */}
         <NameInput value={name} onChange={handleNameChange} />
         {/* second compartement */}
@@ -456,6 +460,10 @@ const AddTrekForm: React.FC = () => {
           handleRemoveAccommodation={handleRemoveAccommodation}
         />
 
+        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+          Part 2 (highlights, Itenaries & faq)
+        </h1>
+
         {/* Highlights */}
         <Highlights
           highlights={highlights}
@@ -473,6 +481,11 @@ const AddTrekForm: React.FC = () => {
           onAddFaq={addFaq}
           onRemoveFaq={removeFaq}
         />
+
+        <h1 className="text-primary text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
+          Part 3 (images & video)
+        </h1>
+
         {/* Image Upload */}
         <ImageUpload
           images={images}
