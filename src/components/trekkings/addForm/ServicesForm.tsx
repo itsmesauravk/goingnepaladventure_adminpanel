@@ -76,7 +76,11 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
               </Button>
             </div>
           ))}
-          <Button onClick={handleAddInclusive} className="mt-2 text-white">
+          <Button
+            type="button"
+            onClick={handleAddInclusive}
+            className="mt-2 text-white"
+          >
             Add New Inclusive
           </Button>
         </div>
@@ -102,7 +106,11 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
               </Button>
             </div>
           ))}
-          <Button onClick={handleAddExclusive} className="mt-2 text-white">
+          <Button
+            type="button"
+            onClick={handleAddExclusive}
+            className="mt-2 text-white"
+          >
             Add New Exclusive
           </Button>
         </div>

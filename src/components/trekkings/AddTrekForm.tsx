@@ -29,6 +29,7 @@ import OverviewForm from "./addForm/OverviewForm"
 import InclusiveExclusiveServicesForm from "./addForm/ServicesForm"
 import PackagingForm from "./addForm/PackagingForm"
 import NoteForm from "./addForm/NoteForm"
+import axios from "axios"
 
 interface FAQ {
   question: string
@@ -307,101 +308,236 @@ const AddTrekForm: React.FC = () => {
     setOverview(newValue)
   }
 
+  //autofill function
+  const autoFillHandler = () => {
+    // Basic Information
+    setName("Everest Base Camp Trek")
+    setPrice(1499)
+    setCountry("Nepal")
+    setLocation("Khumbu Region")
+    setDifficulty("Moderate")
+    setMinDays(12)
+    setMaxDays(14)
+    setMinGroupSize(2)
+    setMaxGroupSize(16)
+    setStartingPoint("Kathmandu")
+    setEndingPoint("Lukla")
+    setMeal("Inclusive")
+    setSelectedSeasons(["Spring", "Autumn"])
+
+    // Accommodations
+    setAccommodations([
+      "Luxury Hotel in Kathmandu",
+      "Tea House Lodge in Namche",
+      "Mountain Lodge in Dingboche",
+      "Basic Guesthouse in Gorak Shep",
+    ])
+
+    // Overview
+    setOverview(
+      `Experience the adventure of a lifetime on our Everest Base Camp Trek. This iconic journey takes you through the stunning Khumbu region, past charming Sherpa villages, and into the heart of the Himalayas. Witness breathtaking mountain views, experience rich local culture, and achieve your dreams of reaching the base of the world's highest peak.`
+    )
+
+    // Note
+    setNote(
+      "Please ensure you have adequate travel insurance and are physically prepared for high-altitude trekking."
+    )
+
+    // Highlights
+    setHighlights([
+      {
+        content: "Stand at Everest Base Camp (5,364m)",
+        links: [
+          { text: "Base Camp Details", url: "https://example.com/base-camp" },
+        ],
+      },
+      {
+        content: "Visit the historic Tengboche Monastery",
+        links: [
+          { text: "Monastery Info", url: "https://example.com/tengboche" },
+        ],
+      },
+      {
+        content: "Spectacular sunrise view from Kala Patthar",
+        links: [
+          { text: "View Point", url: "https://example.com/kala-patthar" },
+        ],
+      },
+    ])
+
+    // Itineraries
+    setItineraries([
+      {
+        day: 1,
+        title: "Arrival in Kathmandu",
+        details: "Welcome meeting and trek briefing",
+        accommodations: "5-star hotel",
+        meals: "Welcome dinner",
+        links: [
+          { text: "Kathmandu Guide", url: "https://example.com/kathmandu" },
+        ],
+      },
+      {
+        day: 2,
+        title: "Fly to Lukla, Trek to Phakding",
+        details: "Scenic mountain flight and easy trek",
+        accommodations: "Tea house",
+        meals: "Breakfast, lunch, dinner",
+        links: [{ text: "Lukla Info", url: "https://example.com/lukla" }],
+      },
+      {
+        day: 3,
+        title: "Trek to Namche Bazaar",
+        details: "Challenging ascent to Sherpa capital",
+        accommodations: "Mountain lodge",
+        meals: "All meals included",
+        links: [{ text: "Namche Guide", url: "https://example.com/namche" }],
+      },
+    ])
+
+    // FAQs
+    setFaqs([
+      {
+        question: "What is the best time to trek?",
+        answer:
+          "March to May and September to November offer the best weather conditions.",
+      },
+      {
+        question: "Do I need prior trekking experience?",
+        answer:
+          "While prior experience is beneficial, this trek is suitable for beginners with good fitness levels.",
+      },
+      {
+        question: "What about altitude sickness?",
+        answer:
+          "Our itinerary includes proper acclimatization days to minimize the risk of altitude sickness.",
+      },
+    ])
+
+    // Services
+    setInclusives([
+      "All domestic flights",
+      "Professional licensed guide",
+      "Porters (1 porter for 2 trekkers)",
+      "All permits and fees",
+      "All accommodations during trek",
+      "Three meals per day during trek",
+    ])
+
+    setExclusives([
+      "International flights",
+      "Travel insurance",
+      "Personal trekking gear",
+      "Tips for guides and porters",
+      "Personal expenses",
+      "Alcoholic beverages",
+    ])
+
+    // Packaging Lists
+    setGeneral([
+      "Backpack (40-60L)",
+      "Daypack (20-30L)",
+      "Sleeping bag (-20°C rated)",
+      "Trekking poles",
+    ])
+
+    setClothes([
+      "Down jacket",
+      "Waterproof jacket and pants",
+      "Thermal base layers",
+      "Trekking pants",
+      "Hiking boots",
+    ])
+
+    setFirstAid([
+      "Altitude sickness medication",
+      "Basic first aid kit",
+      "Personal medications",
+      "Bandages and antiseptic wipes",
+    ])
+
+    setOtherEssentials([
+      "Headlamp with spare batteries",
+      "Water purification tablets",
+      "Sun protection (hat, sunscreen, sunglasses)",
+      "Camera with extra batteries",
+    ])
+  }
+
   // function
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const formData = {
       name,
       price,
-      thumbnail: thumbnailPreview,
       country,
-      trekkingDays: {
-        min: minDays,
-        max: maxDays,
-      },
+      minDays,
+      maxDays,
       location,
       difficulty,
-      groupSize: {
-        min: minGroupSize,
-        max: maxGroupSize,
-      },
+      thumbnail: thumbnailPreview,
+      groupSizeMin: minGroupSize,
+      groupSizeMax: maxGroupSize,
       startingPoint,
       endingPoint,
-      accommodations: accommodations.filter((acc) => acc.trim() !== ""), // Remove empty accommodations
+      accommodation: accommodations.filter((acc) => acc.trim() !== ""),
       meal,
-      bestSeasons: selectedSeasons,
+      bestSeason: selectedSeasons,
+      overview,
+      note,
+      trekHighlights: highlights.map((highlight) => ({
+        content: highlight.content,
+        links: highlight.links.filter((link) => link.text && link.url),
+      })),
+      itinerary: itineraries.map((itinerary) => ({
+        day: itinerary.day,
+        title: itinerary.title,
+        details: itinerary.details,
+        accommodations: itinerary.accommodations,
+        meals: itinerary.meals,
+        links: itinerary.links.filter((link) => link.text && link.url),
+      })),
+      servicesCostIncludes: inclusives,
+      servicesCostExcludes: exclusives,
+      faq: faqs.filter((faq) => faq.question && faq.answer),
+
+      packingList: {
+        general,
+        clothes,
+        firstAid,
+        otherEssentials,
+      },
+
       images: previews,
       video: video
         ? {
             name: video.name,
-            size: video.size,
+            size: `${(video.size / 1024 / 1024).toFixed(2)}MB`,
             type: video.type,
           }
         : null,
-      faqs: faqs.map(({ question, answer }) => ({
-        question,
-        answer,
-      })),
     }
+    console.log("Form data:", formData)
 
-    // Log the formatted data
-    console.log("Trek Data:", formData)
-
-    // You can also log individual sections for better readability
-    console.group("Trek Submission Details:")
-    console.log("Basic Information:", {
-      name,
-      price,
-      country,
-      location,
-      difficulty,
-    })
-    console.log("Duration:", {
-      minDays,
-      maxDays,
-    })
-    console.log("Group Size:", {
-      min: minGroupSize,
-      max: maxGroupSize,
-    })
-    console.log("Locations:", {
-      startingPoint,
-      endingPoint,
-    })
-    console.log("Accommodations:", accommodations)
-    console.log("Meal Plan:", meal)
-    console.log("Best Seasons:", selectedSeasons)
-    console.log("Media:", {
-      thumbnailPreview,
-      images: previews,
-      video: video
-        ? `${video.name} (${(video.size / 1024 / 1024).toFixed(2)}MB)`
-        : null,
-    })
-    console.log("FAQs:", faqs)
-    console.groupEnd()
-
-    // Add validation feedback
-    const requiredFields = {
-      name,
-      price,
-      thumbnail: thumbnailPreview,
-      country,
-      location,
-      difficulty,
-      startingPoint,
-      endingPoint,
-      meal,
-    }
-
-    const emptyFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value)
-      .map(([key]) => key)
-
-    if (emptyFields.length > 0) {
-      console.warn("Missing required fields:", emptyFields)
-      // You can add UI feedback here later
+    try {
+      // fetch api
+      const data = await axios
+        .post(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .catch((error) => {
+          console.error("Error:", error)
+        })
+      console.log(data)
+    } catch (error) {
+      console.log("Error:", error)
     }
   }
 
@@ -424,7 +560,19 @@ const AddTrekForm: React.FC = () => {
       {/* Separator */}
       <hr className="border-gray-300 mb-6" />
 
-      <form onSubmit={handleSubmit} className=" items-center px-10">
+      <Button
+        type="button"
+        onClick={autoFillHandler}
+        className="bg-green-500 text-white"
+      >
+        Auto Fill Form (Debug)
+      </Button>
+
+      <form
+        typeof="multipart/form-data"
+        onSubmit={handleSubmit}
+        className=" items-center px-10"
+      >
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 1 (Basic Information)
         </h1>

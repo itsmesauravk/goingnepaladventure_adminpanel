@@ -91,6 +91,7 @@ const PackagingForm: React.FC<PackagingProps> = ({
               </div>
             ))}
             <Button
+              type="button"
               onClick={() => handleAddItem(list, updater)}
               className="mt-2 text-white"
             >
