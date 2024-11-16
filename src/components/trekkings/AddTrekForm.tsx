@@ -69,7 +69,7 @@ const AddTrekForm: React.FC = () => {
   const [accommodations, setAccommodations] = useState<string[]>([""])
   const [name, setName] = useState("")
   const [price, setPrice] = useState<number>(0)
-  const [thumbnail,setThumbnail]=useState<string|File>("")
+  const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [country, setCountry] = useState("")
   const [minDays, setMinDays] = useState<number>(1)
@@ -82,7 +82,7 @@ const AddTrekForm: React.FC = () => {
   const [startingPoint, setStartingPoint] = useState<string>("")
   const [endingPoint, setEndingPoint] = useState<string>("")
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
-  const [images, setImages] = useState<(string|File)[]>([])
+  const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [video, setVideo] = useState<File | null>(null)
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
@@ -111,6 +111,8 @@ const AddTrekForm: React.FC = () => {
   //note
   const [note, setNote] = useState<string>("")
 
+  const [loading, setLoading] = useState(false)
+
   // Event handlers
 
   // name
@@ -137,12 +139,12 @@ const AddTrekForm: React.FC = () => {
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      setThumbnailPreview(URL.createObjectURL(file));
-      setThumbnail(file);
+      setThumbnailPreview(URL.createObjectURL(file))
+      setThumbnail(file)
+    }
   }
-};
   // country
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(event.target.value)
@@ -196,21 +198,22 @@ const AddTrekForm: React.FC = () => {
   }
   // images
   const handleImageChange = useCallback(
-  (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const allowedFiles = newFiles.slice(0, Math.max(0, 10 - images.length));
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files
+      if (files) {
+        const newFiles = Array.from(files)
+        const allowedFiles = newFiles.slice(0, Math.max(0, 10 - images.length))
 
-      const newPreviews = allowedFiles.map((file) => URL.createObjectURL(file));
+        const newPreviews = allowedFiles.map((file) =>
+          URL.createObjectURL(file)
+        )
 
-      setImages((prevImages) => [...prevImages, ...allowedFiles]); // Store File objects
-      setPreviews((prevPreviews) => [...prevPreviews, ...newPreviews]); // Store preview URLs
-    }
-  },
-  [images]
-);
-
+        setImages((prevImages) => [...prevImages, ...allowedFiles]) // Store File objects
+        setPreviews((prevPreviews) => [...prevPreviews, ...newPreviews]) // Store preview URLs
+      }
+    },
+    [images]
+  )
 
   const removeImage = useCallback((index: number) => {
     setImages((prevImages) => {
@@ -346,19 +349,19 @@ const AddTrekForm: React.FC = () => {
       {
         content: "Stand at Everest Base Camp (5,364m)",
         links: [
-          { text: "Base Camp Details", url: "https://example.com/base-camp" },
+          { text: "Everest Base Camp", url: "https://example.com/base-camp" },
         ],
       },
       {
         content: "Visit the historic Tengboche Monastery",
         links: [
-          { text: "Monastery Info", url: "https://example.com/tengboche" },
+          { text: "Tengboche Monastery", url: "https://example.com/tengboche" },
         ],
       },
       {
-        content: "Spectacular sunrise view from Kala Patthar",
+        content: "Spectacular sunrise view from Kala Patthar view point",
         links: [
-          { text: "View Point", url: "https://example.com/kala-patthar" },
+          { text: "Kala Patthar", url: "https://example.com/kala-patthar" },
         ],
       },
     ])
@@ -368,25 +371,27 @@ const AddTrekForm: React.FC = () => {
       {
         day: 1,
         title: "Arrival in Kathmandu",
-        details: "Welcome meeting and trek briefing",
+        details:
+          "Welcome meeting and trek briefing on Thangaland Restro and stay there.",
         accommodations: "5-star hotel",
         meals: "Welcome dinner",
         links: [
-          { text: "Kathmandu Guide", url: "https://example.com/kathmandu" },
+          { text: "Thangaland Restro", url: "https://example.com/kathmandu" },
         ],
       },
       {
         day: 2,
         title: "Fly to Lukla, Trek to Phakding",
-        details: "Scenic mountain flight and easy trek",
+        details: "Scenic mountain flight and easy trek and stay as Hotel Taj.",
         accommodations: "Tea house",
         meals: "Breakfast, lunch, dinner",
-        links: [{ text: "Lukla Info", url: "https://example.com/lukla" }],
+        links: [{ text: "Hotel Taj", url: "https://example.com/lukla" }],
       },
       {
         day: 3,
         title: "Trek to Namche Bazaar",
-        details: "Challenging ascent to Sherpa capital",
+        details:
+          "Challenging ascent to Sherpa capital with Namche Guide helping you.",
         accommodations: "Mountain lodge",
         meals: "All meals included",
         links: [{ text: "Namche Guide", url: "https://example.com/namche" }],
@@ -464,71 +469,202 @@ const AddTrekForm: React.FC = () => {
 
   // function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+    e.preventDefault()
 
-  const formData = new FormData();
+    // const formData1 = {
+    //   name,
+    //   price,
+    //   thumbnail: thumbnailPreview,
+    //   country,
+    //   location,
+    //   difficulty,
+    //   trekkingDays: {
+    //     min: minDays,
+    //     max: maxDays,
+    //   },
+    //   groupSize: {
+    //     min: minGroupSize,
+    //     max: maxGroupSize,
+    //   },
+    //   startingPoint,
+    //   endingPoint,
+    //   accommodations: accommodations.filter((acc) => acc.trim() !== ""),
+    //   meal,
+    //   bestSeasons: selectedSeasons,
+    //   overview,
+    //   note,
+    //   highlights: highlights.map((highlight) => ({
+    //     content: highlight.content,
+    //     links: highlight.links.filter((link) => link.text && link.url),
+    //   })),
+    //   itineraries: itineraries.map((itinerary) => ({
+    //     day: itinerary.day,
+    //     title: itinerary.title,
+    //     details: itinerary.details,
+    //     accommodations: itinerary.accommodations,
+    //     meals: itinerary.meals,
+    //     links: itinerary.links.filter((link) => link.text && link.url),
+    //   })),
+    //   faqs: faqs.filter((faq) => faq.question && faq.answer),
+    //   services: {
+    //     inclusive: inclusives,
+    //     exclusive: exclusives,
+    //   },
+    //   packaging: {
+    //     general,
+    //     clothes,
+    //     firstAid,
+    //     otherEssentials,
+    //   },
+    //   images: previews.forEach((_, index) =>
+    //     formData.append("images", images[index])
+    //   ),
+    //   video,
+    // }
 
-  // Append fields
-  formData.append("name", name);
-  formData.append("price", price.toString());
-  formData.append("country", country);
-  formData.append("minDays", minDays.toString());
-  formData.append("maxDays", maxDays.toString());
-  formData.append("location", location);
-  formData.append("difficulty", difficulty);
-  formData.append("groupSizeMin", minGroupSize.toString());
-  formData.append("groupSizeMax", maxGroupSize.toString());
-  formData.append("startingPoint", startingPoint);
-  formData.append("endingPoint", endingPoint);
-  formData.append("meal", meal);
-  formData.append("thumbnail", thumbnail);
+    const formData = new FormData()
 
-<<<<<<< HEAD
-      images:images,
-      video: video
-        ? {
-            name: video.name,
-            size: `${(video.size / 1024 / 1024).toFixed(2)}MB`,
-            type: video.type,
-          }
-        : null,
+    // // Append fields
+    // formData.append("name", name)
+    // formData.append("price", price.toString())
+    // formData.append("country", country)
+    // formData.append("minDays", minDays.toString())
+    // formData.append("maxDays", maxDays.toString())
+    // formData.append("location", location)
+    // formData.append("difficulty", difficulty)
+    // formData.append("groupSizeMin", minGroupSize.toString())
+    // formData.append("groupSizeMax", maxGroupSize.toString())
+    // formData.append("startingPoint", startingPoint)
+    // formData.append("endingPoint", endingPoint)
+    // formData.append("meal", meal)
+    // formData.append("thumbnail", thumbnail)
+    // formData.append("overview", overview)
+    // formData.append("note", note)
+    // formData.append("itineries", JSON.stringify(itineraries))
+    // formData.append("highlights", JSON.stringify(highlights))
+    // formData.append("faqs", JSON.stringify(faqs))
+    // formData.append("servicesCostIncludes", JSON.stringify(inclusives))
+    // formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+
+    // // Append arrays
+    // accommodations
+    //   .filter((acc) => acc.trim() !== "")
+    //   .forEach((acc, index) => formData.append(`accommodation[${index}]`, acc))
+
+    // selectedSeasons.forEach((season, index) =>
+    //   formData.append(`bestSeason[${index}]`, season)
+    // )
+
+    // formData.append(
+    //   JSON.stringify({
+    //     name,
+    //     price,
+    //     thumbnail: thumbnailPreview,
+    //     country,
+    //     location,
+    //     difficulty,
+    //     trekkingDays: {
+    //       min: minDays,
+    //       max: maxDays,
+    //     },
+    //     groupSize: {
+    //       min: minGroupSize,
+    //       max: maxGroupSize,
+    //     },
+    //     startingPoint,
+    //     endingPoint,
+    //     accommodations: accommodations.filter((acc) => acc.trim() !== ""),
+    //     meal,
+    //     bestSeasons: selectedSeasons,
+    //     overview,
+    //     note,
+    //     highlights: highlights.map((highlight) => ({
+    //       content: highlight.content,
+    //       links: highlight.links.filter((link) => link.text && link.url),
+    //     })),
+    //     itineraries: itineraries.map((itinerary) => ({
+    //       day: itinerary.day,
+    //       title: itinerary.title,
+    //       details: itinerary.details,
+    //       accommodations: itinerary.accommodations,
+    //       meals: itinerary.meals,
+    //       links: itinerary.links.filter((link) => link.text && link.url),
+    //     })),
+    //     faqs: faqs.filter((faq) => faq.question && faq.answer),
+    //     services: {
+    //       inclusive: inclusives,
+    //       exclusive: exclusives,
+    //     },
+    //     packaging: {
+    //       general,
+    //       clothes,
+    //       firstAid,
+    //       otherEssentials,
+    //     },
+    //     video,
+    //   })
+    // );
+    formData.append("name", name)
+    formData.append("price", price.toString())
+    formData.append("thumbnail", thumbnail as File)
+    formData.append("country", country)
+    formData.append("location", location)
+    formData.append("difficulty", difficulty)
+    formData.append("minDays", minDays.toString())
+    formData.append("maxDays", maxDays.toString())
+    formData.append("groupSizeMin", minGroupSize.toString())
+    formData.append("groupSizeMax", maxGroupSize.toString())
+    formData.append("startingPoint", startingPoint)
+    formData.append("endingPoint", endingPoint)
+    formData.append("accommodation", JSON.stringify(accommodations))
+    formData.append("meal", meal)
+    formData.append("bestSeason", JSON.stringify(selectedSeasons))
+    formData.append("overview", overview)
+    formData.append("trekHighlights", JSON.stringify(highlights))
+    formData.append("itinerary", JSON.stringify(itineraries))
+    formData.append("servicesCostIncludes", JSON.stringify(inclusives))
+    formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+    formData.append(
+      "packingList",
+      JSON.stringify({ general, clothes, firstAid, otherEssentials })
+    )
+    formData.append("faq", JSON.stringify(faqs))
+    formData.append("note", note)
+
+    previews.forEach(
+      (_, index) => formData.append("images", images[index]) // Attach image files
+    )
+
+    if (video) {
+      formData.append("video", video) // Attach video file
     }
-    console.log("Form data:", formData)
-=======
-  // Append arrays
-  accommodations
-    .filter((acc) => acc.trim() !== "")
-    .forEach((acc, index) => formData.append(`accommodation[${index}]`, acc));
->>>>>>> 71f48ea6d5b153f9d8edc025cd1a35ba49fd401a
 
-  selectedSeasons.forEach((season, index) =>
-    formData.append(`bestSeason[${index}]`, season)
-  );
-
-  previews.forEach((_, index) =>
-    formData.append("images", images[index]) // Attach image files
-  );
-
-  if (video) {
-    formData.append("video", video); // Attach video file
-  }
-
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    try {
+      setLoading(true)
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      console.log("Response:", response.data)
+      if (response.data.success) {
+        alert(response.data.message)
+        setLoading(false)
+        route.push("/trekking")
+      } else {
+        alert(response.data.message)
+        setLoading(false)
       }
-    );
-    console.log("Response:", response.data);
-  } catch (error) {
-    console.error("Error:", error);
+    } catch (error) {
+      console.error("Error:", error)
+      alert("Error occurred while submitting the form.")
+      setLoading(false)
+    }
   }
-};
-
 
   return (
     <div className="container mx-auto p-6">
@@ -759,11 +895,12 @@ const AddTrekForm: React.FC = () => {
         <div className="flex justify-center items-center mt-16 mb-16">
           <button
             type="submit"
+            disabled={loading}
             className="px-8 py-4 bg-primary text-white font-semibold rounded
                      hover:bg-primary transition-colors duration-200
                      focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
-            Submit Trek
+            {loading ? "Uploading Your Trek, Please Wait..." : "Submit Details"}
           </button>
         </div>
       </form>

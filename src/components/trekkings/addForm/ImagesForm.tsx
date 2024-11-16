@@ -3,7 +3,7 @@ import Image from "next/image"
 import React from "react"
 
 interface ImageUploadProps {
-  images: (string|File)[]
+  images: (string | File)[]
   previews: string[]
   handleImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   removeImage: (index: number) => void
