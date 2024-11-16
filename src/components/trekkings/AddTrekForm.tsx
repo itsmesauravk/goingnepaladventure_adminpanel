@@ -509,7 +509,7 @@ const AddTrekForm: React.FC = () => {
         otherEssentials,
       },
 
-      images: previews,
+      images:images,
       video: video
         ? {
             name: video.name,
