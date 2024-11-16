@@ -69,6 +69,7 @@ const AddTrekForm: React.FC = () => {
   const [accommodations, setAccommodations] = useState<string[]>([""])
   const [name, setName] = useState("")
   const [price, setPrice] = useState<number>(0)
+  const [thumbnail,setThumbnail]=useState<string|File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [country, setCountry] = useState("")
   const [minDays, setMinDays] = useState<number>(1)
@@ -81,7 +82,7 @@ const AddTrekForm: React.FC = () => {
   const [startingPoint, setStartingPoint] = useState<string>("")
   const [endingPoint, setEndingPoint] = useState<string>("")
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<(string|File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [video, setVideo] = useState<File | null>(null)
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
@@ -136,12 +137,12 @@ const AddTrekForm: React.FC = () => {
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file)
-      setThumbnailPreview(imageUrl)
-    }
+      setThumbnailPreview(URL.createObjectURL(file));
+      setThumbnail(file);
   }
+};
   // country
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(event.target.value)
@@ -195,25 +196,22 @@ const AddTrekForm: React.FC = () => {
   }
   // images
   const handleImageChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files
-      if (files) {
-        const newFiles = Array.from(files)
-        const allowedFiles = newFiles.slice(0, Math.max(0, 10 - images.length))
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      const allowedFiles = newFiles.slice(0, Math.max(0, 10 - images.length));
 
-        const newPreviews = allowedFiles.map((file) =>
-          URL.createObjectURL(file)
-        )
+      const newPreviews = allowedFiles.map((file) => URL.createObjectURL(file));
 
-        setImages((prevImages) => [
-          ...prevImages,
-          ...allowedFiles.map((file) => URL.createObjectURL(file)),
-        ])
-        setPreviews((prevPreviews) => [...prevPreviews, ...newPreviews])
-      }
-    },
-    [images]
-  )
+      setImages((prevImages) => [...prevImages, ...allowedFiles]); // Store File objects
+      setPreviews((prevPreviews) => [...prevPreviews, ...newPreviews]); // Store preview URLs
+    }
+  },
+  [images]
+);
+
+
   const removeImage = useCallback((index: number) => {
     setImages((prevImages) => {
       const newImages = [...prevImages]
@@ -466,49 +464,26 @@ const AddTrekForm: React.FC = () => {
 
   // function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  e.preventDefault();
 
-    const formData = {
-      name,
-      price,
-      country,
-      minDays,
-      maxDays,
-      location,
-      difficulty,
-      thumbnail: thumbnailPreview,
-      groupSizeMin: minGroupSize,
-      groupSizeMax: maxGroupSize,
-      startingPoint,
-      endingPoint,
-      accommodation: accommodations.filter((acc) => acc.trim() !== ""),
-      meal,
-      bestSeason: selectedSeasons,
-      overview,
-      note,
-      trekHighlights: highlights.map((highlight) => ({
-        content: highlight.content,
-        links: highlight.links.filter((link) => link.text && link.url),
-      })),
-      itinerary: itineraries.map((itinerary) => ({
-        day: itinerary.day,
-        title: itinerary.title,
-        details: itinerary.details,
-        accommodations: itinerary.accommodations,
-        meals: itinerary.meals,
-        links: itinerary.links.filter((link) => link.text && link.url),
-      })),
-      servicesCostIncludes: inclusives,
-      servicesCostExcludes: exclusives,
-      faq: faqs.filter((faq) => faq.question && faq.answer),
+  const formData = new FormData();
 
-      packingList: {
-        general,
-        clothes,
-        firstAid,
-        otherEssentials,
-      },
+  // Append fields
+  formData.append("name", name);
+  formData.append("price", price.toString());
+  formData.append("country", country);
+  formData.append("minDays", minDays.toString());
+  formData.append("maxDays", maxDays.toString());
+  formData.append("location", location);
+  formData.append("difficulty", difficulty);
+  formData.append("groupSizeMin", minGroupSize.toString());
+  formData.append("groupSizeMax", maxGroupSize.toString());
+  formData.append("startingPoint", startingPoint);
+  formData.append("endingPoint", endingPoint);
+  formData.append("meal", meal);
+  formData.append("thumbnail", thumbnail);
 
+<<<<<<< HEAD
       images:images,
       video: video
         ? {
@@ -519,27 +494,41 @@ const AddTrekForm: React.FC = () => {
         : null,
     }
     console.log("Form data:", formData)
+=======
+  // Append arrays
+  accommodations
+    .filter((acc) => acc.trim() !== "")
+    .forEach((acc, index) => formData.append(`accommodation[${index}]`, acc));
+>>>>>>> 71f48ea6d5b153f9d8edc025cd1a35ba49fd401a
 
-    try {
-      // fetch api
-      const data = await axios
-        .post(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .catch((error) => {
-          console.error("Error:", error)
-        })
-      console.log(data)
-    } catch (error) {
-      console.log("Error:", error)
-    }
+  selectedSeasons.forEach((season, index) =>
+    formData.append(`bestSeason[${index}]`, season)
+  );
+
+  previews.forEach((_, index) =>
+    formData.append("images", images[index]) // Attach image files
+  );
+
+  if (video) {
+    formData.append("video", video); // Attach video file
   }
+
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("Response:", response.data);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
 
   return (
     <div className="container mx-auto p-6">
