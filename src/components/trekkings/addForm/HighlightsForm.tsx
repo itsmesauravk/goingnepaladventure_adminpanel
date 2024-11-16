@@ -52,7 +52,7 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
   }
 
   return (
-    <div className="mb-4 border-b pb-4">
+    <div className="mb-4  border p-2 rounded-md border-primary pb-4">
       <div className="flex items-center justify-between">
         <Input
           type="text"
@@ -64,11 +64,15 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
         <Button
           type="button"
           onClick={removeHighlight}
-          className="ml-4 text-red-500 hover:text-red-700"
+          variant={"destructive"}
+          className="ml-4"
         >
           <Trash2 size={18} />
+          Remove Highlight
         </Button>
       </div>
+
+      <h1 className="text-lg font-bold mt-4">Links</h1>
 
       {highlight.links.map((link, linkIndex) => (
         <div key={linkIndex} className="mt-2 flex items-center">
@@ -89,7 +93,7 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
           <Button
             type="button"
             onClick={() => removeLink(linkIndex)}
-            className="text-red-500 hover:text-red-700"
+            variant={"destructive"}
           >
             <Trash2 size={18} />
           </Button>
@@ -99,7 +103,7 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
       <Button
         type="button"
         onClick={addLink}
-        className="mt-2 flex items-center"
+        className="mt-2 flex items-center text-white"
       >
         <Camera size={18} className="mr-2" />
         Add Link

@@ -12,6 +12,8 @@ interface Itinerary {
   day: number
   title: string
   details: string
+  accommodations: string
+  meals: string
   links: Link[]
 }
 
@@ -28,7 +30,10 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
   updateItinerary,
   removeItinerary,
 }) => {
-  const updateField = (key: "title" | "details", value: string) => {
+  const updateField = (
+    key: "title" | "details" | "accommodations" | "meals",
+    value: string
+  ) => {
     updateItinerary({ ...itinerary, [key]: value })
   }
 
@@ -54,7 +59,7 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
   }
 
   return (
-    <div className="mb-4 border-b pb-4">
+    <div className="mb-4 border p-2 rounded-md border-primary pb-4">
       <h2 className="text-lg font-bold mb-2">Day {itinerary.day}</h2>
       <div className="flex flex-col gap-4">
         <Input
@@ -63,13 +68,28 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
           value={itinerary.title}
           onChange={(e) => updateField("title", e.target.value)}
         />
-        <Input
-          type="text"
-          placeholder="Details"
+
+        <textarea
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="Enter itinerary details"
           value={itinerary.details}
           onChange={(e) => updateField("details", e.target.value)}
         />
+        <Input
+          type="text"
+          placeholder="Accommodation"
+          value={itinerary.accommodations}
+          onChange={(e) => updateField("accommodations", e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Meals"
+          value={itinerary.meals}
+          onChange={(e) => updateField("meals", e.target.value)}
+        />
       </div>
+
+      <h1 className="text-lg font-bold mt-4">Links</h1>
 
       <div className="mt-4">
         {itinerary.links.map((link, linkIndex) => (
@@ -86,12 +106,12 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
               placeholder="Value (url)"
               value={link.url}
               onChange={(e) => updateLink(linkIndex, "url", e.target.value)}
-              className="flex-grow mr-2"
+              className="flex-grow mr-2 "
             />
             <Button
               type="button"
+              variant={"destructive"}
               onClick={() => removeLink(linkIndex)}
-              className="text-red-500 hover:text-red-700"
             >
               <Trash2 size={18} />
             </Button>
@@ -101,7 +121,7 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
         <Button
           type="button"
           onClick={addLink}
-          className="mt-2 flex items-center"
+          className="mt-2 flex items-center text-white"
         >
           <Camera size={18} className="mr-2" />
           Add Link
@@ -111,7 +131,8 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
       <Button
         type="button"
         onClick={removeItinerary}
-        className="mt-4 text-red-500 hover:text-red-700"
+        variant={"destructive"}
+        className="mt-2"
       >
         <Trash2 size={18} className="mr-2" />
         Remove Itinerary

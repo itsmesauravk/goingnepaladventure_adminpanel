@@ -25,6 +25,10 @@ import { Button } from "../ui/button"
 import HighlightForm from "./addForm/HighlightsForm"
 import ItineraryForm from "./addForm/ItineraryForm"
 import FAQForm from "./addForm/FaqForm"
+import OverviewForm from "./addForm/OverviewForm"
+import InclusiveExclusiveServicesForm from "./addForm/ServicesForm"
+import PackagingForm from "./addForm/PackagingForm"
+import NoteForm from "./addForm/NoteForm"
 
 interface FAQ {
   question: string
@@ -46,6 +50,8 @@ interface Itinerary {
   day: number
   title: string
   details: string
+  accommodations: string
+  meals: string
   links: Link[]
 }
 
@@ -82,8 +88,28 @@ const AddTrekForm: React.FC = () => {
     { content: "", links: [{ text: "", url: "" }] },
   ])
   const [itineraries, setItineraries] = useState<Itinerary[]>([
-    { day: 1, title: "", details: "", links: [{ text: "", url: "" }] },
+    {
+      day: 1,
+      title: "",
+      details: "",
+      accommodations: "",
+      meals: "",
+      links: [{ text: "", url: "" }],
+    },
   ])
+  const [overview, setOverview] = useState("")
+  // services
+  const [inclusives, setInclusives] = useState<string[]>([])
+  const [exclusives, setExclusives] = useState<string[]>([])
+  // packaging
+  const [general, setGeneral] = useState<string[]>([])
+  const [clothes, setClothes] = useState<string[]>([])
+  const [firstAid, setFirstAid] = useState<string[]>([])
+  const [otherEssentials, setOtherEssentials] = useState<string[]>([])
+  //note
+  const [note, setNote] = useState<string>("")
+
+  // Event handlers
 
   // name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,17 +279,17 @@ const AddTrekForm: React.FC = () => {
         day: itineraries.length + 1,
         title: "",
         details: "",
+        accommodations: "",
+        meals: "",
         links: [{ text: "", url: "" }],
       },
     ])
   }
-
   const updateItineraries = (index: number, updatedItinerary: Itinerary) => {
     const newItineraries = [...itineraries]
     newItineraries[index] = updatedItinerary
     setItineraries(newItineraries)
   }
-
   const removeItinerary = (index: number) => {
     const newItineraries = [...itineraries]
     newItineraries.splice(index, 1)
@@ -274,6 +300,11 @@ const AddTrekForm: React.FC = () => {
       day: i + 1,
     }))
     setItineraries(recalculatedItineraries)
+  }
+
+  // overview
+  const handleOverviewChange = (newValue: string) => {
+    setOverview(newValue)
   }
 
   // function
@@ -468,6 +499,10 @@ const AddTrekForm: React.FC = () => {
           handleRemoveAccommodation={handleRemoveAccommodation}
         />
 
+        <OverviewForm value={overview} onChange={handleOverviewChange} />
+
+        <NoteForm value={note} onChange={setNote} />
+
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 2 (highlights, Itenaries & faq)
         </h1>
@@ -492,7 +527,7 @@ const AddTrekForm: React.FC = () => {
           <Button
             type="button"
             onClick={addHighlight}
-            className="flex items-center"
+            className="flex items-center text-white"
           >
             Add Highlight
           </Button>
@@ -518,7 +553,7 @@ const AddTrekForm: React.FC = () => {
           <Button
             type="button"
             onClick={addItinerary}
-            className="flex items-center mt-4"
+            className="flex items-center mt-4 text-white"
           >
             Add New Itinerary
           </Button>
@@ -541,11 +576,30 @@ const AddTrekForm: React.FC = () => {
           <Button
             type="button"
             onClick={addFAQ}
-            className="flex items-center mt-4"
+            className="flex items-center mt-4 text-white"
           >
             Add New Question
           </Button>
         </div>
+
+        {/* Services  */}
+        <InclusiveExclusiveServicesForm
+          inclusives={inclusives}
+          exclusives={exclusives}
+          onUpdateInclusives={setInclusives}
+          onUpdateExclusives={setExclusives}
+        />
+
+        <PackagingForm
+          general={general}
+          clothes={clothes}
+          firstAid={firstAid}
+          otherEssentials={otherEssentials}
+          onUpdateGeneral={setGeneral}
+          onUpdateClothes={setClothes}
+          onUpdateFirstAid={setFirstAid}
+          onUpdateOtherEssentials={setOtherEssentials}
+        />
 
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 3 (images & video)

@@ -26,7 +26,7 @@ const FAQForm: React.FC<FAQChildProps> = ({
   }
 
   return (
-    <div className="mb-4 border-b pb-4">
+    <div className="mb-4  border p-2 rounded-md border-primary pb-4">
       <h2 className="text-lg font-bold mb-2">FAQ {index + 1}</h2>
       <div className="flex flex-col gap-4">
         <Input
@@ -46,7 +46,8 @@ const FAQForm: React.FC<FAQChildProps> = ({
       <Button
         type="button"
         onClick={removeFAQ}
-        className="mt-4 text-red-500 hover:text-red-700"
+        variant={"destructive"}
+        className="mt-4"
       >
         <Trash2 size={18} className="mr-2" />
         Remove Question
