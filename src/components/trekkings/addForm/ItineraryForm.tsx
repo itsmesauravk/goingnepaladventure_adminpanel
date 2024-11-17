@@ -75,64 +75,70 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
           value={itinerary.details}
           onChange={(e) => updateField("details", e.target.value)}
         />
-        <Input
-          type="text"
-          placeholder="Accommodation"
-          value={itinerary.accommodations}
-          onChange={(e) => updateField("accommodations", e.target.value)}
-        />
-        <Input
-          type="text"
-          placeholder="Meals"
-          value={itinerary.meals}
-          onChange={(e) => updateField("meals", e.target.value)}
-        />
+
+        <h1 className="text-lg font-bold mt-4">Links</h1>
+
+        <div className="mt-4">
+          {itinerary.links.map((link, linkIndex) => (
+            <div key={linkIndex} className="mt-2 flex items-center">
+              <Input
+                type="text"
+                placeholder="Key (text)"
+                value={link.text}
+                onChange={(e) => updateLink(linkIndex, "text", e.target.value)}
+                className="flex-grow mr-2"
+              />
+              <Input
+                type="text"
+                placeholder="Value (url)"
+                value={link.url}
+                onChange={(e) => updateLink(linkIndex, "url", e.target.value)}
+                className="flex-grow mr-2 "
+              />
+              <Button
+                type="button"
+                variant={"destructive"}
+                onClick={() => removeLink(linkIndex)}
+              >
+                <Trash2 size={18} />
+              </Button>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            onClick={addLink}
+            className="mt-2 flex items-center text-white"
+          >
+            <Camera size={18} className="mr-2" />
+            Add Link
+          </Button>
+        </div>
       </div>
 
-      <h1 className="text-lg font-bold mt-4">Links</h1>
+      <h1 className="text-lg font-bold mt-4">Accommodations</h1>
 
-      <div className="mt-4">
-        {itinerary.links.map((link, linkIndex) => (
-          <div key={linkIndex} className="mt-2 flex items-center">
-            <Input
-              type="text"
-              placeholder="Key (text)"
-              value={link.text}
-              onChange={(e) => updateLink(linkIndex, "text", e.target.value)}
-              className="flex-grow mr-2"
-            />
-            <Input
-              type="text"
-              placeholder="Value (url)"
-              value={link.url}
-              onChange={(e) => updateLink(linkIndex, "url", e.target.value)}
-              className="flex-grow mr-2 "
-            />
-            <Button
-              type="button"
-              variant={"destructive"}
-              onClick={() => removeLink(linkIndex)}
-            >
-              <Trash2 size={18} />
-            </Button>
-          </div>
-        ))}
+      <Input
+        type="text"
+        placeholder="Accommodation"
+        value={itinerary.accommodations}
+        onChange={(e) => updateField("accommodations", e.target.value)}
+      />
 
-        <Button
-          type="button"
-          onClick={addLink}
-          className="mt-2 flex items-center text-white"
-        >
-          <Camera size={18} className="mr-2" />
-          Add Link
-        </Button>
-      </div>
+      <h1 className="text-lg font-bold mt-4">Meals</h1>
+
+      <Input
+        type="text"
+        placeholder="Meals"
+        value={itinerary.meals}
+        onChange={(e) => updateField("meals", e.target.value)}
+      />
 
       <Button
         type="button"
         onClick={removeItinerary}
         variant={"destructive"}
-        className="mt-2"
+        className="mt-4"
       >
         <Trash2 size={18} className="mr-2" />
         Remove Itinerary

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
-import Image from "next/image"
 
 interface Trekking {
   _id: string
@@ -61,13 +60,12 @@ const TrekkingHome: React.FC = () => {
       <hr className="border-gray-300 mb-6" />
 
       {/* Title */}
-      <h3 className="text-xl  text-gray-700 mb-4 font-semibold">
+      <h3 className="text-xl text-gray-700 mb-4 font-semibold">
         Our Trekkings
       </h3>
 
       {/* Filter and Search */}
       <div className="flex items-center justify-between mb-6">
-        {/* Dropdown for Filter */}
         <select
           className="p-2 border border-gray-300 text-primary rounded-md w-1/3"
           defaultValue=""
@@ -80,12 +78,11 @@ const TrekkingHome: React.FC = () => {
           <option value="forest">Forest</option>
         </select>
 
-        {/* Search Input and Button */}
         <div className="flex items-center space-x-2">
           <input
             type="text"
             placeholder="Search Trekkings"
-            className="p-2 border text-primary  border-gray-300 rounded-md w-full"
+            className="p-2 border text-primary border-gray-300 rounded-md w-full"
           />
           <button className="bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded-md">
             Search
@@ -93,51 +90,53 @@ const TrekkingHome: React.FC = () => {
         </div>
       </div>
 
-      {/* Trekking Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trekking.map((trek) => (
-          <div
-            key={trek._id}
-            className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300"
-          >
-            {/* Thumbnail */}
-            <img
-              src={trek.thumbnail}
-              alt={trek.name}
-              className="w-full h-40 object-cover rounded-md mb-4"
-            />
-
-            {/* Trek Name */}
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">
-              {trek.name}
-            </h4>
-            {/* Location and Difficulty */}
-            <p className="text-gray-600 text-sm mb-1">
-              <strong>Location:</strong> {trek.location}
-            </p>
-            <p className="text-gray-600 text-sm mb-1">
-              <strong>Difficulty:</strong> {trek.difficulty}
-            </p>
-            {/* Price, Days, and Group Size */}
-            <p className="text-gray-600 text-sm mb-1">
-              <strong>Price:</strong> ${trek.price}
-            </p>
-            <p className="text-gray-600 text-sm mb-1">
-              <strong>Days:</strong> {trek.days.min} - {trek.days.max}
-            </p>
-            <p className="text-gray-600 text-sm mb-1">
-              <strong>Group Size:</strong> {trek.groupSize.min} -{" "}
-              {trek.groupSize.max}
-            </p>
-            {/* View Details Button */}
-            <button
-              className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md mt-4 w-full"
-              onClick={() => router.push(`/trekking/${trek.slug}`)}
-            >
-              View Details
-            </button>
-          </div>
-        ))}
+      {/* Trekking Table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <table className="min-w-full bg-white">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                Image
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+                Trek Name
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {trekking.map((trek) => (
+              <tr key={trek._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                  <img
+                    src={trek.thumbnail}
+                    alt={trek.name}
+                    className="h-24 w-32 object-cover rounded-md"
+                  />
+                </td>
+                <td className="px-6 py-4 border-r border-gray-200">
+                  <div className="text-lg">
+                    <p className="font-semibold text-gray-900 mb-1">
+                      {trek.name}
+                    </p>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <button
+                    className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md"
+                    onClick={() =>
+                      router.push(`/trekking/edit-trek/${trek.slug}`)
+                    }
+                  >
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

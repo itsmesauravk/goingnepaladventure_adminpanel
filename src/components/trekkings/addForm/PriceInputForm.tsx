@@ -12,7 +12,7 @@ const PriceInput: React.FC<PriceInputProps> = ({ value, onChange }) => (
 
     <div className="relative rounded-md shadow-sm">
       <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-        Rs
+        $
       </span>
       <input
         type="number"
@@ -25,7 +25,7 @@ const PriceInput: React.FC<PriceInputProps> = ({ value, onChange }) => (
         min={0}
       />
     </div>
-    <p className="text-sm text-gray-500 mt-1">Enter the price in Rupees.</p>
+    <p className="text-sm text-gray-500 mt-1">Enter the price in Dollor(US).</p>
   </div>
 )
 

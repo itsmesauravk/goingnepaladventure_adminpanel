@@ -29,17 +29,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     />
     <div className="flex flex-wrap gap-4 mt-4">
       {previews.map((preview, index) => (
-        <div
-          key={preview}
-          className="relative w-24 h-24 rounded-md overflow-hidden"
-        >
+        <div key={preview} className="relative w-44 h-44 rounded-md ">
           <Image
             src={preview}
             alt={`Preview ${index + 1}`}
-            width={96}
-            height={96}
+            width={1000}
+            height={1000}
             style={{ objectFit: "cover" }}
-            className="rounded-md"
+            className="rounded-md h-full w-full"
           />
           <button
             type="button"

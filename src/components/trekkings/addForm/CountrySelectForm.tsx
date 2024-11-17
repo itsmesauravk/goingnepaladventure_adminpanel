@@ -20,7 +20,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
     >
       <option value="">Select Country</option>
       <option value="Nepal">Nepal</option>
-      <option value="India">India</option>
+      <option value="Tibet">Tibet</option>
       <option value="Bhutan">Bhutan</option>
     </select>
   </div>
