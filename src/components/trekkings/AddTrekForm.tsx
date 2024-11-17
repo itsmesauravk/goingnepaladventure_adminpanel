@@ -30,6 +30,7 @@ import InclusiveExclusiveServicesForm from "./addForm/ServicesForm"
 import PackagingForm from "./addForm/PackagingForm"
 import NoteForm from "./addForm/NoteForm"
 import axios from "axios"
+import { FaArrowLeft } from "react-icons/fa6"
 
 interface FAQ {
   question: string
@@ -471,139 +472,8 @@ const AddTrekForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // const formData1 = {
-    //   name,
-    //   price,
-    //   thumbnail: thumbnailPreview,
-    //   country,
-    //   location,
-    //   difficulty,
-    //   trekkingDays: {
-    //     min: minDays,
-    //     max: maxDays,
-    //   },
-    //   groupSize: {
-    //     min: minGroupSize,
-    //     max: maxGroupSize,
-    //   },
-    //   startingPoint,
-    //   endingPoint,
-    //   accommodations: accommodations.filter((acc) => acc.trim() !== ""),
-    //   meal,
-    //   bestSeasons: selectedSeasons,
-    //   overview,
-    //   note,
-    //   highlights: highlights.map((highlight) => ({
-    //     content: highlight.content,
-    //     links: highlight.links.filter((link) => link.text && link.url),
-    //   })),
-    //   itineraries: itineraries.map((itinerary) => ({
-    //     day: itinerary.day,
-    //     title: itinerary.title,
-    //     details: itinerary.details,
-    //     accommodations: itinerary.accommodations,
-    //     meals: itinerary.meals,
-    //     links: itinerary.links.filter((link) => link.text && link.url),
-    //   })),
-    //   faqs: faqs.filter((faq) => faq.question && faq.answer),
-    //   services: {
-    //     inclusive: inclusives,
-    //     exclusive: exclusives,
-    //   },
-    //   packaging: {
-    //     general,
-    //     clothes,
-    //     firstAid,
-    //     otherEssentials,
-    //   },
-    //   images: previews.forEach((_, index) =>
-    //     formData.append("images", images[index])
-    //   ),
-    //   video,
-    // }
-
     const formData = new FormData()
 
-    // // Append fields
-    // formData.append("name", name)
-    // formData.append("price", price.toString())
-    // formData.append("country", country)
-    // formData.append("minDays", minDays.toString())
-    // formData.append("maxDays", maxDays.toString())
-    // formData.append("location", location)
-    // formData.append("difficulty", difficulty)
-    // formData.append("groupSizeMin", minGroupSize.toString())
-    // formData.append("groupSizeMax", maxGroupSize.toString())
-    // formData.append("startingPoint", startingPoint)
-    // formData.append("endingPoint", endingPoint)
-    // formData.append("meal", meal)
-    // formData.append("thumbnail", thumbnail)
-    // formData.append("overview", overview)
-    // formData.append("note", note)
-    // formData.append("itineries", JSON.stringify(itineraries))
-    // formData.append("highlights", JSON.stringify(highlights))
-    // formData.append("faqs", JSON.stringify(faqs))
-    // formData.append("servicesCostIncludes", JSON.stringify(inclusives))
-    // formData.append("servicesCostExcludes", JSON.stringify(exclusives))
-
-    // // Append arrays
-    // accommodations
-    //   .filter((acc) => acc.trim() !== "")
-    //   .forEach((acc, index) => formData.append(`accommodation[${index}]`, acc))
-
-    // selectedSeasons.forEach((season, index) =>
-    //   formData.append(`bestSeason[${index}]`, season)
-    // )
-
-    // formData.append(
-    //   JSON.stringify({
-    //     name,
-    //     price,
-    //     thumbnail: thumbnailPreview,
-    //     country,
-    //     location,
-    //     difficulty,
-    //     trekkingDays: {
-    //       min: minDays,
-    //       max: maxDays,
-    //     },
-    //     groupSize: {
-    //       min: minGroupSize,
-    //       max: maxGroupSize,
-    //     },
-    //     startingPoint,
-    //     endingPoint,
-    //     accommodations: accommodations.filter((acc) => acc.trim() !== ""),
-    //     meal,
-    //     bestSeasons: selectedSeasons,
-    //     overview,
-    //     note,
-    //     highlights: highlights.map((highlight) => ({
-    //       content: highlight.content,
-    //       links: highlight.links.filter((link) => link.text && link.url),
-    //     })),
-    //     itineraries: itineraries.map((itinerary) => ({
-    //       day: itinerary.day,
-    //       title: itinerary.title,
-    //       details: itinerary.details,
-    //       accommodations: itinerary.accommodations,
-    //       meals: itinerary.meals,
-    //       links: itinerary.links.filter((link) => link.text && link.url),
-    //     })),
-    //     faqs: faqs.filter((faq) => faq.question && faq.answer),
-    //     services: {
-    //       inclusive: inclusives,
-    //       exclusive: exclusives,
-    //     },
-    //     packaging: {
-    //       general,
-    //       clothes,
-    //       firstAid,
-    //       otherEssentials,
-    //     },
-    //     video,
-    //   })
-    // );
     formData.append("name", name)
     formData.append("price", price.toString())
     formData.append("thumbnail", thumbnail as File)
@@ -668,18 +538,18 @@ const AddTrekForm: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center   gap-4 mb-4 pb-4 pt-4 ">
         {/* Back Button */}
         <div
           onClick={() => route.back()}
-          className="bg-secondary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+          className=" font-bold py-2 px-4 rounded cursor-pointer"
         >
-          Back
+          <FaArrowLeft size={24} />
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-primary text-center flex-1">
-          Add New Trek
+        <h1 className="text-2xl font-semibold bg-secondary text-white text-center flex-1  px-12 py-2 ">
+          Add Trek
         </h1>
       </div>
       {/* Separator */}

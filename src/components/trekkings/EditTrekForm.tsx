@@ -30,6 +30,7 @@ import InclusiveExclusiveServicesForm from "./addForm/ServicesForm"
 import PackagingForm from "./addForm/PackagingForm"
 import NoteForm from "./addForm/NoteForm"
 import axios from "axios"
+import { FaArrowLeft } from "react-icons/fa6"
 
 interface FAQ {
   question: string
@@ -432,18 +433,18 @@ const EditTrekForm: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto p-6 ">
+      <div className="flex items-center   gap-4 mb-4 pb-4 pt-4 ">
         {/* Back Button */}
         <div
           onClick={() => route.back()}
-          className="bg-secondary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+          className=" font-bold py-2 px-4 rounded cursor-pointer"
         >
-          Back
+          <FaArrowLeft size={24} />
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-primary text-center flex-1">
+        <h1 className="text-2xl font-semibold bg-secondary text-white text-center flex-1  px-12 py-2 ">
           Edit Trek
         </h1>
       </div>
