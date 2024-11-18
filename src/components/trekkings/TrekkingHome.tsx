@@ -8,6 +8,17 @@ import { Button } from "../ui/button"
 import { Trash2 } from "lucide-react"
 import { DeleteTrek } from "./DeleteTrek"
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import { CustomPagination } from "../utils/Pagination"
+
 interface Trekking {
   _id: string
   name: string
@@ -30,6 +41,9 @@ const TrekkingHome: React.FC = () => {
   const router = useRouter()
   const [trekking, setTrekking] = useState<Trekking[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(10)
+  const [totalPages, setTotalPages] = useState<number>(1)
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTrekToDelete, setSelectedTrekToDelete] = useState<
@@ -41,10 +55,17 @@ const TrekkingHome: React.FC = () => {
     try {
       setLoading(true)
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/treks`
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/treks`,
+        {
+          params: {
+            page,
+            limit,
+          },
+        }
       )
       if (response.data.success) {
         setTrekking(response.data.data)
+        setTotalPages(response.data.totalPages)
         setLoading(false)
       }
     } catch (error) {
@@ -69,9 +90,18 @@ const TrekkingHome: React.FC = () => {
     }
   }
 
+  const handleNextPage = (page: number) => {
+    page = page + 1
+    setPage(page)
+  }
+  const handlePrevPage = (page: number) => {
+    page = page - 1
+    setPage(page)
+  }
+
   useEffect(() => {
     getTrekking()
-  }, [])
+  }, [page, limit])
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -184,6 +214,14 @@ const TrekkingHome: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div>
+        <CustomPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
       </div>
 
       {/* LOADER */}

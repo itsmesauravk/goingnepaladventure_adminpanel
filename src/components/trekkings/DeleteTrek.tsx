@@ -35,8 +35,11 @@ export const DeleteTrek: React.FC<DeleteConfirmationModalProps> = ({
         </h2>
 
         <p className="mb-4 text-gray-600">
-          You are about to delete <strong>{itemName}</strong>.<br /> This action
+          You are about to delete <strong>{itemName}</strong>. This action{" "}
+          <br />
           cannot be undone.
+          <br />
+          Type <strong>CONFIRM</strong> to proceed.
         </p>
 
         <input
