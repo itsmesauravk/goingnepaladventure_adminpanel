@@ -44,6 +44,7 @@ const TrekkingHome: React.FC = () => {
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
   const [totalPages, setTotalPages] = useState<number>(1)
+  const [search, setSearch] = useState<string>("")
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTrekToDelete, setSelectedTrekToDelete] = useState<
@@ -60,6 +61,7 @@ const TrekkingHome: React.FC = () => {
           params: {
             page,
             limit,
+            search,
           },
         }
       )
@@ -74,6 +76,9 @@ const TrekkingHome: React.FC = () => {
     }
   }
 
+  console.log("test", totalPages)
+  console.log("I am searching : ", search)
+
   const handleDeleteClick = (trekId: string) => {
     setSelectedTrekToDelete(trekId)
     setDeleteModalOpen(true)
@@ -81,27 +86,16 @@ const TrekkingHome: React.FC = () => {
 
   const confirmDelete = async () => {
     try {
-      // Implement delete logic here
-      await axios.delete(`/your-delete-endpoint/${selectedTrekToDelete}`)
-      // Refresh trekking list or remove item from state
+      alert("Service Currently Unavailable")
       setDeleteModalOpen(false)
     } catch (error) {
       console.error("Delete failed", error)
     }
   }
 
-  const handleNextPage = (page: number) => {
-    page = page + 1
-    setPage(page)
-  }
-  const handlePrevPage = (page: number) => {
-    page = page - 1
-    setPage(page)
-  }
-
   useEffect(() => {
     getTrekking()
-  }, [page, limit])
+  }, [page, limit, search])
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -141,12 +135,11 @@ const TrekkingHome: React.FC = () => {
         <div className="flex items-center space-x-2">
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch((e.target as HTMLInputElement).value)}
             placeholder="Search Trekkings"
             className="p-2 border text-primary border-gray-300 rounded-md w-full"
           />
-          <button className="bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded-md">
-            Search
-          </button>
         </div>
       </div>
 
