@@ -31,6 +31,7 @@ import PackagingForm from "./addForm/PackagingForm"
 import NoteForm from "./addForm/NoteForm"
 import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
+import { Loader } from "../loading/Loader"
 
 interface FAQ {
   question: string
@@ -779,7 +780,14 @@ const AddTrekForm: React.FC = () => {
                      hover:bg-primary transition-colors duration-200
                      focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
-            {loading ? "Uploading Your Trek, Please Wait..." : "Submit Details"}
+            {loading ? (
+              <div className="flex gap-2">
+                <p>Uploading Your Trek, Please Wait...</p>
+                <Loader height="20px" width="20px" />
+              </div>
+            ) : (
+              "Submit Details"
+            )}
           </button>
         </div>
       </form>
