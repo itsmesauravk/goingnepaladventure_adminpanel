@@ -190,12 +190,21 @@ const AddTrekForm: React.FC = () => {
     setEndingPoint(event.target.value)
   }
   // best seasons
-  const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const options = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value
+  // const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const options = Array.from(
+  //     event.target.selectedOptions,
+  //     (option) => option.value
+  //   )
+  //   setSelectedSeasons(options)
+  // }
+  // Handler function for season changes
+  const handleSeasonChange = (season: string) => {
+    setSelectedSeasons(
+      (prev) =>
+        prev.includes(season)
+          ? prev.filter((s) => s !== season) // Remove if already selected
+          : [...prev, season] // Add if not selected
     )
-    setSelectedSeasons(options)
   }
   // images
   const handleImageChange = useCallback(
