@@ -8,15 +8,6 @@ import { Button } from "../ui/button"
 import { Trash2 } from "lucide-react"
 import { DeleteTrek } from "./DeleteTrek"
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import { CustomPagination } from "../utils/Pagination"
 
 interface Trekking {
@@ -45,6 +36,8 @@ const TrekkingHome: React.FC = () => {
   const [limit, setLimit] = useState<number>(10)
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
+  const [difficulty, setDifficulty] = useState<string>("")
+  const [sort, setSort] = useState<string>("")
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTrekToDelete, setSelectedTrekToDelete] = useState<
@@ -62,6 +55,8 @@ const TrekkingHome: React.FC = () => {
             page,
             limit,
             search,
+            difficulty,
+            sort,
           },
         }
       )
@@ -75,9 +70,6 @@ const TrekkingHome: React.FC = () => {
       setLoading(false)
     }
   }
-
-  console.log("test", totalPages)
-  console.log("I am searching : ", search)
 
   const handleDeleteClick = (trekId: string) => {
     setSelectedTrekToDelete(trekId)
@@ -93,9 +85,18 @@ const TrekkingHome: React.FC = () => {
     }
   }
 
+  const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDifficulty(e.target.value)
+    setPage(1) // Reset to page 1 when filtering
+  }
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSort(e.target.value)
+    setPage(1) // Reset to page 1 when filtering
+  }
+
   useEffect(() => {
     getTrekking()
-  }, [page, limit, search])
+  }, [page, limit, search, difficulty, sort])
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -122,14 +123,33 @@ const TrekkingHome: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <select
           className="p-2 border border-gray-300 text-primary rounded-md w-1/3"
-          defaultValue=""
+          value={difficulty}
+          onChange={handleDifficultyChange}
         >
           <option value="" disabled>
-            Filter by Category
+            Filter by Difficulty
           </option>
-          <option value="mountain">Mountain</option>
-          <option value="desert">Desert</option>
-          <option value="forest">Forest</option>
+          <option value="all">All</option>
+          <option value="Easy">Easy</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Difficult">Difficult</option>
+        </select>
+
+        <select
+          className="p-2 border border-gray-300 text-primary rounded-md w-1/3"
+          value={sort}
+          onChange={handleSortChange}
+        >
+          <option value="" disabled>
+            Sort by
+          </option>
+          <option value="none">None</option>
+          <option value="createdAt">New to Older</option>
+          <option value="-createdAt">Older to New</option>
+          <option value="price">Price Low to High</option>
+          <option value="-price">Price High to Low</option>
+          <option value="name">Name A-Z</option>
+          <option value="-name">Name Z-A</option>
         </select>
 
         <div className="flex items-center space-x-2">
@@ -143,7 +163,7 @@ const TrekkingHome: React.FC = () => {
         </div>
       </div>
 
-      {/* TREKKING S */}
+      {/* Trekking List */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 mb-5">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-50 border-b border-gray-200">
@@ -217,8 +237,7 @@ const TrekkingHome: React.FC = () => {
         />
       </div>
 
-      {/* LOADER */}
-      {/* LOADER */}
+      {/* Loader */}
       {loading && <Loader />}
 
       {!loading && trekking.length === 0 && (
