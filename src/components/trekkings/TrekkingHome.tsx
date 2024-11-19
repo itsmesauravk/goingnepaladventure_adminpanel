@@ -104,10 +104,10 @@ const TrekkingHome: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-gray-800">Trekkings</h2>
         <button
-          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-md"
-          onClick={() => router.push("/trekking/add-trek")}
+          className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md"
+          onClick={() => router.push("/trekkings/add-trek")}
         >
-          Add New
+          Add New Trek
         </button>
       </div>
 
@@ -201,7 +201,7 @@ const TrekkingHome: React.FC = () => {
                   <button
                     className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md"
                     onClick={() =>
-                      router.push(`/trekking/edit-trek/${trek.slug}`)
+                      router.push(`/trekkings/edit-trek/${trek.slug}`)
                     }
                   >
                     View Details

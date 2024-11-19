@@ -1,23 +1,24 @@
 import React, { FC } from "react"
 
-interface NameInputProps {
+interface SuitableAgeProps {
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const NameInput: FC<NameInputProps> = ({ value, onChange }) => (
+const SuitableAge: FC<SuitableAgeProps> = ({ value, onChange }) => (
   <div className="mb-4">
-    <h2 className="text-lg text-primary font-semibold ">Name</h2>
+    <h2 className="text-lg text-primary font-semibold ">Suitable Age</h2>
     <input
       type="text"
       id="name"
-      name="name"
+      name="suitableAge"
       value={value}
       onChange={onChange}
       className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      placeholder="Enter name"
+      placeholder="eg. +16 (for 16 years and above)"
+      required
     />
   </div>
 )
 
-export default NameInput
+export default SuitableAge

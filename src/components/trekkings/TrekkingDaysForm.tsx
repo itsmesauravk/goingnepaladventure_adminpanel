@@ -13,8 +13,8 @@ const TrekkingDaysInput: React.FC<TrekkingDaysInputProps> = ({
   handleMinDaysChange,
   handleMaxDaysChange,
 }) => (
-  <div className="mb-4">
-    <h2 className="text-lg font-semibold mb-2 text-primary">Trekking Days</h2>
+  <div className="mb-4 mt-5">
+    <h2 className="text-lg font-semibold mb-2  text-primary">Total Days</h2>
 
     <div className="flex gap-4">
       <div className="flex-1">

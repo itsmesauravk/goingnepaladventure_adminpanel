@@ -17,7 +17,9 @@ const DifficultySelect: React.FC<DifficultySelectProps> = ({
       onChange={handleDifficultyChange}
       className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
-      <option value="">Select Difficulty</option>
+      <option value="" disabled>
+        Select Difficulty
+      </option>
       <option value="Easy">Easy</option>
       <option value="Moderate">Moderate</option>
       <option value="Difficult">Difficult</option>

@@ -18,7 +18,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
       value={location}
       onChange={handleLocationChange}
       className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      placeholder="Enter the trekking location"
+      placeholder="Enter the location"
     />
   </div>
 )

@@ -18,7 +18,9 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
       onChange={handleCountryChange}
       className="w-full p-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
-      <option value="">Select Country</option>
+      <option value="" disabled>
+        Select Country
+      </option>
       <option value="Nepal">Nepal</option>
       <option value="Tibet">Tibet</option>
       <option value="Bhutan">Bhutan</option>
