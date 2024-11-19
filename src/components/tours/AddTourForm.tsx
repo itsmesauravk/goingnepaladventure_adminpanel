@@ -27,7 +27,7 @@ import HighlightForm from "../trekkings/addForm/HighlightsForm"
 import ItineraryForm from "../trekkings/addForm/ItineraryForm"
 import FAQForm from "../trekkings/addForm/FaqForm"
 import InclusiveExclusiveServicesForm from "../trekkings/addForm/ServicesForm"
-import PackagingForm from "../trekkings/addForm/PackagingForm"
+
 import ImageUpload from "../trekkings/addForm/ImagesForm"
 import VideoUpload from "../trekkings/addForm/VideoForm"
 import TripTypeForm from "./form/TripTypesFrom"
@@ -35,6 +35,7 @@ import MaxAltitude from "./form/MaxAltitude"
 import TourLanguage from "./form/TourLanguage"
 import SuitableAge from "./form/SuitableAge"
 import ThingsToKnow from "./form/ThingsToKnow"
+import ArrivalLocation from "./form/ArrivalLocation"
 
 interface FAQ {
   question: string
@@ -84,6 +85,7 @@ const AddTourForm: React.FC = () => {
   const [minDays, setMinDays] = useState<number>(1)
   const [maxDays, setMaxDays] = useState<number>(1)
   const [location, setLocation] = useState<string>("")
+  const [arrivalLocation, setArrivalLocation] = useState<string>("")
   const [tripType, setTripType] = useState<string>("")
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
@@ -112,11 +114,7 @@ const AddTourForm: React.FC = () => {
   // services
   const [inclusives, setInclusives] = useState<string[]>([])
   const [exclusives, setExclusives] = useState<string[]>([])
-  // packaging
-  const [general, setGeneral] = useState<string[]>([])
-  const [clothes, setClothes] = useState<string[]>([])
-  const [firstAid, setFirstAid] = useState<string[]>([])
-  const [otherEssentials, setOtherEssentials] = useState<string[]>([])
+
   //note
   const [note, setNote] = useState<string>("")
 
@@ -193,6 +191,12 @@ const AddTourForm: React.FC = () => {
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
   }
+  // arrival location
+  const handleArrivalLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setArrivalLocation(event.target.value)
+  }
   // trip type
   const handleTripTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -222,14 +226,7 @@ const AddTourForm: React.FC = () => {
     setEndingPoint(event.target.value)
   }
   // best seasons
-  // const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const options = Array.from(
-  //     event.target.selectedOptions,
-  //     (option) => option.value
-  //   )
-  //   setSelectedSeasons(options)
-  // }
-  // Handler function for season changes
+
   const handleSeasonChange = (season: string) => {
     setSelectedSeasons(
       (prev) =>
@@ -361,6 +358,7 @@ const AddTourForm: React.FC = () => {
     setPrice(1499)
     setCountry("Nepal")
     setLocation("Khumbu Region")
+    setArrivalLocation("Kathmandu")
     setTripType("Wildelife and Safari")
     setMinDays(12)
     setMaxDays(14)
@@ -487,36 +485,6 @@ const AddTourForm: React.FC = () => {
       "Personal expenses",
       "Alcoholic beverages",
     ])
-
-    // Packaging Lists
-    setGeneral([
-      "Backpack (40-60L)",
-      "Daypack (20-30L)",
-      "Sleeping bag (-20°C rated)",
-      "Trekking poles",
-    ])
-
-    setClothes([
-      "Down jacket",
-      "Waterproof jacket and pants",
-      "Thermal base layers",
-      "Trekking pants",
-      "Hiking boots",
-    ])
-
-    setFirstAid([
-      "Altitude sickness medication",
-      "Basic first aid kit",
-      "Personal medications",
-      "Bandages and antiseptic wipes",
-    ])
-
-    setOtherEssentials([
-      "Headlamp with spare batteries",
-      "Water purification tablets",
-      "Sun protection (hat, sunscreen, sunglasses)",
-      "Camera with extra batteries",
-    ])
   }
 
   // function
@@ -533,6 +501,7 @@ const AddTourForm: React.FC = () => {
     formData.append("thumbnail", thumbnail as File)
     formData.append("country", country)
     formData.append("location", location)
+    formData.append("arrivalLocation", arrivalLocation)
     formData.append("tripType", tripType)
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
@@ -549,10 +518,7 @@ const AddTourForm: React.FC = () => {
     formData.append("itinerary", JSON.stringify(itineraries))
     formData.append("servicesCostIncludes", JSON.stringify(inclusives))
     formData.append("servicesCostExcludes", JSON.stringify(exclusives))
-    formData.append(
-      "packingList",
-      JSON.stringify({ general, clothes, firstAid, otherEssentials })
-    )
+
     formData.append("faq", JSON.stringify(faqs))
     formData.append("note", note)
 
@@ -696,6 +662,11 @@ const AddTourForm: React.FC = () => {
           handleMinChange={handleMinChange}
           handleMaxChange={handleMaxChange}
         />
+        {/* Arrival Location */}
+        <ArrivalLocation
+          arrivalLocation={arrivalLocation}
+          handleArrivalLocationChange={handleArrivalLocationChange}
+        />
         {/* Starting & Ending Points */}
         <StartingEndingPointInput
           startingPoint={startingPoint}
@@ -810,17 +781,6 @@ const AddTourForm: React.FC = () => {
           exclusives={exclusives}
           onUpdateInclusives={setInclusives}
           onUpdateExclusives={setExclusives}
-        />
-
-        <PackagingForm
-          general={general}
-          clothes={clothes}
-          firstAid={firstAid}
-          otherEssentials={otherEssentials}
-          onUpdateGeneral={setGeneral}
-          onUpdateClothes={setClothes}
-          onUpdateFirstAid={setFirstAid}
-          onUpdateOtherEssentials={setOtherEssentials}
         />
 
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
