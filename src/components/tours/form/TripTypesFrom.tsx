@@ -22,9 +22,10 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
       </option>
 
       <option value="Family Tour">Family Tour</option>
-      <option value="Cultural Tour and Sightseeing">
-        Cultural Tour and Sightseeing
+      <option value="Cultural and Religious">
+        Cultural and Religious Tour
       </option>
+      <option value="Sightseeing">Sightseeing</option>
       <option value="Wildelife and Safari">Wildelife and Safari</option>
       <option value="Heli Tour Expeditions">Heli Tour Expeditions</option>
       <option value="Festival Celebrations Tour">
