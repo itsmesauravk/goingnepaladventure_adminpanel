@@ -109,15 +109,15 @@ const WellnessHome: React.FC = () => {
       {/* Wellness Table */}
       <div className="overflow-x-auto rounded-lg border border-blue-200 mb-5">
         <table className="min-w-full bg-white">
-          <thead className="bg-blue-100 border-b border-blue-200">
+          <thead className="bg-wellnessPrimary text-white border-b border-blue-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider border-r border-blue-200">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
                 Image
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-primary uppercase tracking-wider border-r border-blue-200">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
                 Wellness Name
               </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-primary uppercase tracking-wider">
+              <th className="px-6 py-3 text-center text-xs font-medium  uppercase tracking-wider">
                 Actions
               </th>
             </tr>

@@ -166,15 +166,15 @@ const TrekkingHome: React.FC = () => {
       {/* Trekking List */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 mb-5">
         <table className="min-w-full bg-white">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-trekPrimary text-white border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-gray-200">
                 Image
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-gray-200">
                 Trek Name
               </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-center text-xs font-medium  uppercase tracking-wider">
                 Action
               </th>
             </tr>

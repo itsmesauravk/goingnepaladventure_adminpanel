@@ -569,7 +569,7 @@ const AddTourForm: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold bg-secondary text-white text-center flex-1  px-12 py-2 ">
+        <h1 className="text-2xl font-semibold bg-tourPrimary text-white text-center flex-1  px-12 py-2 ">
           Add New Tour
         </h1>
       </div>

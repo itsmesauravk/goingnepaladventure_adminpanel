@@ -558,7 +558,7 @@ const AddTrekForm: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold bg-secondary text-white text-center flex-1  px-12 py-2 ">
+        <h1 className="text-2xl font-semibold bg-trekPrimary text-white text-center flex-1  px-12 py-2 ">
           Add Trek
         </h1>
       </div>
