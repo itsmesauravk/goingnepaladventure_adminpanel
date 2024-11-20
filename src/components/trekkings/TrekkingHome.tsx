@@ -229,14 +229,6 @@ const TrekkingHome: React.FC = () => {
         </table>
       </div>
 
-      <div>
-        <CustomPagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
-      </div>
-
       {/* Loader */}
       {loading && <Loader />}
 
@@ -245,6 +237,14 @@ const TrekkingHome: React.FC = () => {
           No trekkings found.
         </p>
       )}
+
+      <div className="mt-5 mb-5">
+        <CustomPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      </div>
     </div>
   )
 }

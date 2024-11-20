@@ -86,6 +86,7 @@ const AddTourForm: React.FC = () => {
   const [maxDays, setMaxDays] = useState<number>(1)
   const [location, setLocation] = useState<string>("")
   const [arrivalLocation, setArrivalLocation] = useState<string>("")
+  const [departureLocation, setDepartureLocation] = useState<string>("")
   const [tripType, setTripType] = useState<string>("")
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
@@ -196,6 +197,11 @@ const AddTourForm: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setArrivalLocation(event.target.value)
+  }
+  const handleDepartureLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setDepartureLocation(event.target.value)
   }
   // trip type
   const handleTripTypeChange = (
@@ -359,6 +365,7 @@ const AddTourForm: React.FC = () => {
     setCountry("Nepal")
     setLocation("Khumbu Region")
     setArrivalLocation("Kathmandu")
+    setDepartureLocation("Pokhara")
     setTripType("Wildelife and Safari")
     setMinDays(12)
     setMaxDays(14)
@@ -502,6 +509,7 @@ const AddTourForm: React.FC = () => {
     formData.append("country", country)
     formData.append("location", location)
     formData.append("arrivalLocation", arrivalLocation)
+    formData.append("departureLocation", departureLocation)
     formData.append("tripType", tripType)
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
@@ -514,7 +522,7 @@ const AddTourForm: React.FC = () => {
     formData.append("meal", meal)
     formData.append("bestSeason", JSON.stringify(selectedSeasons))
     formData.append("overview", overview)
-    formData.append("trekHighlights", JSON.stringify(highlights))
+    formData.append("highlights", JSON.stringify(highlights))
     formData.append("itinerary", JSON.stringify(itineraries))
     formData.append("servicesCostIncludes", JSON.stringify(inclusives))
     formData.append("servicesCostExcludes", JSON.stringify(exclusives))
@@ -533,7 +541,7 @@ const AddTourForm: React.FC = () => {
     try {
       setLoading(true)
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/add-tour`,
         formData,
         {
           headers: {
@@ -541,17 +549,16 @@ const AddTourForm: React.FC = () => {
           },
         }
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
         alert(response.data.message)
         setLoading(false)
-        route.push("/trekking")
+        route.push("/tours")
       } else {
         alert(response.data.message)
         setLoading(false)
       }
     } catch (error) {
-      console.error("Error:", error)
       alert("Error occurred while submitting the form.")
       setLoading(false)
     }
@@ -665,7 +672,9 @@ const AddTourForm: React.FC = () => {
         {/* Arrival Location */}
         <ArrivalLocation
           arrivalLocation={arrivalLocation}
+          departureLocation={departureLocation}
           handleArrivalLocationChange={handleArrivalLocationChange}
+          handleDepartureLocationChange={handleDepartureLocationChange}
         />
         {/* Starting & Ending Points */}
         <StartingEndingPointInput

@@ -530,17 +530,16 @@ const AddTrekForm: React.FC = () => {
           },
         }
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
         alert(response.data.message)
         setLoading(false)
-        route.push("/trekking")
+        route.push("/trekkings")
       } else {
         alert(response.data.message)
         setLoading(false)
       }
     } catch (error) {
-      console.error("Error:", error)
       alert("Error occurred while submitting the form.")
       setLoading(false)
     }

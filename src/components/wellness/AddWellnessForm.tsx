@@ -36,6 +36,7 @@ import SuitableAge from "../tours/form/SuitableAge"
 import ThingsToKnow from "../tours/form/ThingsToKnow"
 import ArrivalLocation from "../tours/form/ArrivalLocation"
 import ClothesType from "./form/ClothesType"
+import MaxAltitude from "../tours/form/MaxAltitude"
 
 interface FAQ {
   question: string
@@ -87,6 +88,7 @@ const AddWellnessForm: React.FC = () => {
   const [maxDays, setMaxDays] = useState<number>(1)
   const [location, setLocation] = useState<string>("")
   const [arrivalLocation, setArrivalLocation] = useState<string>("")
+  const [departureLocation, setDepartureLocation] = useState<string>("")
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
   const [meal, setMeal] = useState<string>("")
@@ -196,6 +198,12 @@ const AddWellnessForm: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setArrivalLocation(event.target.value)
+  }
+  // departure location
+  const handleDepartureLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setDepartureLocation(event.target.value)
   }
   // clothes type
   const handleClothesTypeChange = (
@@ -361,6 +369,7 @@ const AddWellnessForm: React.FC = () => {
     setCountry("Nepal")
     setLocation("Khumbu Region")
     setArrivalLocation("Kathmandu")
+    setDepartureLocation("Kathmandu")
     setMinDays(12)
     setMaxDays(14)
     setMinGroupSize(2)
@@ -504,6 +513,7 @@ const AddWellnessForm: React.FC = () => {
     formData.append("location", location)
     formData.append("clothesType", clothesType)
     formData.append("arrivalLocation", arrivalLocation)
+    formData.append("departureLocation", departureLocation)
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
     formData.append("groupSizeMin", minGroupSize.toString())
@@ -515,7 +525,7 @@ const AddWellnessForm: React.FC = () => {
     formData.append("meal", meal)
     formData.append("bestSeason", JSON.stringify(selectedSeasons))
     formData.append("overview", overview)
-    formData.append("trekHighlights", JSON.stringify(highlights))
+    formData.append("highlights", JSON.stringify(highlights))
     formData.append("itinerary", JSON.stringify(itineraries))
     formData.append("servicesCostIncludes", JSON.stringify(inclusives))
     formData.append("servicesCostExcludes", JSON.stringify(exclusives))
@@ -534,7 +544,7 @@ const AddWellnessForm: React.FC = () => {
     try {
       setLoading(true)
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/add-wellness`,
         formData,
         {
           headers: {
@@ -542,11 +552,11 @@ const AddWellnessForm: React.FC = () => {
           },
         }
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
         alert(response.data.message)
         setLoading(false)
-        route.push("/trekking")
+        route.push("/wellness")
       } else {
         alert(response.data.message)
         setLoading(false)
@@ -600,6 +610,9 @@ const AddWellnessForm: React.FC = () => {
         <div className="flex justify-between">
           {/* Price */}
           <PriceInput value={price} onChange={handlePriceChange} />
+
+          {/* Max Altitude */}
+          <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
 
           {/* Country */}
           <CountrySelect
@@ -660,8 +673,10 @@ const AddWellnessForm: React.FC = () => {
         />
         {/* Arrival Location */}
         <ArrivalLocation
+          departureLocation={departureLocation}
           arrivalLocation={arrivalLocation}
           handleArrivalLocationChange={handleArrivalLocationChange}
+          handleDepartureLocationChange={handleDepartureLocationChange}
         />
         {/* Starting & Ending Points */}
         <StartingEndingPointInput
@@ -807,7 +822,7 @@ const AddWellnessForm: React.FC = () => {
           >
             {loading ? (
               <div className="flex gap-2">
-                <p>Uploading Your Tour, Please Wait...</p>
+                <p>Uploading Your Wellness, Please Wait...</p>
                 <Loader height="20px" width="20px" />
               </div>
             ) : (
