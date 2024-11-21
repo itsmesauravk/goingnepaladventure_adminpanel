@@ -32,6 +32,7 @@ import NoteForm from "./addForm/NoteForm"
 import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
 import { FaEye } from "react-icons/fa6"
+import { Loader } from "../loading/Loader"
 
 interface FAQ {
   question: string
@@ -321,11 +322,13 @@ const EditTrekForm: React.FC = () => {
   //getting the data of trekking
   const handleGetTrekData = async () => {
     try {
+      setLoading(true)
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/get-trek/${slug}`
       )
       console.log("Response:", response.data)
       if (response.data.success) {
+        setLoading(false)
         const trekData = response.data.data
         setName(trekData.name)
         setViews(trekData.viewsCount)
@@ -361,6 +364,7 @@ const EditTrekForm: React.FC = () => {
         // }
       }
     } catch (error) {
+      setLoading(false)
       console.log(error)
     }
   }
@@ -456,6 +460,9 @@ const EditTrekForm: React.FC = () => {
       </div>
       {/* Separator */}
       <hr className="border-gray-300 mb-6" />
+
+      {/* Loading */}
+      {loading && <Loader height="50px" width="50px" />}
 
       <form
         typeof="multipart/form-data"

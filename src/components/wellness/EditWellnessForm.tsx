@@ -372,10 +372,12 @@ const EditWellnessForm: React.FC = () => {
   // get form
   const handleGetTourData = async () => {
     try {
+      setLoading(true)
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/get-wellness/${slug}`
       )
       if (response.data.success) {
+        setLoading(false)
         const trekData = response.data.data
         setTourViews(trekData.viewsCount)
         setName(trekData.name)
@@ -414,6 +416,7 @@ const EditWellnessForm: React.FC = () => {
         // }
       }
     } catch (error) {
+      setLoading(false)
       console.log(error)
     }
   }
@@ -510,6 +513,9 @@ const EditWellnessForm: React.FC = () => {
       </div>
       {/* Separator */}
       <hr className="border-gray-300 mb-6" />
+
+      {/* Loading */}
+      {loading && <Loader height="50px" width="50px" />}
 
       <form
         typeof="multipart/form-data"
