@@ -2,35 +2,41 @@
 
 import React, { useState, useCallback, useEffect } from "react"
 
-import CountrySelect from "./addForm/CountrySelectForm"
-import DifficultySelect from "./addForm/DifficultySelectForm"
-import Accommodation from "./addForm/AccommodationForm"
-import MealSelect from "./addForm/MealsForm"
-import BestSeasonsSelect from "./addForm/SeasonsForm"
-import ImageUpload from "./addForm/ImagesForm"
-import VideoUpload from "./addForm/VideoForm"
-
-import NameInput from "./addForm/NameInputForm"
-import PriceInput from "./addForm/PriceInputForm"
-import ThumbnailInput from "./addForm/ThumbnailForm"
-import TrekkingDaysInput from "./TrekkingDaysForm"
-import LocationInput from "./addForm/LocationForm"
-import GroupSizeInput from "./addForm/GroupSizeForm"
-import StartingEndingPointInput from "./addForm/StartEndPointForm"
-import FAQList from "./addForm/FaqForm"
 import { nanoid } from "nanoid"
 import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "../ui/button"
-import HighlightForm from "./addForm/HighlightsForm"
-import ItineraryForm from "./addForm/ItineraryForm"
-import FAQForm from "./addForm/FaqForm"
-import OverviewForm from "./addForm/OverviewForm"
-import InclusiveExclusiveServicesForm from "./addForm/ServicesForm"
-import PackagingForm from "./addForm/PackagingForm"
-import NoteForm from "./addForm/NoteForm"
+
 import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
+import { Loader } from "../loading/Loader"
+import NameInput from "../trekkings/addForm/NameInputForm"
+import PriceInput from "../trekkings/addForm/PriceInputForm"
+import CountrySelect from "../trekkings/addForm/CountrySelectForm"
+import ThumbnailInput from "../trekkings/addForm/ThumbnailForm"
+import BestSeasonsSelect from "../trekkings/addForm/SeasonsForm"
+import LocationInput from "../trekkings/addForm/LocationForm"
+import MealSelect from "../trekkings/addForm/MealsForm"
+import TrekkingDaysInput from "../trekkings/TrekkingDaysForm"
+import GroupSizeInput from "../trekkings/addForm/GroupSizeForm"
+import StartingEndingPointInput from "../trekkings/addForm/StartEndPointForm"
+import Accommodation from "../trekkings/addForm/AccommodationForm"
+import OverviewForm from "../trekkings/addForm/OverviewForm"
+import NoteForm from "../trekkings/addForm/NoteForm"
+import HighlightForm from "../trekkings/addForm/HighlightsForm"
+import ItineraryForm from "../trekkings/addForm/ItineraryForm"
+import FAQForm from "../trekkings/addForm/FaqForm"
+import InclusiveExclusiveServicesForm from "../trekkings/addForm/ServicesForm"
+
+import ImageUpload from "../trekkings/addForm/ImagesForm"
+import VideoUpload from "../trekkings/addForm/VideoForm"
+import TourLanguage from "../tours/form/TourLanguage"
+import SuitableAge from "../tours/form/SuitableAge"
+import ThingsToKnow from "../tours/form/ThingsToKnow"
+import ArrivalLocation from "../tours/form/ArrivalLocation"
+import ClothesType from "./form/ClothesType"
+import MaxAltitude from "../tours/form/MaxAltitude"
+
 import { FaEye } from "react-icons/fa6"
 
 interface FAQ {
@@ -65,19 +71,26 @@ interface Itinerary {
   links: Link[]
 }
 
-const EditTrekForm: React.FC = () => {
+const EditWellnessForm: React.FC = () => {
   const route = useRouter()
   // State management
   const [accommodations, setAccommodations] = useState<string[]>([""])
+  const [thingsToKnow, setThingsToKnow] = useState<string[]>([""])
   const [name, setName] = useState("")
+  const [maxAltitude, setMaxAltitude] = useState<number>(0)
+  const [tourLanguage, setTourLanguage] = useState<string>("")
+  const [suitableAge, setSuitableAge] = useState<string>("")
   const [price, setPrice] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [country, setCountry] = useState("")
   const [minDays, setMinDays] = useState<number>(1)
   const [maxDays, setMaxDays] = useState<number>(1)
+  const [clothesType, setClothesType] = useState<string>("")
   const [location, setLocation] = useState<string>("")
-  const [difficulty, setDifficulty] = useState<string>("")
+  const [arrivalLocation, setArrivalLocation] = useState<string>("")
+  const [departureLocation, setDepartureLocation] = useState<string>("")
+  const [tripType, setTripType] = useState<string>("")
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
   const [meal, setMeal] = useState<string>("")
@@ -105,17 +118,14 @@ const EditTrekForm: React.FC = () => {
   // services
   const [inclusives, setInclusives] = useState<string[]>([])
   const [exclusives, setExclusives] = useState<string[]>([])
-  // packaging
-  const [general, setGeneral] = useState<string[]>([])
-  const [clothes, setClothes] = useState<string[]>([])
-  const [firstAid, setFirstAid] = useState<string[]>([])
-  const [otherEssentials, setOtherEssentials] = useState<string[]>([])
+
   //note
   const [note, setNote] = useState<string>("")
 
   const [loading, setLoading] = useState(false)
-  const [views, setViews] = useState(0)
+  const [tourViews, setTourViews] = useState<number>(0)
 
+  //slug
   const slugId = useParams()
   const slug = slugId.slug
 
@@ -124,6 +134,18 @@ const EditTrekForm: React.FC = () => {
   // name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value)
+  }
+  // max altitude
+  const handleAltidueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxAltitude(Number(e.target.value))
+  }
+  // tour language
+  const handleTourLanguageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTourLanguage(e.target.value)
+  }
+  // suitable age
+  const suitableAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSuitableAge(e.target.value)
   }
   // accomodation
   const handleAccommodationChange = (index: number, value: string) => {
@@ -136,6 +158,18 @@ const EditTrekForm: React.FC = () => {
   }
   const handleRemoveAccommodation = (index: number) => {
     setAccommodations(accommodations.filter((_, i) => i !== index))
+  }
+  //things to know
+  const handleThingsToKnowChange = (index: number, value: string) => {
+    const updatedThingsToKnow = [...thingsToKnow]
+    updatedThingsToKnow[index] = value
+    setThingsToKnow(updatedThingsToKnow)
+  }
+  const handleAddThingsToKnow = () => {
+    setThingsToKnow([...thingsToKnow, ""])
+  }
+  const handleRemoveThingsToKnow = (index: number) => {
+    setThingsToKnow(thingsToKnow.filter((_, i) => i !== index))
   }
   // price
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,11 +200,22 @@ const EditTrekForm: React.FC = () => {
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
   }
-  // difficulty
-  const handleDifficultyChange = (
+  // arrival location
+  const handleArrivalLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setArrivalLocation(event.target.value)
+  }
+  const handleDepartureLocationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setDepartureLocation(event.target.value)
+  }
+  // trip type
+  const handleTripTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setDifficulty(event.target.value)
+    setTripType(event.target.value)
   }
   // group size
   const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +239,15 @@ const EditTrekForm: React.FC = () => {
   ) => {
     setEndingPoint(event.target.value)
   }
+  // clothes type
+  // clothes type
+  const handleClothesTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setClothesType(event.target.value)
+  }
   // best seasons
+
   const handleSeasonChange = (season: string) => {
     setSelectedSeasons(
       (prev) =>
@@ -316,27 +369,29 @@ const EditTrekForm: React.FC = () => {
     setOverview(newValue)
   }
 
-  //   const trekSlug = "everest-base-camp-trek-6738c8b330898dabe45628c7"
-
-  //getting the data of trekking
-  const handleGetTrekData = async () => {
+  // get form
+  const handleGetTourData = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/get-trek/${slug}`
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/get-wellness/${slug}`
       )
-      console.log("Response:", response.data)
       if (response.data.success) {
         const trekData = response.data.data
+        setTourViews(trekData.viewsCount)
         setName(trekData.name)
-        setViews(trekData.viewsCount)
-        setPreviews(trekData.viewsCount)
         setPrice(trekData.price)
         setThumbnailPreview(trekData.thumbnail)
         setCountry(trekData.country)
+        setClothesType(trekData.clothesType)
         setMinDays(trekData.days.min)
         setMaxDays(trekData.days.max)
+        setMaxAltitude(trekData.maxAltitude)
+        setTourLanguage(trekData.language)
+        setSuitableAge(trekData.suitableAge)
         setLocation(trekData.location)
-        setDifficulty(trekData.difficulty)
+        setArrivalLocation(trekData.arrivalLocation)
+        setDepartureLocation(trekData.departureLocation)
+        setTripType(trekData.tripType)
         setMinGroupSize(trekData.groupSize.min)
         setMaxGroupSize(trekData.groupSize.max)
         setMeal(trekData.meal)
@@ -344,14 +399,12 @@ const EditTrekForm: React.FC = () => {
         setEndingPoint(trekData.endingPoint)
         setSelectedSeasons(trekData.bestSeason)
         setOverview(trekData.overview)
-        setHighlights(trekData.trekHighlights)
+        setHighlights(trekData.highlights)
+        setAccommodations(trekData.accommodation)
+        setThingsToKnow(trekData.thingsToKnow)
         setItineraries(trekData.itinerary)
         setInclusives(trekData.servicesCostIncludes)
         setExclusives(trekData.servicesCostExcludes)
-        setGeneral(trekData.packingList.general)
-        setClothes(trekData.packingList.clothes)
-        setFirstAid(trekData.packingList.firstAid)
-        setOtherEssentials(trekData.packingList.otherEssentials)
         setFaqs(trekData.faq)
         setNote(trekData.note)
         // setImages(trekData.images)
@@ -366,7 +419,7 @@ const EditTrekForm: React.FC = () => {
   }
 
   useEffect(() => {
-    handleGetTrekData()
+    handleGetTourData()
   }, [])
 
   // function
@@ -376,12 +429,16 @@ const EditTrekForm: React.FC = () => {
     const formData = new FormData()
 
     formData.append("name", name)
-
+    formData.append("maxAltitude", maxAltitude.toString())
+    formData.append("tourLanguage", tourLanguage)
+    formData.append("suitableAge", suitableAge)
     formData.append("price", price.toString())
     formData.append("thumbnail", thumbnail as File)
     formData.append("country", country)
     formData.append("location", location)
-    formData.append("difficulty", difficulty)
+    formData.append("arrivalLocation", arrivalLocation)
+    formData.append("departureLocation", departureLocation)
+    formData.append("tripType", tripType)
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
     formData.append("groupSizeMin", minGroupSize.toString())
@@ -389,17 +446,15 @@ const EditTrekForm: React.FC = () => {
     formData.append("startingPoint", startingPoint)
     formData.append("endingPoint", endingPoint)
     formData.append("accommodation", JSON.stringify(accommodations))
+    formData.append("thingsToKnow", JSON.stringify(thingsToKnow))
     formData.append("meal", meal)
     formData.append("bestSeason", JSON.stringify(selectedSeasons))
     formData.append("overview", overview)
-    formData.append("trekHighlights", JSON.stringify(highlights))
+    formData.append("highlights", JSON.stringify(highlights))
     formData.append("itinerary", JSON.stringify(itineraries))
     formData.append("servicesCostIncludes", JSON.stringify(inclusives))
     formData.append("servicesCostExcludes", JSON.stringify(exclusives))
-    formData.append(
-      "packingList",
-      JSON.stringify({ general, clothes, firstAid, otherEssentials })
-    )
+
     formData.append("faq", JSON.stringify(faqs))
     formData.append("note", note)
 
@@ -414,7 +469,7 @@ const EditTrekForm: React.FC = () => {
     try {
       setLoading(true)
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/edit-wellness/${slug}`,
         formData,
         {
           headers: {
@@ -422,24 +477,23 @@ const EditTrekForm: React.FC = () => {
           },
         }
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
         alert(response.data.message)
         setLoading(false)
-        route.push("/trekking")
+        route.push("/wellness")
       } else {
         alert(response.data.message)
         setLoading(false)
       }
     } catch (error) {
-      console.error("Error:", error)
       alert("Error occurred while submitting the form.")
       setLoading(false)
     }
   }
 
   return (
-    <div className="container mx-auto p-6 ">
+    <div className="container mx-auto p-6">
       <div className="flex items-center   gap-4 mb-4 pb-4 pt-4 ">
         {/* Back Button */}
         <div
@@ -450,8 +504,8 @@ const EditTrekForm: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold bg-secondary text-white text-center flex-1  px-12 py-2 ">
-          Edit Trek - {name}
+        <h1 className="text-2xl font-semibold bg-tourPrimary text-white text-center flex-1  px-12 py-2 ">
+          Edit Wellness - {name}
         </h1>
       </div>
       {/* Separator */}
@@ -465,9 +519,10 @@ const EditTrekForm: React.FC = () => {
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 1 (Basic Information)
         </h1>
+
         {/* views  */}
-        <p className="flex gap-2 items-center text-trekPrimary text-lg font-bold ">
-          <FaEye /> {views}
+        <p className="flex gap-2 items-center text-tourPrimary text-lg font-bold ">
+          <FaEye /> {tourViews}
         </p>
 
         {/* Name */}
@@ -477,16 +532,28 @@ const EditTrekForm: React.FC = () => {
           {/* Price */}
           <PriceInput value={price} onChange={handlePriceChange} />
 
+          {/* Max Altitude */}
+          <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
+
           {/* Country */}
           <CountrySelect
             country={country}
             handleCountryChange={handleCountryChange}
           />
-          {/* Difficulty */}
-          <DifficultySelect
-            difficulty={difficulty}
-            handleDifficultyChange={handleDifficultyChange}
+        </div>
+        {/* third compartment */}
+        <div className="flex justify-between">
+          {/* Tour Language */}
+          <TourLanguage
+            value={tourLanguage}
+            onChange={handleTourLanguageChange}
           />
+
+          {/* Clothes Type */}
+          <ClothesType value={clothesType} onChange={handleClothesTypeChange} />
+
+          {/* suitable age  */}
+          <SuitableAge value={suitableAge} onChange={suitableAgeChange} />
         </div>
 
         {/* Thumbnail */}
@@ -525,6 +592,13 @@ const EditTrekForm: React.FC = () => {
           handleMinChange={handleMinChange}
           handleMaxChange={handleMaxChange}
         />
+        {/* Arrival Location */}
+        <ArrivalLocation
+          arrivalLocation={arrivalLocation}
+          departureLocation={departureLocation}
+          handleArrivalLocationChange={handleArrivalLocationChange}
+          handleDepartureLocationChange={handleDepartureLocationChange}
+        />
         {/* Starting & Ending Points */}
         <StartingEndingPointInput
           startingPoint={startingPoint}
@@ -540,9 +614,19 @@ const EditTrekForm: React.FC = () => {
           handleRemoveAccommodation={handleRemoveAccommodation}
         />
 
+        {/* Overview */}
+
         <OverviewForm value={overview} onChange={handleOverviewChange} />
 
         <NoteForm value={note} onChange={setNote} />
+
+        {/* Things To Know */}
+        <ThingsToKnow
+          thingsToKnow={thingsToKnow}
+          handleThingsToKnowChange={handleThingsToKnowChange}
+          handleAddThingsToKnow={handleAddThingsToKnow}
+          handleRemoveThingsToKnow={handleRemoveThingsToKnow}
+        />
 
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 2 (highlights, Itenaries & faq)
@@ -631,17 +715,6 @@ const EditTrekForm: React.FC = () => {
           onUpdateExclusives={setExclusives}
         />
 
-        <PackagingForm
-          general={general}
-          clothes={clothes}
-          firstAid={firstAid}
-          otherEssentials={otherEssentials}
-          onUpdateGeneral={setGeneral}
-          onUpdateClothes={setClothes}
-          onUpdateFirstAid={setFirstAid}
-          onUpdateOtherEssentials={setOtherEssentials}
-        />
-
         <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
           Part 3 (images & video)
         </h1>
@@ -668,7 +741,14 @@ const EditTrekForm: React.FC = () => {
                      hover:bg-primary transition-colors duration-200
                      focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
-            {loading ? "Updating Your Trek, Please Wait..." : "Update Details"}
+            {loading ? (
+              <div className="flex gap-2">
+                <p>Uploading Your Tour, Please Wait...</p>
+                <Loader height="20px" width="20px" />
+              </div>
+            ) : (
+              "Submit Details"
+            )}
           </button>
         </div>
       </form>
@@ -676,4 +756,4 @@ const EditTrekForm: React.FC = () => {
   )
 }
 
-export default EditTrekForm
+export default EditWellnessForm

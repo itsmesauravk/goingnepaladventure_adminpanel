@@ -126,7 +126,7 @@ const TourHome: React.FC = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <button
                     className="bg-primary hover:bg-primary text-white py-2 px-4 rounded-md"
-                    onClick={() => router.push(`/tour/edit-tour/${tour.slug}`)}
+                    onClick={() => router.push(`/tours/edit-tour/${tour.slug}`)}
                   >
                     View Details
                   </button>
