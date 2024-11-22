@@ -29,14 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
-        {/* <SidebarProvider>
+        <SidebarProvider>
           <AppSidebar />
-          <SidebarTrigger /> */}
-        {children}
-        <Analytics />
-        {/* </SidebarProvider> */}
+          <SidebarTrigger />
+          {children}
+          <Analytics />
+        </SidebarProvider>
       </body>
     </html>
   )

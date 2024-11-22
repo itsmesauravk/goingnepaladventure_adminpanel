@@ -99,7 +99,7 @@ const TrekkingHome: React.FC = () => {
   }, [page, limit, search, difficulty, sort])
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100 min-h-screen w-full">
       {/* Heading and Add New Button */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-gray-800">Trekkings</h2>

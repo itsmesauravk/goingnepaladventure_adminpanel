@@ -19,18 +19,18 @@ const items = [
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
+    title: "Trekkings",
+    url: "/trekkings",
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "#",
+    title: "Tours",
+    url: "/tours",
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
+    title: "Wellness",
+    url: "/wellness",
     icon: Search,
   },
   {

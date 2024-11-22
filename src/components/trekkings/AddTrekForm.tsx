@@ -546,8 +546,8 @@ const AddTrekForm: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center   gap-4 mb-4 pb-4 pt-4 ">
+    <div className="container p-6 w-full">
+      <div className="flex items-center w-full   gap-4 mb-4 pb-4 pt-4 ">
         {/* Back Button */}
         <div
           onClick={() => route.back()}
