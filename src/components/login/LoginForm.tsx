@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import React, { useState, useEffect } from "react"
 
 const LoginForm: React.FC = () => {
@@ -32,7 +33,7 @@ const LoginForm: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          GNA Admin Login
+          GNA ADMIN LOGIN
         </h2>
 
         <form onSubmit={handleLogin}>
@@ -88,9 +89,12 @@ const LoginForm: React.FC = () => {
 
         {/* Forgot Password Link */}
         <div className="mt-4 text-center">
-          <a href="#" className="text-sm text-primary hover:underline">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-primary hover:underline"
+          >
             Forgot Password?
-          </a>
+          </Link>
         </div>
       </div>
     </div>
