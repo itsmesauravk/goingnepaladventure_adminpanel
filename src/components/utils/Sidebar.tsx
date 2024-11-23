@@ -86,11 +86,11 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link
-                      className={`mt-2 ${
+                      className={`mt-2  hover:text-primary ${
                         resource && resource === item.title.toLocaleLowerCase()
                           ? "bg-secondary text-white"
                           : ""
-                      } hover:bg-blue-800 hover:text-white`}
+                      } `}
                       href={item.url}
                     >
                       <item.icon />
