@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2 } from "lucide-react"
-
-import { CustomPagination } from "../utils/Pagination"
+import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
 import { DeleteTour } from "./DeleteTour"
-import axios from "axios"
+import { CustomPagination } from "../utils/Pagination"
+import { Switch } from "../ui/switch"
 
 interface Tour {
   _id: string
@@ -19,16 +19,83 @@ interface Tour {
   price: number
   tripType: string
   category: string
+  isPopular: boolean
+  isFeatured: boolean
+  isRecommended: boolean
+  isNewItem: boolean
 }
 
 const TourHome: React.FC = () => {
   const router = useRouter()
+  const [tours, setTours] = useState<Tour[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [updateLoading, setUpdateLoading] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(8)
+  const [totalPages, setTotalPages] = useState<number>(1)
+  const [search, setSearch] = useState<string>("")
+  const [tripType, setTripType] = useState<string>("")
+  const [sort, setSort] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTourToDelete, setSelectedTourToDelete] = useState<
     string | null
   >(null)
-  const [loading, setLoading] = useState(false)
-  const [tours, setTours] = useState<Tour[]>([])
+
+  // Fetch tours data with filters
+  const getTours = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/tours`,
+        {
+          params: {
+            page,
+            limit,
+            search,
+            tripType,
+            sort,
+            visibility,
+          },
+        }
+      )
+      if (response.data.success) {
+        setTours(response.data.data)
+        setTotalPages(response.data.totalPages)
+      }
+    } catch (error) {
+      console.log("Failed to fetch tour data")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSwitchChange = async (
+    tourId: string,
+    field: string,
+    currentValue: boolean
+  ) => {
+    setUpdateLoading(tourId)
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/edit-tour-visibility/${tourId}`,
+        { [field]: !currentValue }
+      )
+
+      if (response.data.success) {
+        setTours((prevTours) =>
+          prevTours.map((tour) =>
+            tour._id === tourId ? { ...tour, [field]: !currentValue } : tour
+          )
+        )
+        console.log(`${field} status updated successfully`)
+      }
+    } catch (error) {
+      console.log("Failed to update status")
+    } finally {
+      setUpdateLoading(null)
+    }
+  }
 
   const handleDeleteClick = (tourId: string) => {
     setSelectedTourToDelete(tourId)
@@ -36,116 +103,250 @@ const TourHome: React.FC = () => {
   }
 
   const confirmDelete = async () => {
-    alert("Delete service is currently unavailable")
-    setDeleteModalOpen(false)
-  }
-
-  // get all tours
-  const getTourHandler = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/tours`
-      )
-
-      if (response.data.success) {
-        setTours(response.data.data)
-        setLoading(false)
-      } else {
-        console.log(response.data.message)
-        setLoading(false)
+      if (selectedTourToDelete) {
+        const response = await axios.delete(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/tours/${selectedTourToDelete}`
+        )
+        if (response.data.success) {
+          console.log("Tour deleted successfully")
+          getTours()
+        }
       }
     } catch (error) {
-      setLoading(false)
-      console.error(error)
+      console.log("Failed to delete tour")
+    } finally {
+      setDeleteModalOpen(false)
     }
   }
 
   useEffect(() => {
-    getTourHandler()
-  }, [])
+    getTours()
+  }, [page, limit, tripType, sort, visibility])
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen w-full">
-      {/* Heading and Add New Button */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-primary">Tours</h2>
-        <button
-          className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md"
-          onClick={() => router.push("/tours/add-tour")}
-        >
-          Add New Tour
-        </button>
+    <div className="p-8 bg-gray-50 min-h-screen w-full">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">Tour Manager</h2>
+          <Button
+            onClick={() => router.push("/tours/add-tour")}
+            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add New Tour
+          </Button>
+        </div>
+        <p className="text-gray-600">
+          Manage your tour packages and their visibility options
+        </p>
       </div>
 
-      {/* Separator */}
-      <hr className="border-blue-300 mb-6" />
+      {/* Filters Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="relative">
+          <Filter className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={tripType}
+            onChange={(e) => {
+              setTripType(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">All Trip Types</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Cultural">Cultural</option>
+            <option value="Historical">Historical</option>
+            <option value="Nature">Nature</option>
+          </select>
+        </div>
 
-      {/* Title */}
-      <h3 className="text-xl text-primary mb-4 font-semibold">
-        Explore Our Tours
-      </h3>
+        <div className="relative">
+          <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={visibility}
+            onChange={(e) => {
+              setVisibility(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Visibility</option>
+            <option value="isNewItem">New</option>
+            <option value="isPopular">Popular</option>
+            <option value="isRecommended">Recommended</option>
+            <option value="isFeatured">Featured</option>
+          </select>
+        </div>
 
-      {/* Tours Table */}
-      <div className="overflow-x-auto rounded-lg border border-blue-200 mb-5">
-        <table className="min-w-full bg-white">
-          <thead className="bg-tourPrimary text-white border-b border-blue-200">
+        <div className="relative">
+          <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Sort by...</option>
+            <option value="createdAt">Newest First</option>
+            <option value="-createdAt">Oldest First</option>
+            <option value="price">Price: Low to High</option>
+            <option value="-price">Price: High to Low</option>
+            <option value="name">Name: A-Z</option>
+            <option value="-name">Name: Z-A</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tours..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+          />
+          <Search
+            className="absolute right-3 top-2 cursor-pointer text-primary"
+            size={20}
+            onClick={() => getTours()}
+          />
+        </div>
+      </div>
+
+      {/* Tours List */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
-                Image
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Tour Details
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
-                Tour Name
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Visibility Options
               </th>
-              <th className="px-6 py-3 text-center text-xs font-medium  uppercase tracking-wider">
-                Action
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Actions
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-blue-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {tours.map((tour) => (
-              <tr key={tour._id} className="hover:bg-blue-50">
-                <td className="px-6 py-4 whitespace-nowrap border-r border-blue-200">
-                  <img
-                    src={tour.thumbnail}
-                    alt={tour.name}
-                    className="h-24 w-32 object-cover rounded-md"
-                  />
-                </td>
-                <td className="px-6 py-4 border-r border-blue-200">
-                  <div className="text-lg">
-                    <p className="font-semibold text-blue-900 mb-1">
-                      {tour.name}
-                    </p>
-                    <p className="text-sm text-blue-600">
-                      Trip Type: {tour.tripType}
-                    </p>
+              <tr key={tour._id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-6 py-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={tour.thumbnail}
+                      alt={tour.name}
+                      className="h-24 w-32 object-cover rounded-lg shadow-sm"
+                    />
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {tour.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">{tour.location}</p>
+                      <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 mt-2">
+                        {tour.tripType}
+                      </span>
+                    </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <button
-                    className="bg-primary hover:bg-primary text-white py-2 px-4 rounded-md"
-                    onClick={() => router.push(`/tours/edit-tour/${tour.slug}`)}
-                  >
-                    View Details
-                  </button>
 
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="ml-6"
-                    onClick={() => handleDeleteClick(tour._id)}
-                  >
-                    <Trash2 size={18} />
-                  </Button>
+                <td className="px-6 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          New
+                        </span>
+                        <Switch
+                          checked={tour.isNewItem}
+                          disabled={updateLoading === tour._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              tour._id,
+                              "isNewItem",
+                              tour.isNewItem
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Popular
+                        </span>
+                        <Switch
+                          checked={tour.isPopular}
+                          disabled={updateLoading === tour._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              tour._id,
+                              "isPopular",
+                              tour.isPopular
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Featured
+                        </span>
+                        <Switch
+                          checked={tour.isFeatured}
+                          disabled={updateLoading === tour._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              tour._id,
+                              "isFeatured",
+                              tour.isFeatured
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Recommended
+                        </span>
+                        <Switch
+                          checked={tour.isRecommended}
+                          disabled={updateLoading === tour._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              tour._id,
+                              "isRecommended",
+                              tour.isRecommended
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </td>
 
-                  <DeleteTour
-                    isOpen={deleteModalOpen}
-                    onClose={() => setDeleteModalOpen(false)}
-                    onConfirmDelete={confirmDelete}
-                    itemName={tour?.name}
-                  />
+                <td className="px-6 py-4 text-center">
+                  <div className="flex items-center justify-center space-x-3">
+                    <Button
+                      onClick={() =>
+                        router.push(`/tours/edit-tour/${tour.slug}`)
+                      }
+                      className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg"
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteClick(tour._id)}
+                      className="px-4 py-2 rounded-lg"
+                    >
+                      <Trash2 size={18} />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -153,23 +354,40 @@ const TourHome: React.FC = () => {
         </table>
       </div>
 
-      {/* Loader */}
-
-      {loading && <Loader />}
-
-      {!loading && tours.length === 0 && (
-        <p className="text-center mt-10 text-2xl text-gray-500">
-          No Tours found.
-        </p>
+      {/* Loading and Empty States */}
+      {loading && (
+        <div className="flex justify-center my-8">
+          <Loader />
+        </div>
       )}
 
-      <div className="mt-5 mb-5">
-        <CustomPagination
-          currentPage={1} // Pagination is hardcoded for now
-          totalPages={1}
-          onPageChange={(newPage) => console.log(`Change to page: ${newPage}`)}
-        />
-      </div>
+      {!loading && tours.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200 mt-4">
+          <p className="text-2xl text-gray-400 font-medium">No tours found</p>
+          <p className="text-gray-500 mt-2">
+            Try adjusting your search or filters
+          </p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {tours.length > 0 && (
+        <div className="mt-6">
+          <CustomPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      <DeleteTour
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirmDelete={confirmDelete}
+        itemName={tours.find((t) => t._id === selectedTourToDelete)?.name || ""}
+      />
     </div>
   )
 }

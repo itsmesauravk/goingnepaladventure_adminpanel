@@ -39,7 +39,7 @@ const TrekkingHome: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [updateLoading, setUpdateLoading] = useState<string | null>(null)
   const [page, setPage] = useState<number>(1)
-  const [limit, setLimit] = useState<number>(10)
+  const [limit, setLimit] = useState<number>(8)
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [difficulty, setDifficulty] = useState<string>("")

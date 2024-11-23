@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2 } from "lucide-react"
-
-import { CustomPagination } from "../utils/Pagination"
+import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
 import { DeleteWellness } from "./DeleteWellness"
-import axios from "axios"
+import { CustomPagination } from "../utils/Pagination"
+import { Switch } from "../ui/switch"
 
 interface Wellness {
   _id: string
@@ -19,17 +19,83 @@ interface Wellness {
   price: number
   country: string
   category: string
+  isFeatured: boolean
+  isPopular: boolean
+  isRecommended: boolean
+  isNewItem: boolean
 }
 
 const WellnessHome: React.FC = () => {
   const router = useRouter()
+  const [wellnessData, setWellnessData] = useState<Wellness[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [updateLoading, setUpdateLoading] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(8)
+  const [totalPages, setTotalPages] = useState<number>(1)
+  const [search, setSearch] = useState<string>("")
+  const [category, setCategory] = useState<string>("")
+  const [sort, setSort] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedWellnessToDelete, setSelectedWellnessToDelete] = useState<
     string | null
   >(null)
 
-  const [loading, setLoading] = useState(false)
-  const [wellnessData, setWellnessData] = useState<Wellness[]>([])
+  // Fetch wellness data
+  const getWellnessHandler = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/all-wellness`,
+        {
+          params: {
+            page,
+            limit,
+            search,
+            category,
+            sort,
+            visibility,
+          },
+        }
+      )
+      if (response.data.success) {
+        setWellnessData(response.data.data)
+        setTotalPages(response.data.totalPages || 1)
+      }
+    } catch (error) {
+      console.log("Failed to fetch wellness data")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSwitchChange = async (
+    wellnessId: string,
+    field: string,
+    currentValue: boolean
+  ) => {
+    setUpdateLoading(wellnessId)
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/edit-wellness-visibility/${wellnessId}`,
+        { [field]: !currentValue }
+      )
+
+      if (response.data.success) {
+        setWellnessData((prevWellness) =>
+          prevWellness.map((item) =>
+            item._id === wellnessId ? { ...item, [field]: !currentValue } : item
+          )
+        )
+        console.log(`${field} status updated successfully`)
+      }
+    } catch (error) {
+      console.log("Failed to update status")
+    } finally {
+      setUpdateLoading(null)
+    }
+  }
 
   const handleDeleteClick = (wellnessId: string) => {
     setSelectedWellnessToDelete(wellnessId)
@@ -37,118 +103,254 @@ const WellnessHome: React.FC = () => {
   }
 
   const confirmDelete = async () => {
-    alert("Delete service is currently unavailable")
-    setDeleteModalOpen(false)
-  }
-
-  // get all wellness
-  const getWellnessHandler = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/all-wellness`
-      )
-
-      if (response.data.success) {
-        setWellnessData(response.data.data)
-        setLoading(false)
-      } else {
-        console.log(response.data.message)
-        setLoading(false)
+      if (selectedWellnessToDelete) {
+        const response = await axios.delete(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/delete/${selectedWellnessToDelete}`
+        )
+        if (response.data.success) {
+          console.log("Wellness deleted successfully")
+          getWellnessHandler()
+        }
       }
     } catch (error) {
-      setLoading(false)
-      console.error(error)
+      console.log("Failed to delete wellness")
+    } finally {
+      setDeleteModalOpen(false)
     }
   }
 
   useEffect(() => {
     getWellnessHandler()
-  }, [])
+  }, [page, limit, category, sort, visibility])
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Heading and Add New Button */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-primary">Wellness</h2>
-        <button
-          className="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md"
-          onClick={() => router.push("/wellness/add-wellness")}
-        >
-          Add New Wellness
-        </button>
+    <div className="p-8 bg-gray-50 min-h-screen w-full">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">Wellness Manager</h2>
+          <Button
+            onClick={() => router.push("/wellness/add-wellness")}
+            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add New Wellness
+          </Button>
+        </div>
+        <p className="text-gray-600">
+          Manage your wellness services and their visibility options
+        </p>
       </div>
 
-      {/* Separator */}
-      <hr className="border-blue-300 mb-6" />
+      {/* Filters Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="relative">
+          <Filter className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">All Categories</option>
+            <option value="Spa">Spa</option>
+            <option value="Yoga">Yoga</option>
+            <option value="Meditation">Meditation</option>
+          </select>
+        </div>
 
-      {/* Title */}
-      <h3 className="text-xl text-primary mb-4 font-semibold">
-        Explore Our Wellness
-      </h3>
+        <div className="relative">
+          <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={visibility}
+            onChange={(e) => {
+              setVisibility(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Visibility</option>
+            <option value="isNewItem">New</option>
+            <option value="isPopular">Popular</option>
+            <option value="isRecommended">Recommended</option>
+            <option value="isFeatured">Featured</option>
+          </select>
+        </div>
 
-      {/* Wellness Table */}
-      <div className="overflow-x-auto rounded-lg border border-blue-200 mb-5">
-        <table className="min-w-full bg-white">
-          <thead className="bg-wellnessPrimary text-white border-b border-blue-200">
+        <div className="relative">
+          <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Sort by...</option>
+            <option value="createdAt">Newest First</option>
+            <option value="-createdAt">Oldest First</option>
+            <option value="price">Price: Low to High</option>
+            <option value="-price">Price: High to Low</option>
+            <option value="name">Name: A-Z</option>
+            <option value="-name">Name: Z-A</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search wellness..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+          />
+          <Search
+            className="absolute right-3 top-2 cursor-pointer text-primary"
+            size={20}
+            onClick={() => getWellnessHandler()}
+          />
+        </div>
+      </div>
+
+      {/* Wellness List */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
-                Image
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Wellness Details
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider border-r border-blue-200">
-                Wellness Name
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Visibility Options
               </th>
-              <th className="px-6 py-3 text-center text-xs font-medium  uppercase tracking-wider">
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-blue-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {wellnessData.map((wellness) => (
-              <tr key={wellness._id} className="hover:bg-blue-50">
-                <td className="px-6 py-4 whitespace-nowrap border-r border-blue-200">
-                  <img
-                    src={wellness.thumbnail}
-                    alt={wellness.name}
-                    className="h-24 w-32 object-cover rounded-md"
-                  />
-                </td>
-                <td className="px-6 py-4 border-r border-blue-200">
-                  <div className="text-lg">
-                    <p className="font-semibold text-blue-900 mb-1">
-                      {wellness.name}
-                    </p>
-                    <p className="text-sm font-semibold text-blue-600">
-                      {wellness.country}
-                    </p>
+              <tr
+                key={wellness._id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                <td className="px-6 py-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={wellness.thumbnail}
+                      alt={wellness.name}
+                      className="h-24 w-32 object-cover rounded-lg shadow-sm"
+                    />
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {wellness.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {wellness.location}
+                      </p>
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full mt-2">
+                        {wellness.country}
+                      </span>
+                    </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <button
-                    className="bg-primary hover:bg-primary text-white py-2 px-4 rounded-md"
-                    onClick={() =>
-                      router.push(`/wellness/edit-wellness/${wellness.slug}`)
-                    }
-                  >
-                    View Details
-                  </button>
 
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="ml-6"
-                    onClick={() => handleDeleteClick(wellness._id)}
-                  >
-                    <Trash2 size={18} />
-                  </Button>
+                <td className="px-6 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          New
+                        </span>
+                        <Switch
+                          checked={wellness.isNewItem}
+                          disabled={updateLoading === wellness._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              wellness._id,
+                              "isNewItem",
+                              wellness.isNewItem
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Popular
+                        </span>
+                        <Switch
+                          checked={wellness.isPopular}
+                          disabled={updateLoading === wellness._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              wellness._id,
+                              "isPopular",
+                              wellness.isPopular
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Featured
+                        </span>
+                        <Switch
+                          checked={wellness.isFeatured}
+                          disabled={updateLoading === wellness._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              wellness._id,
+                              "isFeatured",
+                              wellness.isFeatured
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Recommended
+                        </span>
+                        <Switch
+                          checked={wellness.isRecommended}
+                          disabled={updateLoading === wellness._id}
+                          onCheckedChange={() =>
+                            handleSwitchChange(
+                              wellness._id,
+                              "isRecommended",
+                              wellness.isRecommended
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </td>
 
-                  <DeleteWellness
-                    isOpen={deleteModalOpen}
-                    onClose={() => setDeleteModalOpen(false)}
-                    onConfirmDelete={confirmDelete}
-                    itemName={wellness?.name}
-                  />
+                <td className="px-6 py-4 text-center">
+                  <div className="flex items-center justify-center space-x-3">
+                    <Button
+                      onClick={() =>
+                        router.push(`/wellness/edit-wellness/${wellness.slug}`)
+                      }
+                      className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg"
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteClick(wellness._id)}
+                      className="px-4 py-2 rounded-lg"
+                    >
+                      <Trash2 size={18} />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -156,22 +358,45 @@ const WellnessHome: React.FC = () => {
         </table>
       </div>
 
-      <div>
-        <CustomPagination
-          currentPage={1} // Pagination is hardcoded for now
-          totalPages={1}
-          onPageChange={(newPage) => console.log(`Change to page: ${newPage}`)}
-        />
-      </div>
-
-      {/* Loader */}
-      {loading && <Loader />}
+      {/* Loading and Empty States */}
+      {loading && (
+        <div className="flex justify-center my-8">
+          <Loader />
+        </div>
+      )}
 
       {!loading && wellnessData.length === 0 && (
-        <p className="text-center mt-10 text-2xl text-blue-500">
-          No wellness found.
-        </p>
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200 mt-4">
+          <p className="text-2xl text-gray-400 font-medium">
+            No wellness services found
+          </p>
+          <p className="text-gray-500 mt-2">
+            Try adjusting your search or filters
+          </p>
+        </div>
       )}
+
+      {/* Pagination */}
+      {wellnessData.length > 0 && (
+        <div className="mt-6">
+          <CustomPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      <DeleteWellness
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirmDelete={confirmDelete}
+        itemName={
+          wellnessData.find((w) => w._id === selectedWellnessToDelete)?.name ||
+          ""
+        }
+      />
     </div>
   )
 }
