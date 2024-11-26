@@ -1,6 +1,5 @@
 "use client"
 import React, { useState } from "react"
-import CountUp from "react-countup"
 import {
   Package,
   Mountain,
@@ -70,15 +69,13 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Users className="text-gray-600" />
             <span className="text-lg font-medium">
-              Active Users:{" "}
-              <CountUp end={stats.activeUsers} duration={1.5} separator="," />
+              Active Users: {stats.activeUsers.toLocaleString()}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="text-gray-600" />
             <span className="text-lg font-medium">
-              New Packages:{" "}
-              <CountUp end={stats.newPackagesThisMonth} duration={1.5} />
+              New Packages: {stats.newPackagesThisMonth}
             </span>
           </div>
         </div>
@@ -96,7 +93,7 @@ const Dashboard: React.FC = () => {
                 {category.name}
               </h3>
               <p className="text-2xl font-bold text-gray-800">
-                <CountUp end={category.count} duration={1.5} />
+                {category.count}
               </p>
             </div>
             <div>
@@ -122,7 +119,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="text-center">
             <p className="text-4xl font-bold text-primary">
-              <CountUp end={stats.totalPackages} duration={1.5} separator="," />
+              {stats.totalPackages.toLocaleString()}
             </p>
           </div>
         </div>
@@ -137,22 +134,13 @@ const Dashboard: React.FC = () => {
             <div className="text-center">
               <p className="text-sm text-gray-500">Total Bookings</p>
               <p className="text-2xl font-bold text-green-600">
-                <CountUp
-                  end={stats.totalBookings}
-                  duration={1.5}
-                  separator=","
-                />
+                {stats.totalBookings.toLocaleString()}
               </p>
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-500">Avg. Booking Value</p>
               <p className="text-2xl font-bold text-blue-600">
-                $
-                <CountUp
-                  end={stats.averageBookingValue}
-                  duration={1.5}
-                  separator=","
-                />
+                ${stats.averageBookingValue.toLocaleString()}
               </p>
             </div>
           </div>
@@ -168,13 +156,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="text-center">
             <p className="text-4xl font-bold text-blue-600">
-              $
-              <CountUp
-                end={stats.totalRevenue}
-                duration={1.5}
-                separator=","
-                decimals={0}
-              />
+              ${stats.totalRevenue.toLocaleString()}
             </p>
           </div>
         </div>
