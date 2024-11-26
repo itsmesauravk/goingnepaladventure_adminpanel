@@ -576,7 +576,7 @@ const AddTourForm: React.FC = () => {
             >
               <FaArrowLeft size={24} />
             </button>
-            <h1 className="text-3xl font-bold">Add New Wellness Experience</h1>
+            <h1 className="text-3xl font-bold">Add New Tour</h1>
           </div>
           <Button
             type="button"
@@ -595,7 +595,7 @@ const AddTourForm: React.FC = () => {
           {/* Basic Information Section */}
           <div className="bg-gray-100 rounded-lg p-6">
             <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
-              Basic Wellness Information
+              Basic Tour Information
             </h2>
 
             {/* Name Input */}
@@ -603,23 +603,26 @@ const AddTourForm: React.FC = () => {
               <NameInput value={name} onChange={handleNameChange} />
             </div>
 
-            {/* First Row: Price, Country, Details */}
+            {/* First Row: Price, Country, Trip Type */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <PriceInput value={price} onChange={handlePriceChange} />
               <CountrySelect
                 country={country}
                 handleCountryChange={handleCountryChange}
               />
-              <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
+              <TripTypeForm
+                tripType={tripType}
+                handleTripTypeChange={handleTripTypeChange}
+              />
             </div>
 
             {/* Second Row: Additional Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
               <TourLanguage
                 value={tourLanguage}
                 onChange={handleTourLanguageChange}
               />
-              {/* <ClothesType value={clothesType} onChange={handleClothesTypeChange} /> */}
               <SuitableAge value={suitableAge} onChange={suitableAgeChange} />
             </div>
 
@@ -632,10 +635,10 @@ const AddTourForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Wellness Specifics Section */}
+          {/* Tour Details Section */}
           <div className="bg-gray-100 rounded-lg p-6">
             <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
-              Wellness Experience Details
+              Tour Specifics
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -833,10 +836,10 @@ const AddTourForm: React.FC = () => {
               {loading ? (
                 <div className="flex justify-center items-center space-x-3">
                   <Loader height="24px" width="24px" />
-                  <p>Uploading Wellness Details...</p>
+                  <p>Uploading Tour Details...</p>
                 </div>
               ) : (
-                "Submit Wellness Information"
+                "Submit Tour Information"
               )}
             </button>
           </div>
