@@ -1,110 +1,184 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
+import CountUp from "react-countup"
+import {
+  Package,
+  Mountain,
+  Flame,
+  Users,
+  Tent,
+  Footprints,
+  Globe,
+  BookOpen,
+  Activity,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+} from "lucide-react"
 
 const Dashboard: React.FC = () => {
-  // Dummy data for the dashboard
+  // Comprehensive dashboard state
   const [stats, setStats] = useState({
-    totalTours: 100,
-    activeTours: 80,
-    featuredTours: 20,
-    totalVisitors: 1500,
+    totalPackages: 157,
+    trekPackages: 45,
+    tourPackages: 62,
+    wellnessPackages: 25,
+    activitiesPackages: 25,
+    totalBookings: 1245,
+    totalRevenue: 245600,
+    activeUsers: 3420,
+    newPackagesThisMonth: 12,
+    averageBookingValue: 197,
   })
 
-  const [recentActivity, setRecentActivity] = useState([
+  const packageCategories = [
     {
-      id: 1,
-      action: "Added a new tour",
-      tourName: "Mountain Adventure",
-      date: "2024-11-20",
+      name: "Treks",
+      count: stats.trekPackages,
+      icon: <Mountain className="text-blue-600" />,
+      color: "bg-blue-100",
+      trend: "up",
     },
     {
-      id: 2,
-      action: "Updated tour details",
-      tourName: "Beach Paradise",
-      date: "2024-11-19",
+      name: "Tours",
+      count: stats.tourPackages,
+      icon: <Footprints className="text-green-600" />,
+      color: "bg-green-100",
+      trend: "up",
     },
     {
-      id: 3,
-      action: "Deleted a tour",
-      tourName: "City Tour",
-      date: "2024-11-18",
+      name: "Wellness",
+      count: stats.wellnessPackages,
+      icon: <Activity className="text-purple-600" />,
+      color: "bg-purple-100",
+      trend: "stable",
     },
-  ])
-
-  // UseEffect for any future data fetching (if necessary)
-  useEffect(() => {
-    // Simulate data fetching, we can use this to fetch real data in the future
-    // setStats(fetchedStats);
-    // setRecentActivity(fetchedActivity);
-  }, [])
+    {
+      name: "Activities",
+      count: stats.activitiesPackages,
+      icon: <Flame className="text-orange-600" />,
+      color: "bg-orange-100",
+      trend: "up",
+    },
+  ]
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-primary mb-6">Dashboard</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800">Dashboard Overview</h1>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Users className="text-gray-600" />
+            <span className="text-lg font-medium">
+              Active Users:{" "}
+              <CountUp end={stats.activeUsers} duration={1.5} separator="," />
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Calendar className="text-gray-600" />
+            <span className="text-lg font-medium">
+              New Packages:{" "}
+              <CountUp end={stats.newPackagesThisMonth} duration={1.5} />
+            </span>
+          </div>
+        </div>
+      </div>
 
-      {/* Dashboard Stats */}
+      {/* Package Categories Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {packageCategories.map((category) => (
+          <div
+            key={category.name}
+            className={`${category.color} p-6 rounded-lg shadow-md flex items-center justify-between hover:scale-105 transition-transform`}
+          >
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700">
+                {category.name}
+              </h3>
+              <p className="text-2xl font-bold text-gray-800">
+                <CountUp end={category.count} duration={1.5} />
+              </p>
+            </div>
+            <div>
+              {category.trend === "up" ? (
+                <TrendingUp className="text-green-600" />
+              ) : (
+                <div className="w-6 h-6"></div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Financial Insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Tours */}
-        <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700">Total Tours</h3>
-            <p className="text-3xl font-bold text-primary">
-              {stats.totalTours}
+        {/* Total Packages */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-700">
+              Total Packages
+            </h3>
+            <Package className="text-gray-500" />
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-bold text-primary">
+              <CountUp end={stats.totalPackages} duration={1.5} separator="," />
             </p>
           </div>
         </div>
 
-        {/* Active Tours */}
-        <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700">
-              Active Tours
-            </h3>
-            <p className="text-3xl font-bold text-primary">
-              {stats.activeTours}
-            </p>
+        {/* Bookings & Revenue */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-700">Bookings</h3>
+            <DollarSign className="text-gray-500" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-500">Total Bookings</p>
+              <p className="text-2xl font-bold text-green-600">
+                <CountUp
+                  end={stats.totalBookings}
+                  duration={1.5}
+                  separator=","
+                />
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-500">Avg. Booking Value</p>
+              <p className="text-2xl font-bold text-blue-600">
+                $
+                <CountUp
+                  end={stats.averageBookingValue}
+                  duration={1.5}
+                  separator=","
+                />
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Featured Tours */}
-        <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-          <div>
+        {/* Total Revenue */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-700">
-              Featured Tours
+              Total Revenue
             </h3>
-            <p className="text-3xl font-bold text-primary">
-              {stats.featuredTours}
+            <TrendingUp className="text-green-500" />
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-bold text-blue-600">
+              $
+              <CountUp
+                end={stats.totalRevenue}
+                duration={1.5}
+                separator=","
+                decimals={0}
+              />
             </p>
           </div>
         </div>
       </div>
-
-      {/* Recent Activity Table */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-700 mb-4">
-          Recent Activity
-        </h3>
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="text-left text-sm font-medium text-gray-600">
-              <th className="px-4 py-2">Action</th>
-              <th className="px-4 py-2">Tour Name</th>
-              <th className="px-4 py-2">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentActivity.map((activity) => (
-              <tr key={activity.id} className="border-b border-gray-200">
-                <td className="px-4 py-2">{activity.action}</td>
-                <td className="px-4 py-2">{activity.tourName}</td>
-                <td className="px-4 py-2">{activity.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Optional: You can add charts/graphs here */}
     </div>
   )
 }
