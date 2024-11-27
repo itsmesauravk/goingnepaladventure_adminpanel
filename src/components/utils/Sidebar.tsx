@@ -7,6 +7,7 @@ import {
   Settings,
   User2,
   ChevronUp,
+  BookOpen,
 } from "lucide-react"
 import { TbTrekking } from "react-icons/tb"
 
@@ -53,6 +54,11 @@ const items = [
     title: "Wellness",
     url: "/wellness",
     icon: TicketsPlane,
+  },
+  {
+    title: "Blogs",
+    url: "/blogs",
+    icon: BookOpen,
   },
   {
     title: "Settings",
