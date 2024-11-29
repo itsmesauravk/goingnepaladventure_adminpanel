@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
+import { Trash2, Plus, Search, Filter, SortAsc, EyeIcon } from "lucide-react"
 
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
@@ -15,14 +15,10 @@ interface Blog {
   _id: string
   title: string
   slug: string
-  thumbnail: string
-  author: string
-  category: string
-  tags: string[]
-  isPopular: boolean
-  isFeatured: boolean
-  isRecommended: boolean
-  isNewItem: boolean
+  blogImage: string
+  isActive: boolean
+  isNewBlog: boolean
+  blogViews: number
 }
 
 const BlogHome: React.FC = () => {
@@ -47,7 +43,7 @@ const BlogHome: React.FC = () => {
     try {
       setLoading(true)
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blog/blogs`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/all-blogs`,
         {
           params: {
             page,
@@ -61,7 +57,7 @@ const BlogHome: React.FC = () => {
       )
       if (response.data.success) {
         setBlogs(response.data.data)
-        setTotalPages(response.data.totalPages)
+        // setTotalPages(response.data.totalPages)
       }
     } catch (error) {
       console.log("Failed to fetch blog data")
@@ -78,7 +74,7 @@ const BlogHome: React.FC = () => {
     setUpdateLoading(blogId)
     try {
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blog/edit-blog-visibility/${blogId}`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/edit-blog-visibility/${blogId}`,
         { [field]: !currentValue }
       )
 
@@ -106,7 +102,7 @@ const BlogHome: React.FC = () => {
     try {
       if (selectedBlogToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/blog/blogs/${selectedBlogToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/${selectedBlogToDelete}`
         )
         if (response.data.success) {
           console.log("Blog deleted successfully")
@@ -238,7 +234,7 @@ const BlogHome: React.FC = () => {
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={blog.thumbnail}
+                      src={blog.blogImage}
                       alt={blog.title}
                       className="h-24 w-32 object-cover rounded-lg shadow-sm"
                     />
@@ -246,84 +242,30 @@ const BlogHome: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-900">
                         {blog.title}
                       </h3>
-                      <p className="text-sm text-gray-500">{blog.author}</p>
-                      <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 mt-2">
-                        {blog.category}
+                      <p className="text-sm text-gray-500">@admin</p>
+                      <span className=" flex gap-2 items-center text-primary">
+                        <EyeIcon size={16} /> {blog.blogViews}
                       </span>
                     </div>
                   </div>
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          New
-                        </span>
-                        <Switch
-                          checked={blog.isNewItem}
-                          disabled={updateLoading === blog._id}
-                          onCheckedChange={() =>
-                            handleSwitchChange(
-                              blog._id,
-                              "isNewItem",
-                              blog.isNewItem
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Popular
-                        </span>
-                        <Switch
-                          checked={blog.isPopular}
-                          disabled={updateLoading === blog._id}
-                          onCheckedChange={() =>
-                            handleSwitchChange(
-                              blog._id,
-                              "isPopular",
-                              blog.isPopular
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Featured
-                        </span>
-                        <Switch
-                          checked={blog.isFeatured}
-                          disabled={updateLoading === blog._id}
-                          onCheckedChange={() =>
-                            handleSwitchChange(
-                              blog._id,
-                              "isFeatured",
-                              blog.isFeatured
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Recommended
-                        </span>
-                        <Switch
-                          checked={blog.isRecommended}
-                          disabled={updateLoading === blog._id}
-                          onCheckedChange={() =>
-                            handleSwitchChange(
-                              blog._id,
-                              "isRecommended",
-                              blog.isRecommended
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">
+                      New
+                    </span>
+                    <Switch
+                      checked={blog.isNewBlog}
+                      disabled={updateLoading === blog._id}
+                      onCheckedChange={() =>
+                        handleSwitchChange(
+                          blog._id,
+                          "isNewBlog",
+                          blog.isNewBlog
+                        )
+                      }
+                    />
                   </div>
                 </td>
 

@@ -7,6 +7,7 @@ import { ImageUp, Save, ArrowLeft } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import Link from "next/link"
+import axios from "axios"
 
 interface BlogPostProps {
   onSubmit: (blogData: {
@@ -39,29 +40,45 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
     []
   )
 
-  const handleSubmit = useCallback(async () => {
+  const handleAddBlog = async () => {
     if (!title.trim() || !description.trim() || !image) {
-      toast.error("Please fill all fields")
-      return
+      return toast.error("Please fill all fields")
     }
 
     try {
       setIsSubmitting(true)
-      await onSubmit({ title, image, description })
-      toast.success("Blog post created successfully")
 
-      // Reset form
-      setTitle("")
-      setDescription("")
-      setImage(null)
-      setImagePreview(null)
+      const formData = new FormData()
+      formData.append("title", title)
+      formData.append("description", description)
+      formData.append("image", image)
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/add-blog`,
+        formData
+      )
+
+      console.log(response)
+
+      if (response.data.success) {
+        toast.success(response.data.message)
+        setTitle("")
+        setDescription("")
+        setImage(null)
+        setImagePreview(null)
+        setIsSubmitting(false)
+      } else {
+        toast.error(response.data.message)
+        setIsSubmitting(false)
+      }
     } catch (error) {
       toast.error("Failed to create blog post")
+      setIsSubmitting(false)
       console.error(error)
     } finally {
       setIsSubmitting(false)
     }
-  }, [title, description, image, onSubmit])
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -122,12 +139,14 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
             />
 
             <Button
-              onClick={handleSubmit}
+              onClick={handleAddBlog}
               disabled={!title || !description || !image || isSubmitting}
               className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
             >
               <Save className="mr-2" />
-              {isSubmitting ? "Creating..." : "Create Blog Post"}
+              {isSubmitting
+                ? "Uploading Post, please wait..."
+                : "Create Blog Post"}
             </Button>
           </div>
         </CardContent>
