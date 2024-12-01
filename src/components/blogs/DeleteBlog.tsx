@@ -7,6 +7,7 @@ interface DeleteConfirmationModalProps {
   onClose: () => void
   onConfirmDelete: () => void
   itemName?: string
+  loading?: boolean
 }
 
 export const DeleteBlog: React.FC<DeleteConfirmationModalProps> = ({
@@ -14,6 +15,7 @@ export const DeleteBlog: React.FC<DeleteConfirmationModalProps> = ({
   onClose,
   onConfirmDelete,
   itemName = "item",
+  loading = false,
 }) => {
   const [confirmText, setConfirmText] = useState("")
   const isConfirmValid = confirmText.toLowerCase() === "confirm"
@@ -57,10 +59,10 @@ export const DeleteBlog: React.FC<DeleteConfirmationModalProps> = ({
           <Button
             variant="destructive"
             onClick={onConfirmDelete}
-            disabled={!isConfirmValid}
+            disabled={loading || !isConfirmValid}
             className="w-full"
           >
-            Delete
+            {loading ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>

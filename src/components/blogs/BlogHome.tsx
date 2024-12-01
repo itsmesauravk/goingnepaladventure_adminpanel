@@ -10,6 +10,7 @@ import { Trash2, Plus, Search, Filter, SortAsc, EyeIcon } from "lucide-react"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { DeleteBlog } from "./DeleteBlog"
+import { toast } from "sonner"
 
 interface Blog {
   _id: string
@@ -31,12 +32,13 @@ const BlogHome: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [category, setCategory] = useState<string>("")
-  const [sort, setSort] = useState<string>("")
+  const [sort, setSort] = useState<string>("-createdAt")
   const [visibility, setVisibility] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedBlogToDelete, setSelectedBlogToDelete] = useState<
     string | null
   >(null)
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
 
   // Fetch blogs data with filters
   const getBlogs = async () => {
@@ -100,17 +102,23 @@ const BlogHome: React.FC = () => {
 
   const confirmDelete = async () => {
     try {
+      setDeleteLoading(true)
       if (selectedBlogToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/${selectedBlogToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/delete-blog/${selectedBlogToDelete}`
         )
         if (response.data.success) {
-          console.log("Blog deleted successfully")
+          setDeleteLoading(false)
+          toast.success(response.data.message)
           getBlogs()
+        } else {
+          setDeleteLoading(false)
+          toast.error(response.data.message)
         }
       }
     } catch (error) {
-      console.log("Failed to delete blog")
+      setDeleteLoading(false)
+      toast.error("Failed to delete blog")
     } finally {
       setDeleteModalOpen(false)
     }
@@ -142,24 +150,6 @@ const BlogHome: React.FC = () => {
       {/* Filters Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="relative">
-          <Filter className="absolute left-3 top-2 text-gray-400" size={20} />
-          <select
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value)
-              setPage(1)
-            }}
-          >
-            <option value="">All Categories</option>
-            <option value="Technology">Technology</option>
-            <option value="Travel">Travel</option>
-            <option value="Lifestyle">Lifestyle</option>
-            <option value="Food">Food</option>
-          </select>
-        </div>
-
-        <div className="relative">
           <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
           <select
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -170,10 +160,8 @@ const BlogHome: React.FC = () => {
             }}
           >
             <option value="">Visibility</option>
-            <option value="isNewItem">New</option>
-            <option value="isPopular">Popular</option>
-            <option value="isRecommended">Recommended</option>
-            <option value="isFeatured">Featured</option>
+            <option value="isNewBlog">New</option>
+            <option value="isActive">Active</option>
           </select>
         </div>
 
@@ -188,10 +176,10 @@ const BlogHome: React.FC = () => {
             }}
           >
             <option value="">Sort by...</option>
-            <option value="createdAt">Newest First</option>
-            <option value="-createdAt">Oldest First</option>
-            <option value="title">Title: A-Z</option>
-            <option value="-title">Title: Z-A</option>
+            <option value="-createdAt">Newest First</option>
+            <option value="createdAt">Oldest First</option>
+            <option value="blogViews">Views: Low to High</option>
+            <option value="-blogViews">Views: High to Low</option>
           </select>
         </div>
 
@@ -326,6 +314,7 @@ const BlogHome: React.FC = () => {
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirmDelete={confirmDelete}
+        loading={deleteLoading}
         itemName={
           blogs.find((b) => b._id === selectedBlogToDelete)?.title || ""
         }
