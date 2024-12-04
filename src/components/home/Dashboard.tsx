@@ -125,7 +125,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Bookings & Revenue */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-700">Bookings</h3>
             <DollarSign className="text-gray-500" />
@@ -144,10 +144,10 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Total Revenue */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-700">
               Total Revenue
@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
               ${stats.totalRevenue.toLocaleString()}
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )
