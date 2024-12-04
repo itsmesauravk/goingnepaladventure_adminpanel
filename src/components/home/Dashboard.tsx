@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
   Package,
   Mountain,
@@ -14,6 +14,8 @@ import {
   DollarSign,
   Calendar,
 } from "lucide-react"
+import { PlanTripContext } from "../utils/ContextProvider"
+import axios from "axios"
 
 const Dashboard: React.FC = () => {
   // Comprehensive dashboard state
@@ -29,6 +31,28 @@ const Dashboard: React.FC = () => {
     newPackagesThisMonth: 12,
     averageBookingValue: 197,
   })
+
+  const planTripContext = useContext(PlanTripContext)!
+
+  // if (!planTripContext) {
+  //   throw new Error("PlanTripContext must be used within a PlanTripProvider")
+  // }
+  const { setPendingData } = planTripContext
+
+  const handleGetPendingData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/plan-trip/total-pending-trip-requests`
+      )
+      setPendingData(response.data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    handleGetPendingData()
+  }, [])
 
   const packageCategories = [
     {

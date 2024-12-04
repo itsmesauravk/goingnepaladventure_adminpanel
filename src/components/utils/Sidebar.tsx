@@ -33,6 +33,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { usePathname } from "next/navigation"
+import { useContext } from "react"
+import { PlanTripContext } from "./ContextProvider"
 
 // Menu items.
 const items = [
@@ -77,6 +79,13 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname()
 
+  const planTripContext = useContext(PlanTripContext)
+
+  if (!planTripContext) {
+    throw new Error("PlanTripContext must be used within a PlanTripProvider")
+  }
+  const { pendingData } = planTripContext
+
   const resource = pathname.split("/")[1]
 
   return (
@@ -110,7 +119,7 @@ export function AppSidebar() {
                       <span className="text-xl">{item.title}</span>
                       {item.notificationCount && (
                         <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          {item.notificationCount}
+                          {pendingData}
                         </span>
                       )}
                     </Link>
