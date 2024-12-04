@@ -33,6 +33,7 @@ import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
 import { FaEye } from "react-icons/fa6"
 import { Loader } from "../loading/Loader"
+import TrekPdfForm from "./addForm/TrekPdfForm"
 
 interface FAQ {
   question: string
@@ -74,6 +75,10 @@ const EditTrekForm: React.FC = () => {
   const [price, setPrice] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [trekPdf, setTrekPdf] = useState<string | File>("")
+  const [trekPdfPreview, setTrekPdfPreview] = useState<string | null>(null)
+  const [pdfFileSize, setPdfFileSize] = useState<number | null>(null)
+  const maxSizeMB = 5 // Maximum allowed size in MB
   const [country, setCountry] = useState("")
   const [minDays, setMinDays] = useState<number>(1)
   const [maxDays, setMaxDays] = useState<number>(1)
@@ -150,6 +155,32 @@ const EditTrekForm: React.FC = () => {
     if (file) {
       setThumbnailPreview(URL.createObjectURL(file))
       setThumbnail(file)
+    }
+  }
+  // trek pdf
+  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setTrekPdfPreview(URL.createObjectURL(file))
+      setTrekPdf(file)
+    }
+    if (file) {
+      const sizeInMB = file.size / (1024 * 1024) // Convert bytes to MB
+      setPdfFileSize(sizeInMB)
+
+      if (sizeInMB > maxSizeMB) {
+        alert(
+          `File size exceeds ${maxSizeMB} MB. Please upload a smaller file.`
+        )
+        setTrekPdf("")
+        return
+      }
+
+      if (file.type === "application/pdf") {
+        setTrekPdfPreview(URL.createObjectURL(file))
+      } else {
+        alert("Please select a valid PDF file.")
+      }
     }
   }
   // country
@@ -335,6 +366,7 @@ const EditTrekForm: React.FC = () => {
         setPreviews(trekData.viewsCount)
         setPrice(trekData.price)
         setThumbnailPreview(trekData.thumbnail)
+        setTrekPdfPreview(trekData.trekPdf)
         setCountry(trekData.country)
         setMinDays(trekData.days.min)
         setMaxDays(trekData.days.max)
@@ -383,6 +415,7 @@ const EditTrekForm: React.FC = () => {
 
     formData.append("price", price.toString())
     formData.append("thumbnail", thumbnail as File)
+    formData.append("trekPdf", trekPdf as File)
     formData.append("country", country)
     formData.append("location", location)
     formData.append("difficulty", difficulty)
@@ -501,6 +534,16 @@ const EditTrekForm: React.FC = () => {
           preview={thumbnailPreview}
           handleImageChange={handleThumbnailChange}
         />
+
+        {/* trek pdf */}
+        <div className="mt-6">
+          <TrekPdfForm
+            preview={trekPdfPreview}
+            handlePdfChange={handlePdfChange}
+            pdfFileSize={pdfFileSize}
+            maxFileSize={maxSizeMB}
+          />
+        </div>
 
         {/* compartment 3  */}
         <div className="flex justify-between">

@@ -9,6 +9,7 @@ import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
 import { DeleteTour } from "./DeleteTour"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
+import { toast } from "sonner"
 
 interface Tour {
   _id: string
@@ -41,6 +42,8 @@ const TourHome: React.FC = () => {
   const [selectedTourToDelete, setSelectedTourToDelete] = useState<
     string | null
   >(null)
+
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
 
   // Fetch tours data with filters
   const getTours = async () => {
@@ -106,15 +109,17 @@ const TourHome: React.FC = () => {
     try {
       if (selectedTourToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/tours/${selectedTourToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/tours/delete-tour/${selectedTourToDelete}`
         )
         if (response.data.success) {
-          console.log("Tour deleted successfully")
+          toast.success(response.data.message)
           getTours()
+        } else {
+          toast.error(response.data.message)
         }
       }
     } catch (error) {
-      console.log("Failed to delete tour")
+      toast.error("Failed to delete tour")
     } finally {
       setDeleteModalOpen(false)
     }
@@ -387,6 +392,7 @@ const TourHome: React.FC = () => {
         onClose={() => setDeleteModalOpen(false)}
         onConfirmDelete={confirmDelete}
         itemName={tours.find((t) => t._id === selectedTourToDelete)?.name || ""}
+        deleteLoading={deleteLoading}
       />
     </div>
   )

@@ -7,6 +7,7 @@ interface DeleteConfirmationModalProps {
   onClose: () => void
   onConfirmDelete: () => void
   itemName?: string
+  deleteLoading?: boolean
 }
 
 export const DeleteTour: React.FC<DeleteConfirmationModalProps> = ({
@@ -14,6 +15,7 @@ export const DeleteTour: React.FC<DeleteConfirmationModalProps> = ({
   onClose,
   onConfirmDelete,
   itemName = "item",
+  deleteLoading,
 }) => {
   const [confirmText, setConfirmText] = useState("")
   const isConfirmValid = confirmText.toLowerCase() === "confirm"

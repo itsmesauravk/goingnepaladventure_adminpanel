@@ -32,6 +32,7 @@ import NoteForm from "./addForm/NoteForm"
 import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
 import { Loader } from "../loading/Loader"
+import TrekPdfForm from "./addForm/TrekPdfForm"
 
 interface FAQ {
   question: string
@@ -73,6 +74,10 @@ const AddTrekForm: React.FC = () => {
   const [price, setPrice] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [trekPdf, setTrekPdf] = useState<string | File>("")
+  const [trekPdfPreview, setTrekPdfPreview] = useState<string | null>(null)
+  const [pdfFileSize, setPdfFileSize] = useState<number | null>(null)
+  const maxSizeMB = 5 // Maximum allowed size in MB
   const [country, setCountry] = useState("")
   const [minDays, setMinDays] = useState<number>(1)
   const [maxDays, setMaxDays] = useState<number>(1)
@@ -147,6 +152,33 @@ const AddTrekForm: React.FC = () => {
       setThumbnail(file)
     }
   }
+  // trek pdf
+  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setTrekPdfPreview(URL.createObjectURL(file))
+      setTrekPdf(file)
+    }
+    if (file) {
+      const sizeInMB = file.size / (1024 * 1024) // Convert bytes to MB
+      setPdfFileSize(sizeInMB)
+
+      if (sizeInMB > maxSizeMB) {
+        alert(
+          `File size exceeds ${maxSizeMB} MB. Please upload a smaller file.`
+        )
+        setTrekPdf("")
+        return
+      }
+
+      if (file.type === "application/pdf") {
+        setTrekPdfPreview(URL.createObjectURL(file))
+      } else {
+        alert("Please select a valid PDF file.")
+      }
+    }
+  }
+
   // country
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(event.target.value)
@@ -487,6 +519,7 @@ const AddTrekForm: React.FC = () => {
     formData.append("name", name)
     formData.append("price", price.toString())
     formData.append("thumbnail", thumbnail as File)
+    formData.append("trekPdf", trekPdf as File)
     formData.append("country", country)
     formData.append("location", location)
     formData.append("difficulty", difficulty)
@@ -604,6 +637,16 @@ const AddTrekForm: React.FC = () => {
               <ThumbnailInput
                 preview={thumbnailPreview}
                 handleImageChange={handleThumbnailChange}
+              />
+            </div>
+
+            {/* trek pdf */}
+            <div className="mt-6">
+              <TrekPdfForm
+                preview={trekPdfPreview}
+                handlePdfChange={handlePdfChange}
+                pdfFileSize={pdfFileSize}
+                maxFileSize={maxSizeMB}
               />
             </div>
           </div>
