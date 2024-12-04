@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import Link from "next/link"
 import axios from "axios"
+import { FaArrowLeft } from "react-icons/fa6"
+import { useRouter } from "next/navigation"
 
 interface BlogPostProps {
   onSubmit: (blogData: {
@@ -23,6 +25,8 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const route = useRouter()
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,14 +86,17 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center mb-6">
-        <Link
-          href="/blogs"
-          className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
-        >
-          <ArrowLeft className="mr-2" /> Back to Blogs
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-800">Create Blog Post</h1>
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => route.back()}
+            className="hover:bg-teal-700 p-2 rounded-full transition-colors"
+          >
+            <FaArrowLeft size={24} />
+          </button>
+          <h1 className="text-3xl font-bold">Add New Tour</h1>
+        </div>
       </div>
 
       <Card className="w-full max-w-4xl mx-auto shadow-lg">

@@ -5,6 +5,7 @@ import {
   MountainSnow,
   TicketsPlane,
   Settings,
+  Bus,
   User2,
   ChevronUp,
   BookOpen,
@@ -61,6 +62,12 @@ const items = [
     icon: BookOpen,
   },
   {
+    title: "Plan Trip",
+    url: "/plan-trip",
+    icon: Bus,
+    notificationCount: 2,
+  },
+  {
     title: "Settings",
     url: "#",
     icon: Settings,
@@ -101,6 +108,11 @@ export function AppSidebar() {
                     >
                       <item.icon />
                       <span className="text-xl">{item.title}</span>
+                      {item.notificationCount && (
+                        <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                          {item.notificationCount}
+                        </span>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
