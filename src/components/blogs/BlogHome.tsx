@@ -124,6 +124,14 @@ const BlogHome: React.FC = () => {
     }
   }
 
+  //debounce search
+  useEffect(() => {
+    const searchData = setTimeout(() => {
+      getBlogs()
+    }, 2000)
+    return () => clearTimeout(searchData)
+  }, [search])
+
   useEffect(() => {
     getBlogs()
   }, [page, limit, category, sort, visibility])
@@ -190,11 +198,6 @@ const BlogHome: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search blogs by title..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-          />
-          <Search
-            className="absolute right-3 top-2 cursor-pointer text-primary"
-            size={20}
-            onClick={() => getBlogs()}
           />
         </div>
       </div>

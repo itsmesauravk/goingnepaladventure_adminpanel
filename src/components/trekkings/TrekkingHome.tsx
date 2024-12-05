@@ -9,6 +9,7 @@ import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
 import { DeleteTrek } from "./DeleteTrek"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
+import { get } from "http"
 // import { toast } from "sonner"
 
 interface Trekking {
@@ -130,6 +131,13 @@ const TrekkingHome: React.FC = () => {
   }
 
   useEffect(() => {
+    const searchTimeout = setTimeout(() => {
+      getTrekking()
+    }, 2000)
+    return () => clearTimeout(searchTimeout)
+  }, [search])
+
+  useEffect(() => {
     getTrekking()
   }, [page, limit, difficulty, sort, visibility])
 
@@ -216,11 +224,6 @@ const TrekkingHome: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search treks..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-          />
-          <Search
-            className="absolute right-3 top-2 cursor-pointer text-primary"
-            size={20}
-            onClick={() => getTrekking()}
           />
         </div>
       </div>

@@ -126,6 +126,13 @@ const TourHome: React.FC = () => {
   }
 
   useEffect(() => {
+    const searchTimeout = setTimeout(() => {
+      getTours()
+    }, 2000)
+    return () => clearTimeout(searchTimeout)
+  }, [search])
+
+  useEffect(() => {
     getTours()
   }, [page, limit, tripType, sort, visibility])
 
@@ -213,11 +220,6 @@ const TourHome: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tours..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-          />
-          <Search
-            className="absolute right-3 top-2 cursor-pointer text-primary"
-            size={20}
-            onClick={() => getTours()}
           />
         </div>
       </div>

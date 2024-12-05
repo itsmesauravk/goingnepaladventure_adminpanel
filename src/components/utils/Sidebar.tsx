@@ -117,7 +117,7 @@ export function AppSidebar() {
                     >
                       <item.icon />
                       <span className="text-xl">{item.title}</span>
-                      {item.notificationCount && (
+                      {item.notificationCount && pendingData > 0 && (
                         <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                           {pendingData}
                         </span>
