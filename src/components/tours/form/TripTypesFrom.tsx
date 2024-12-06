@@ -1,25 +1,28 @@
 "use client"
 import axios from "axios"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 
-interface TripTypeSelectProps {
-  tripType: string
-  handleTripTypeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
-}
-
-interface tripAndTour {
+interface TripType {
+  _id: string
   title: string
   description: string
   image: string
+}
+
+interface TripTypeSelectProps {
+  tripType: {
+    id: string
+    title: string
+  }
+  handleTripTypeChange: (event: { id: string; title: string }) => void
 }
 
 const TripTypeForm: React.FC<TripTypeSelectProps> = ({
   tripType,
   handleTripTypeChange,
 }) => {
-  const [tripTypes, setTripTypes] = useState<tripAndTour[]>([])
+  const [tripTypes, setTripTypes] = useState<TripType[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -56,6 +59,17 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
     }
   }
 
+  const onTripTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedType = tripTypes.find((type) => type.title === e.target.value)
+
+    if (selectedType) {
+      handleTripTypeChange({
+        id: selectedType._id,
+        title: selectedType.title,
+      })
+    }
+  }
+
   return (
     <div className="mb-4">
       <div className="flex items-center gap-4 mb-2">
@@ -79,15 +93,15 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
       ) : (
         <select
           id="tripType"
-          value={tripType}
-          onChange={handleTripTypeChange}
+          value={tripType.title}
+          onChange={onTripTypeChange}
           className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="" disabled>
             Select Trip Type
           </option>
-          {tripTypes.map((type, index) => (
-            <option key={index} value={type.title}>
+          {tripTypes.map((type) => (
+            <option key={type._id} value={type.title}>
               {type.title}
             </option>
           ))}

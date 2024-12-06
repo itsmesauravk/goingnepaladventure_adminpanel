@@ -38,6 +38,7 @@ import ThingsToKnow from "./form/ThingsToKnow"
 import ArrivalLocation from "./form/ArrivalLocation"
 
 import { FaEye } from "react-icons/fa6"
+import { json } from "stream/consumers"
 
 interface FAQ {
   question: string
@@ -89,7 +90,10 @@ const EditTourForm: React.FC = () => {
   const [location, setLocation] = useState<string>("")
   const [arrivalLocation, setArrivalLocation] = useState<string>("")
   const [departureLocation, setDepartureLocation] = useState<string>("")
-  const [tripType, setTripType] = useState<string>("")
+  const [selectedTripType, setSelectedTripType] = useState({
+    id: "",
+    title: "",
+  })
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
   const [meal, setMeal] = useState<string>("")
@@ -210,12 +214,7 @@ const EditTourForm: React.FC = () => {
   ) => {
     setDepartureLocation(event.target.value)
   }
-  // trip type
-  const handleTripTypeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setTripType(event.target.value)
-  }
+
   // group size
   const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMinGroupSize(Number(event.target.value))
@@ -384,7 +383,7 @@ const EditTourForm: React.FC = () => {
         setLocation(trekData.location)
         setArrivalLocation(trekData.arrivalLocation)
         setDepartureLocation(trekData.departureLocation)
-        setTripType(trekData.tripType)
+        setSelectedTripType(trekData.tripType)
         setMinGroupSize(trekData.groupSize.min)
         setMaxGroupSize(trekData.groupSize.max)
         setMeal(trekData.meal)
@@ -432,7 +431,7 @@ const EditTourForm: React.FC = () => {
     formData.append("location", location)
     formData.append("arrivalLocation", arrivalLocation)
     formData.append("departureLocation", departureLocation)
-    formData.append("tripType", tripType)
+    formData.append("tripType", JSON.stringify(selectedTripType))
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
     formData.append("groupSizeMin", minGroupSize.toString())
@@ -534,10 +533,11 @@ const EditTourForm: React.FC = () => {
             country={country}
             handleCountryChange={handleCountryChange}
           />
-          {/* Difficulty */}
           <TripTypeForm
-            tripType={tripType}
-            handleTripTypeChange={handleTripTypeChange}
+            tripType={selectedTripType}
+            handleTripTypeChange={(selected) => {
+              setSelectedTripType(selected)
+            }}
           />
         </div>
         {/* third compartment */}

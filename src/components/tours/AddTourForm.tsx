@@ -88,7 +88,11 @@ const AddTourForm: React.FC = () => {
   const [location, setLocation] = useState<string>("")
   const [arrivalLocation, setArrivalLocation] = useState<string>("")
   const [departureLocation, setDepartureLocation] = useState<string>("")
-  const [tripType, setTripType] = useState<string>("")
+  // const [tripType, setTripType] = useState<string>("")
+  const [selectedTripType, setSelectedTripType] = useState({
+    id: "",
+    title: "",
+  })
   const [minGroupSize, setMinGroupSize] = useState<number>(0)
   const [maxGroupSize, setMaxGroupSize] = useState<number>(0)
   const [meal, setMeal] = useState<string>("")
@@ -204,12 +208,7 @@ const AddTourForm: React.FC = () => {
   ) => {
     setDepartureLocation(event.target.value)
   }
-  // trip type
-  const handleTripTypeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setTripType(event.target.value)
-  }
+
   // group size
   const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMinGroupSize(Number(event.target.value))
@@ -367,7 +366,10 @@ const AddTourForm: React.FC = () => {
     setLocation("Khumbu Region")
     setArrivalLocation("Kathmandu")
     setDepartureLocation("Pokhara")
-    setTripType("Wildelife and Safari")
+    setSelectedTripType({
+      id: "675317b60b4e6270ecaffa60",
+      title: "Climbing and Expeditions",
+    })
     setMinDays(12)
     setMaxDays(14)
     setMinGroupSize(2)
@@ -511,7 +513,7 @@ const AddTourForm: React.FC = () => {
     formData.append("location", location)
     formData.append("arrivalLocation", arrivalLocation)
     formData.append("departureLocation", departureLocation)
-    formData.append("tripType", tripType)
+    formData.append("tripType", JSON.stringify(selectedTripType))
     formData.append("minDays", minDays.toString())
     formData.append("maxDays", maxDays.toString())
     formData.append("groupSizeMin", minGroupSize.toString())
@@ -605,9 +607,15 @@ const AddTourForm: React.FC = () => {
             </div>
 
             <div className="flex justify-between">
-              <TripTypeForm
+              {/* <TripTypeForm
                 tripType={tripType}
                 handleTripTypeChange={handleTripTypeChange}
+              /> */}
+              <TripTypeForm
+                tripType={selectedTripType}
+                handleTripTypeChange={(selected) => {
+                  setSelectedTripType(selected)
+                }}
               />
             </div>
 
