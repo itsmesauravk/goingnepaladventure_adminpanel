@@ -133,7 +133,7 @@ const TrekkingHome: React.FC = () => {
   useEffect(() => {
     const searchTimeout = setTimeout(() => {
       getTrekking()
-    }, 2000)
+    }, 1000)
     return () => clearTimeout(searchTimeout)
   }, [search])
 

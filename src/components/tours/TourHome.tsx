@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
+import { Trash2, Plus, TreePineIcon, Filter, SortAsc } from "lucide-react"
 import { DeleteTour } from "./DeleteTour"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
@@ -128,7 +128,7 @@ const TourHome: React.FC = () => {
   useEffect(() => {
     const searchTimeout = setTimeout(() => {
       getTours()
-    }, 2000)
+    }, 1000)
     return () => clearTimeout(searchTimeout)
   }, [search])
 
@@ -142,13 +142,22 @@ const TourHome: React.FC = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Tour Manager</h2>
-          <Button
-            onClick={() => router.push("/tours/add-tour")}
-            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Add New Tour
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/tours/create-trips-and-tours")}
+              className="bg-tourPrimary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+            >
+              <TreePineIcon size={20} />
+              Create T&T
+            </Button>
+            <Button
+              onClick={() => router.push("/tours/add-tour")}
+              className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Add New Tour
+            </Button>
+          </div>
         </div>
         <p className="text-gray-600">
           Manage your tour packages and their visibility options

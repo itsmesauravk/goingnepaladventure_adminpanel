@@ -36,6 +36,7 @@ import TourLanguage from "./form/TourLanguage"
 import SuitableAge from "./form/SuitableAge"
 import ThingsToKnow from "./form/ThingsToKnow"
 import ArrivalLocation from "./form/ArrivalLocation"
+import Link from "next/link"
 
 interface FAQ {
   question: string
@@ -603,16 +604,23 @@ const AddTourForm: React.FC = () => {
               <NameInput value={name} onChange={handleNameChange} />
             </div>
 
-            {/* First Row: Price, Country, Trip Type */}
+            <div className="flex justify-between">
+              <TripTypeForm
+                tripType={tripType}
+                handleTripTypeChange={handleTripTypeChange}
+              />
+            </div>
+
+            {/* First Row: Price, Country, Location */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <PriceInput value={price} onChange={handlePriceChange} />
               <CountrySelect
                 country={country}
                 handleCountryChange={handleCountryChange}
               />
-              <TripTypeForm
-                tripType={tripType}
-                handleTripTypeChange={handleTripTypeChange}
+              <LocationInput
+                location={location}
+                handleLocationChange={handleLocationChange}
               />
             </div>
 
@@ -646,10 +654,7 @@ const AddTourForm: React.FC = () => {
                 selectedSeasons={selectedSeasons}
                 handleSeasonChange={handleSeasonChange}
               />
-              <LocationInput
-                location={location}
-                handleLocationChange={handleLocationChange}
-              />
+
               <MealSelect meal={meal} handleMealChange={handleMealChange} />
             </div>
 
