@@ -33,7 +33,12 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
       setLoading(true)
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trips-and-tours/get`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trips-and-tours/get`,
+          {
+            params: {
+              select: "_id title",
+            },
+          }
         )
 
         const data = response.data

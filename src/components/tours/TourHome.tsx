@@ -148,7 +148,7 @@ const TourHome: React.FC = () => {
               className="bg-tourPrimary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
             >
               <TreePineIcon size={20} />
-              Create T&T
+              Trips And Tours (category)
             </Button>
             <Button
               onClick={() => router.push("/tours/add-tour")}
