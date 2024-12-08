@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2, Plus, Search, Filter, SortAsc } from "lucide-react"
+import { Trash2, Plus, MapIcon, Filter, SortAsc } from "lucide-react"
 import { DeleteTrek } from "./DeleteTrek"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
@@ -46,6 +46,8 @@ const TrekkingHome: React.FC = () => {
   const [difficulty, setDifficulty] = useState<string>("")
   const [sort, setSort] = useState<string>("")
   const [visibility, setVisibility] = useState<string>("")
+  const [allLocations, setAllLocations] = useState<string[]>([])
+  const [location, setLocation] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTrekToDelete, setSelectedTrekToDelete] = useState<
     string | null
@@ -65,6 +67,7 @@ const TrekkingHome: React.FC = () => {
             difficulty,
             sort,
             visibility,
+            location,
           },
         }
       )
@@ -77,6 +80,20 @@ const TrekkingHome: React.FC = () => {
       console.log("Failed to fetch trekking data")
     } finally {
       setLoading(false)
+    }
+  }
+
+  // get trek locations
+  const getTrekLocations = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/get-trek-location`
+      )
+      if (response.data.success) {
+        setAllLocations(response.data.data)
+      }
+    } catch (error) {
+      console.log("Failed to fetch trek locations")
     }
   }
 
@@ -138,8 +155,12 @@ const TrekkingHome: React.FC = () => {
   }, [search])
 
   useEffect(() => {
+    getTrekLocations()
+  }, [])
+
+  useEffect(() => {
     getTrekking()
-  }, [page, limit, difficulty, sort, visibility])
+  }, [page, limit, difficulty, sort, visibility, location])
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
@@ -214,6 +235,26 @@ const TrekkingHome: React.FC = () => {
             <option value="-price">Price: High to Low</option>
             <option value="name">Name: A-Z</option>
             <option value="-name">Name: Z-A</option>
+          </select>
+        </div>
+
+        {/* location  */}
+        <div className="relative">
+          <MapIcon className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={location}
+            onChange={(e) => {
+              setLocation(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Location</option>
+            {allLocations.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Loader } from "../loading/Loader"
 import { Button } from "../ui/button"
-import { Trash2, Plus, TreePineIcon, Filter, SortAsc } from "lucide-react"
+import {
+  Trash2,
+  Plus,
+  TreePineIcon,
+  Filter,
+  SortAsc,
+  MapPin,
+} from "lucide-react"
 import { DeleteTour } from "./DeleteTour"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
@@ -36,6 +43,8 @@ const TourHome: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [tripType, setTripType] = useState<string>("")
+  const [region, setRegion] = useState<string>("")
+  const [allRegions, setAllRegions] = useState<string[]>([])
   const [sort, setSort] = useState<string>("")
   const [visibility, setVisibility] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -59,6 +68,7 @@ const TourHome: React.FC = () => {
             tripType,
             sort,
             visibility,
+            region,
           },
         }
       )
@@ -72,6 +82,25 @@ const TourHome: React.FC = () => {
       setLoading(false)
     }
   }
+
+  //get all tour regions
+  // get trek locations
+  const getTourLocation = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/get-tour-regions`
+      )
+      if (response.data.success) {
+        setAllRegions(response.data.data)
+      }
+    } catch (error) {
+      console.log("Failed to fetch trek locations")
+    }
+  }
+
+  useEffect(() => {
+    getTourLocation()
+  }, [])
 
   const handleSwitchChange = async (
     tourId: string,
@@ -134,7 +163,7 @@ const TourHome: React.FC = () => {
 
   useEffect(() => {
     getTours()
-  }, [page, limit, tripType, sort, visibility])
+  }, [page, limit, tripType, sort, visibility, region])
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
@@ -184,6 +213,7 @@ const TourHome: React.FC = () => {
           </select>
         </div>
 
+        {/* visibility  */}
         <div className="relative">
           <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
           <select
@@ -199,6 +229,26 @@ const TourHome: React.FC = () => {
             <option value="isPopular">Popular</option>
             <option value="isRecommended">Recommended</option>
             <option value="isFeatured">Featured</option>
+          </select>
+        </div>
+
+        {/* region  */}
+        <div className="relative">
+          <MapPin className="absolute left-3 top-2 text-gray-400" size={20} />
+          <select
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={region}
+            onChange={(e) => {
+              setRegion(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Regions</option>
+            {allRegions.map((reg) => (
+              <option key={reg} value={reg}>
+                {reg}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -1,18 +1,24 @@
 "use client"
-import React, { useState, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+import React, { useState, useCallback, useRef, useEffect } from "react"
+import { Editor as TinyMCEEditor } from "tinymce"
+import { Editor } from "@tinymce/tinymce-react"
+import axios from "axios"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+
+// UI Components
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ImageUp, Save, ArrowLeft } from "lucide-react"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner"
-import Link from "next/link"
-import axios from "axios"
-import { FaArrowLeft } from "react-icons/fa6"
-import { useRouter } from "next/navigation"
+import { Label } from "@/components/ui/label"
 
+// Icons
+import { ImageUp, Save } from "lucide-react"
+import { FaArrowLeft } from "react-icons/fa6"
+
+// Types
 interface BlogPostProps {
-  onSubmit: (blogData: {
+  onSubmit?: (blogData: {
     title: string
     image: File | null
     description: string
@@ -25,8 +31,13 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [isClient, setIsClient] = useState(false) // To check if we're in the client
+  const editorRef = useRef<TinyMCEEditor | null>(null)
   const route = useRouter()
+
+  useEffect(() => {
+    setIsClient(true) // Enable rendering dynamic elements only on the client
+  }, [])
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +56,10 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   )
 
   const handleAddBlog = async () => {
-    if (!title.trim() || !description.trim() || !image) {
+    const editorContent = editorRef.current?.getContent() || ""
+    const plainTextDescription = editorContent.replace(/<[^>]*>/g, "").trim()
+
+    if (!title.trim() || !plainTextDescription || !image) {
       return toast.error("Please fill all fields")
     }
 
@@ -54,54 +68,70 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
 
       const formData = new FormData()
       formData.append("title", title)
-      formData.append("description", description)
+      formData.append("description", editorContent)
       formData.append("image", image)
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/add-blog`,
-        formData
-      )
-
-      console.log(response)
-
-      if (response.data.success) {
-        toast.success(response.data.message)
-        setTitle("")
-        setDescription("")
-        setImage(null)
-        setImagePreview(null)
-        setIsSubmitting(false)
+      if (onSubmit) {
+        await onSubmit({ title, image, description: editorContent })
       } else {
-        toast.error(response.data.message)
-        setIsSubmitting(false)
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/add-blog`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+
+        if (response.data.success) {
+          toast.success(response.data.message)
+          resetForm()
+        } else {
+          toast.error(response.data.message)
+        }
       }
     } catch (error) {
       toast.error("Failed to create blog post")
-      setIsSubmitting(false)
       console.error(error)
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  const resetForm = () => {
+    setTitle("")
+    setDescription("")
+    setImage(null)
+    setImagePreview(null)
+
+    if (editorRef.current) {
+      editorRef.current.setContent("")
+    }
+  }
+
+  if (!isClient) return null // Avoid rendering until on the client
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="bg-primary text-white p-6 flex items-center justify-between rounded-md">
+        <div className="container mx-auto flex items-center space-x-4">
           <button
             onClick={() => route.back()}
-            className="hover:bg-teal-700 p-2 rounded-full transition-colors"
+            className="hover:bg-blue-700 p-2 rounded-full transition-colors"
           >
             <FaArrowLeft size={24} />
           </button>
-          <h1 className="text-3xl font-bold">Add New Tour</h1>
+          <h1 className="text-3xl font-bold">Add New Blog</h1>
         </div>
       </div>
 
-      <Card className="w-full max-w-4xl mx-auto shadow-lg">
-        <CardContent className="p-6">
-          <div className="space-y-6">
+      <div className="container mx-auto px-4 py-8">
+        <div className="w-full space-y-6">
+          {/* Title Input */}
+          <div className="space-y-4">
+            <Label className="text-lg font-semibold">Blog Title</Label>
             <Input
               placeholder="Enter Blog Title"
               value={title}
@@ -109,7 +139,11 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
               className="w-full text-lg"
               disabled={isSubmitting}
             />
+          </div>
 
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <Label className="text-lg font-semibold">Cover Image</Label>
             <div className="flex items-center space-x-4">
               <input
                 type="file"
@@ -136,28 +170,69 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
                 />
               )}
             </div>
-
-            <Textarea
-              placeholder="Write your blog content here..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="h-64 resize-y text-base"
-              disabled={isSubmitting}
-            />
-
-            <Button
-              onClick={handleAddBlog}
-              disabled={!title || !description || !image || isSubmitting}
-              className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
-            >
-              <Save className="mr-2" />
-              {isSubmitting
-                ? "Uploading Post, please wait..."
-                : "Create Blog Post"}
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* TinyMCE Editor */}
+          <div className="space-y-4">
+            <Label className="text-lg font-semibold">Blog Content</Label>
+            <Editor
+              apiKey="3o1sg5ivlfql4w6odven9ndmucyy0xbtv42n11e7tbn8whp6"
+              onInit={(evt, editor) => {
+                editorRef.current = editor
+              }}
+              initialValue="<p>Write your blog content here...</p>"
+              onEditorChange={(content) => setDescription(content)}
+              init={{
+                height: 500,
+                menubar: false,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar:
+                  "undo redo | blocks | " +
+                  "bold italic forecolor | alignleft aligncenter " +
+                  "alignright alignjustify | bullist numlist outdent indent | " +
+                  "removeformat | help",
+                content_style:
+                  "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              }}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            onClick={handleAddBlog}
+            disabled={
+              !title ||
+              !description.replace(/<[^>]*>/g, "").trim() ||
+              !image ||
+              isSubmitting
+            }
+            className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
+          >
+            <Save className="mr-2" />
+            {isSubmitting
+              ? "Uploading Post, please wait..."
+              : "Create Blog Post"}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
