@@ -38,14 +38,14 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [links, setLinks] = useState<BlogLink[]>([{ text: "", url: "" }])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  // const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const editorRef = useRef<TinyMCEEditor | null>(null)
   const route = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // useEffect(() => {
-  //   setIsClient(true)
-  // }, [])
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,13 +101,11 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
       formData.append("title", title)
       formData.append("description", description)
 
-      // // Append links
-      // validLinks.forEach((link, index) => {
-      //   formData.append(`links[${index}][text]`, link.text)
-      //   formData.append(`links[${index}][url]`, link.url)
-      // })
-
-      formData.append("links", JSON.stringify(validLinks))
+      // Append links
+      validLinks.forEach((link, index) => {
+        formData.append(`links[${index}][text]`, link.text)
+        formData.append(`links[${index}][url]`, link.url)
+      })
 
       // Only append image if it exists
       if (image) {
@@ -164,7 +162,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
     }
   }
 
-  // if (!isClient) return null
+  if (!isClient) return null
 
   return (
     <div className="w-full">

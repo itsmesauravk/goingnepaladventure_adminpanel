@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 import axios from "axios"
 import { useParams } from "next/navigation"
+import parse from "html-react-parser"
 
 const EditBlogForm = () => {
   const [title, setTitle] = useState("")
@@ -146,6 +147,8 @@ const EditBlogForm = () => {
                 />
               )}
             </div>
+
+            <p>{parse(description)}</p>
 
             <Textarea
               placeholder="Write your blog content here..."
