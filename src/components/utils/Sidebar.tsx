@@ -1,6 +1,5 @@
 "use client"
 import {
-  Calendar,
   Home,
   MountainSnow,
   TicketsPlane,
@@ -9,6 +8,8 @@ import {
   User2,
   ChevronUp,
   BookOpen,
+  Binoculars,
+  Sailboat,
 } from "lucide-react"
 import { TbTrekking } from "react-icons/tb"
 
@@ -35,6 +36,7 @@ import {
 import { usePathname } from "next/navigation"
 import { useContext } from "react"
 import { PlanTripContext } from "./ContextProvider"
+import { title } from "process"
 
 // Menu items.
 const items = [
@@ -51,7 +53,7 @@ const items = [
   {
     title: "Tours",
     url: "/tours",
-    icon: Calendar,
+    icon: Binoculars,
   },
   {
     title: "Wellness",
@@ -68,6 +70,11 @@ const items = [
     url: "/plan-trip",
     icon: Bus,
     notificationCount: 2,
+  },
+  {
+    title: "Activities",
+    url: "/activities",
+    icon: Sailboat,
   },
   {
     title: "Settings",
