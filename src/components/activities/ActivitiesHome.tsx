@@ -22,6 +22,7 @@ interface Activity {
   viewsCount: number
   country: string
   location: string
+  price: number
 }
 
 const ActivitiesHome: React.FC = () => {
@@ -34,7 +35,7 @@ const ActivitiesHome: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [sort, setSort] = useState<string>("-date")
-  const [visibility, setVisibility] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("all")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedActivityToDelete, setSelectedActivityToDelete] = useState<
     string | null
@@ -168,9 +169,11 @@ const ActivitiesHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">Visibility</option>
-            <option value="isUpcoming">Popular</option>
-            <option value="isActive">Active</option>
+            <option value="all">Visibility (All)</option>
+            <option value="isPopular">Popular</option>
+            <option value="isActivated">Active</option>
+            <option value="notPopular">Not Popular</option>
+            <option value="notActivated">Not Active</option>
           </select>
         </div>
 
@@ -185,10 +188,12 @@ const ActivitiesHome: React.FC = () => {
             }}
           >
             <option value="">Sort by...</option>
-            <option value="-date">Newest First</option>
-            <option value="date">Oldest First</option>
-            <option value="activityViews">Views: Low to High</option>
-            <option value="-activityViews">Views: High to Low</option>
+            <option value="-createdAt">Newest First</option>
+            <option value="createdAt">Oldest First</option>
+            <option value="price">Price: Low to High</option>
+            <option value="-price">Price: High to Low</option>
+            <option value="viewsCount">Views: Low to High</option>
+            <option value="-viewsCount">Views: High to Low</option>
           </select>
         </div>
 
@@ -241,9 +246,16 @@ const ActivitiesHome: React.FC = () => {
                         <MapIcon size={16} />
                         {activity.location}, {activity.country}
                       </p>
-                      <span className="flex gap-2 items-center text-primary">
-                        <EyeIcon size={16} /> {activity.viewsCount}
-                      </span>
+                      <div className="flex gap-2 items-center ">
+                        <span className="text-primary text-md font-semibold">
+                          ${activity.price}
+                        </span>
+                        <span>|</span>
+
+                        <span className="flex gap-4 items-center text-primary text-md">
+                          <EyeIcon size={16} /> {activity.viewsCount}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </td>

@@ -345,6 +345,7 @@ const CreateActivityForm: React.FC = () => {
             {Object.keys(formData.seasons).map((season) => (
               <div key={season} className="flex items-center space-x-2">
                 <Checkbox
+                  className="text-white"
                   checked={
                     formData.seasons[season as keyof typeof formData.seasons]
                   }

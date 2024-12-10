@@ -10,6 +10,8 @@ import {
   BookOpen,
   Binoculars,
   Sailboat,
+  Users2Icon,
+  Mails,
 } from "lucide-react"
 import { TbTrekking } from "react-icons/tb"
 
@@ -76,6 +78,17 @@ const items = [
     url: "/activities",
     icon: Sailboat,
   },
+  {
+    title: "Requests & Mails",
+    url: "/requests-mails",
+    icon: Mails,
+  },
+  {
+    title: "Users Info",
+    url: "/users-info",
+    icon: Users2Icon,
+  },
+
   {
     title: "Settings",
     url: "#",
