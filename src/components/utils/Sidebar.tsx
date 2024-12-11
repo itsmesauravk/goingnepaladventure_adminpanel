@@ -68,16 +68,17 @@ const items = [
     icon: BookOpen,
   },
   {
+    title: "Activities",
+    url: "/activities",
+    icon: Sailboat,
+  },
+  {
     title: "Plan Trip",
     url: "/plan-trip",
     icon: Bus,
     notificationCount: 2,
   },
-  {
-    title: "Activities",
-    url: "/activities",
-    icon: Sailboat,
-  },
+
   {
     title: "Requests & Mails",
     url: "/requests-mails",

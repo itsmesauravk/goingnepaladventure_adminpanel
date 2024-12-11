@@ -73,33 +73,6 @@ const PlanTripHome: React.FC = () => {
     }
   }
 
-  const handleSwitchChange = async (
-    tripId: string,
-    field: string,
-    currentValue: boolean
-  ) => {
-    setUpdateLoading(tripId)
-    try {
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trips/edit-trip-visibility/${tripId}`,
-        { [field]: !currentValue }
-      )
-
-      if (response.data.success) {
-        setTrips((prevTrips) =>
-          prevTrips.map((trip) =>
-            trip._id === tripId ? { ...trip, [field]: !currentValue } : trip
-          )
-        )
-        console.log(`${field} status updated successfully`)
-      }
-    } catch (error) {
-      console.log("Failed to update status")
-    } finally {
-      setUpdateLoading(null)
-    }
-  }
-
   const handleDeleteClick = (tripId: string) => {
     setSelectedTripToDelete(tripId)
     setDeleteModalOpen(true)
@@ -241,7 +214,9 @@ const PlanTripHome: React.FC = () => {
                       className={`text-md ${
                         trip.status === "pending"
                           ? "text-orange-600"
-                          : "text-green-600"
+                          : trip.status === "viewed"
+                          ? "text-green-600"
+                          : "text-blue-600"
                       } font-semibold `}
                     >
                       {trip.status}

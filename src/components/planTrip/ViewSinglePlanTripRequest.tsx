@@ -55,13 +55,9 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
   const [status, setStatus] = useState<string>("")
   const [createdAt, setCreatedAt] = useState<string>("")
 
-  const [sendingMail, setSendingMail] = useState<boolean>(false)
+  const [sendMail, setSendMail] = useState<number>(0)
 
   const router = useRouter()
-
-  const handleSendEmail = async () => {
-    toast.warning("Under development")
-  }
 
   const getSinglePlanTripRequest = async () => {
     try {
@@ -97,9 +93,13 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
     }
   }
 
+  const handleChangeSendMail = (value: number) => {
+    setSendMail((prev) => prev + 1)
+  }
+
   useEffect(() => {
     getSinglePlanTripRequest()
-  }, [requestId])
+  }, [requestId, sendMail])
 
   return (
     <div className="bg-gray-50 min-h-screen py-10">
@@ -127,19 +127,13 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
               </div>
 
               <div className="flex items-center gap-4">
-                {/* <Button
-                  onClick={handleSendEmail}
-                  disabled={sendingMail}
-                  className="bg-white text-blue-700 hover:bg-blue-50 flex items-center gap-2"
-                >
-                  {sendingMail ? "Sending..." : "Send Details"}
-                  <Send size={18} />
-                </Button> */}
                 <span
                   className={`px-4 py-1.5 rounded-full text-sm font-semibold ${
-                    status === "viewed"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-green-100 text-green-800"
+                    status === "pending"
+                      ? "bg-orange-600"
+                      : status === "viewed"
+                      ? "bg-green-600"
+                      : "bg-blue-600"
                   }`}
                 >
                   {status}
@@ -273,7 +267,11 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
           </div>
         </div>
         {/* form for mail  */}
-        <MailSendForm email={email} name={fullName} />
+        <MailSendForm
+          email={email}
+          name={fullName}
+          onChange={handleChangeSendMail}
+        />
       </div>
     </div>
   )

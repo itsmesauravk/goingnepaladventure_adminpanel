@@ -14,9 +14,14 @@ import { Loader } from "../loading/Loader"
 interface MailSendFormProps {
   email: string
   name: string
+  onChange: (value: number) => void
 }
 
-const MailSendForm: React.FC<MailSendFormProps> = ({ email, name }) => {
+const MailSendForm: React.FC<MailSendFormProps> = ({
+  email,
+  name,
+  onChange,
+}) => {
   const [recipient, setRecipient] = useState<string>("")
   const [subject, setSubject] = useState<string>("")
   const [message, setMessage] = useState<string>("")
@@ -96,6 +101,7 @@ const MailSendForm: React.FC<MailSendFormProps> = ({ email, name }) => {
         }
       )
       if (response.data.success) {
+        onChange(1)
         setLoading(false)
         toast.success("Email sent successfully to " + recipient)
         // Reset form
@@ -152,8 +158,7 @@ const MailSendForm: React.FC<MailSendFormProps> = ({ email, name }) => {
         </div>
         <div className="mb-2">
           <p className="text-gray-600 italic">
-            Note: PDFs only, Max total size {MAX_TOTAL_SIZE}MB, Max files{" "}
-            {MAX_FILES}
+            Note: PDFs only, Max total size 10 MB, Max files {MAX_FILES}
           </p>
         </div>
         <div className="mb-4">
