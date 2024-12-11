@@ -268,6 +268,7 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
         </div>
         {/* form for mail  */}
         <MailSendForm
+          id={requestId}
           email={email}
           name={fullName}
           onChange={handleChangeSendMail}

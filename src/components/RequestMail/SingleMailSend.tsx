@@ -14,11 +14,11 @@ import { Loader } from "../loading/Loader"
 interface MailSendFormProps {
   email: string
   name: string
-  onChange: (value: number) => void
   id: string
+  onChange: (value: number) => void
 }
 
-const MailSendForm: React.FC<MailSendFormProps> = ({
+const SingleMailSend: React.FC<MailSendFormProps> = ({
   email,
   name,
   onChange,
@@ -74,7 +74,7 @@ const MailSendForm: React.FC<MailSendFormProps> = ({
     e.preventDefault()
 
     if (!recipient || !subject || !message) {
-      alert("Please fill in all required fields")
+      toast.warning("Please fill in all required fields")
       return
     }
 
@@ -94,7 +94,7 @@ const MailSendForm: React.FC<MailSendFormProps> = ({
     try {
       setLoading(true)
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/plan-trip/send-mail/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/plan-trip/send-single-mail/${id}`,
         formData,
         {
           headers: {
@@ -105,7 +105,7 @@ const MailSendForm: React.FC<MailSendFormProps> = ({
       if (response.data.success) {
         onChange(1)
         setLoading(false)
-        toast.success("Email sent successfully to " + name ? name : recipient)
+        toast.success(`Email sent successfully to ${name ? name : recipient}`)
         // Reset form
         setRecipient("")
         setSubject("")
@@ -227,4 +227,4 @@ const MailSendForm: React.FC<MailSendFormProps> = ({
   )
 }
 
-export default MailSendForm
+export default SingleMailSend

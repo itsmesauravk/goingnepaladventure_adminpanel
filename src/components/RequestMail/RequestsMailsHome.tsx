@@ -253,8 +253,9 @@ const RequestsMailsHome: React.FC = () => {
                   <div className="flex items-center justify-center space-x-3">
                     <Button
                       onClick={() =>
-                        // router.push(`/requests/single-request/${request._id}`)
-                        toast.info("Feature coming soon!")
+                        router.push(
+                          `/requests-mails/single-request/${request._id}`
+                        )
                       }
                       className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg"
                     >
