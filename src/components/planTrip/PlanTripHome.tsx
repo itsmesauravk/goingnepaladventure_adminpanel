@@ -139,13 +139,6 @@ const PlanTripHome: React.FC = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Trip Planner</h2>
-          <Button
-            onClick={() => router.push("/trips/add-trip")}
-            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Plan New Trip
-          </Button>
         </div>
         <p className="text-gray-600">
           Manage and organize your travel plans and itineraries

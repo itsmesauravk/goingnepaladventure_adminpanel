@@ -20,6 +20,7 @@ import {
 import axios from "axios"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import MailSendForm from "./MailSendForm"
 
 interface TrekDetail {
   trekId: string
@@ -102,8 +103,8 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
 
   return (
     <div className="bg-gray-50 min-h-screen py-10">
-      <div className="container mx-auto max-w-5xl">
-        {/* Improved Header Section */}
+      <div className="container flex  p-10">
+        {/*  Header Section */}
         <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6">
             <div className="flex items-center justify-between">
@@ -126,14 +127,14 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
               </div>
 
               <div className="flex items-center gap-4">
-                <Button
+                {/* <Button
                   onClick={handleSendEmail}
                   disabled={sendingMail}
                   className="bg-white text-blue-700 hover:bg-blue-50 flex items-center gap-2"
                 >
                   {sendingMail ? "Sending..." : "Send Details"}
                   <Send size={18} />
-                </Button>
+                </Button> */}
                 <span
                   className={`px-4 py-1.5 rounded-full text-sm font-semibold ${
                     status === "viewed"
@@ -271,6 +272,8 @@ const ViewSinglePlanTripRequest: React.FC<PlanTripRequestProps> = ({
             </div>
           </div>
         </div>
+        {/* form for mail  */}
+        <MailSendForm email={email} name={fullName} />
       </div>
     </div>
   )
