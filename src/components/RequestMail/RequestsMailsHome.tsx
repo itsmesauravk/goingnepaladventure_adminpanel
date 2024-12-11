@@ -8,6 +8,7 @@ import { Trash2, Plus, SortAsc, MapPin, Calendar, Mail } from "lucide-react"
 
 import { CustomPagination } from "../utils/Pagination"
 import { toast } from "sonner"
+import Link from "next/link"
 
 interface RequestMail {
   _id: string
@@ -100,11 +101,6 @@ const RequestsMailsHome: React.FC = () => {
     setDeleteModalOpen(true)
   }
 
-  const handleBulkMailSend = () => {
-    // Implement bulk mail sending logic
-    toast.info("Bulk mail sending feature coming soon!")
-  }
-
   useEffect(() => {
     getCounts()
   }, [activeTab])
@@ -130,13 +126,12 @@ const RequestsMailsHome: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-800">
             Requests Management
           </h2>
-          <Button
-            onClick={handleBulkMailSend}
-            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
-          >
-            <Mail size={20} />
-            Send Bulk Mail
-          </Button>
+          <Link href="/requests-mails/bulk-mailing">
+            <Button className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2">
+              <Mail size={20} />
+              Send Bulk Mail
+            </Button>
+          </Link>
         </div>
         <p className="text-gray-600">
           Manage and track incoming requests from users
