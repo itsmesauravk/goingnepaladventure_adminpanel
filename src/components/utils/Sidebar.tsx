@@ -37,77 +37,88 @@ import {
 } from "../ui/dropdown-menu"
 import { usePathname } from "next/navigation"
 import { useContext } from "react"
-import { PlanTripContext } from "./ContextProvider"
+import { PlanTripContext, RequestsMailsContext } from "./ContextProvider"
 import { title } from "process"
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/home",
-    icon: Home,
-  },
-  {
-    title: "Trekkings",
-    url: "/trekkings",
-    icon: MountainSnow,
-  },
-  {
-    title: "Tours",
-    url: "/tours",
-    icon: Binoculars,
-  },
-  {
-    title: "Wellness",
-    url: "/wellness",
-    icon: TicketsPlane,
-  },
-  {
-    title: "Blogs",
-    url: "/blogs",
-    icon: BookOpen,
-  },
-  {
-    title: "Activities",
-    url: "/activities",
-    icon: Sailboat,
-  },
-  {
-    title: "Plan Trip",
-    url: "/plan-trip",
-    icon: Bus,
-    notificationCount: 2,
-  },
-
-  {
-    title: "Requests & Mails",
-    url: "/requests-mails",
-    icon: Mails,
-  },
-  {
-    title: "Users Info",
-    url: "/users-info",
-    icon: Users2Icon,
-  },
-
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-]
 
 export function AppSidebar() {
   const pathname = usePathname()
 
   const planTripContext = useContext(PlanTripContext)
+  const requestsMailsContext = useContext(RequestsMailsContext)
 
   if (!planTripContext) {
     throw new Error("PlanTripContext must be used within a PlanTripProvider")
   }
+  if (!requestsMailsContext) {
+    throw new Error(
+      "RequestsMailsContext must be used within a RequestsMailsProvider"
+    )
+  }
   const { pendingData } = planTripContext
+  const { pendingQuoteData, pendingCustomizeData } = requestsMailsContext
+
+  const pendingPlanTripData = pendingData
+  const pendingDataCount = pendingQuoteData + pendingCustomizeData
 
   const resource = pathname.split("/")[1]
+
+  // Menu items.
+  const items = [
+    {
+      title: "Home",
+      url: "/home",
+      icon: Home,
+    },
+    {
+      title: "Trekkings",
+      url: "/trekkings",
+      icon: MountainSnow,
+    },
+    {
+      title: "Tours",
+      url: "/tours",
+      icon: Binoculars,
+    },
+    {
+      title: "Wellness",
+      url: "/wellness",
+      icon: TicketsPlane,
+    },
+    {
+      title: "Blogs",
+      url: "/blogs",
+      icon: BookOpen,
+    },
+    {
+      title: "Activities",
+      url: "/activities",
+      icon: Sailboat,
+    },
+    {
+      title: "Plan Trip",
+      url: "/plan-trip",
+      icon: Bus,
+      notificationCount: pendingData,
+    },
+
+    {
+      title: "Requests & Mails",
+      url: "/requests-mails",
+      icon: Mails,
+      pendingData: pendingDataCount,
+    },
+    {
+      title: "Users Info",
+      url: "/users-info",
+      icon: Users2Icon,
+    },
+
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings,
+    },
+  ]
 
   return (
     <Sidebar>
@@ -138,9 +149,14 @@ export function AppSidebar() {
                     >
                       <item.icon />
                       <span className="text-xl">{item.title}</span>
-                      {item.notificationCount && pendingData > 0 && (
+                      {item.notificationCount && pendingPlanTripData > 0 && (
                         <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          {pendingData}
+                          {pendingPlanTripData}
+                        </span>
+                      )}
+                      {item.pendingData && pendingDataCount > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                          {pendingDataCount}
                         </span>
                       )}
                     </Link>

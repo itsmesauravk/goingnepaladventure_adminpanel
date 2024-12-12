@@ -14,6 +14,13 @@ interface PlanTripContextType {
   setPendingData: Dispatch<SetStateAction<number>>
 }
 
+interface RequestsMailsType {
+  pendingQuoteData: number
+  pendingCustomizeData: number
+  setPendingQuoteData: Dispatch<SetStateAction<number>>
+  setPendingCustomizeData: Dispatch<SetStateAction<number>>
+}
+
 // Props for the Provider
 interface PlanTripProviderProps {
   children: ReactNode
@@ -21,8 +28,11 @@ interface PlanTripProviderProps {
 
 // Create Context
 export const PlanTripContext = createContext<PlanTripContextType | null>(null)
+export const RequestsMailsContext = createContext<RequestsMailsType | null>(
+  null
+)
 
-// Context Provider Component
+// first context
 const PlanTripProvider: FC<PlanTripProviderProps> = ({ children }) => {
   const [pendingData, setPendingData] = useState<number>(0)
 
@@ -33,4 +43,23 @@ const PlanTripProvider: FC<PlanTripProviderProps> = ({ children }) => {
   )
 }
 
-export default PlanTripProvider
+//second context
+const RequestsMailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
+  const [pendingQuoteData, setPendingQuoteData] = useState<number>(0)
+  const [pendingCustomizeData, setPendingCustomizeData] = useState<number>(0)
+
+  return (
+    <RequestsMailsContext.Provider
+      value={{
+        pendingQuoteData,
+        pendingCustomizeData,
+        setPendingQuoteData,
+        setPendingCustomizeData,
+      }}
+    >
+      {children}
+    </RequestsMailsContext.Provider>
+  )
+}
+
+export { PlanTripProvider, RequestsMailsProvider }

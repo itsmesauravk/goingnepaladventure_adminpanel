@@ -94,7 +94,7 @@ const SingleMailSend: React.FC<MailSendFormProps> = ({
     try {
       setLoading(true)
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/plan-trip/send-single-mail/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/quote-and-customize/send-single-mail/${id}`,
         formData,
         {
           headers: {

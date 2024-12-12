@@ -5,7 +5,10 @@ import { Analytics } from "@vercel/analytics/next"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/utils/Sidebar"
 import { Providers } from "./providers"
-import PlanTripProvider from "@/components/utils/ContextProvider"
+import {
+  PlanTripProvider,
+  RequestsMailsProvider,
+} from "@/components/utils/ContextProvider"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,14 +37,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
         <PlanTripProvider>
-          <Providers />
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarTrigger />
+          <RequestsMailsProvider>
+            <Providers />
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarTrigger />
 
-            {children}
-            <Analytics />
-          </SidebarProvider>
+              {children}
+              <Analytics />
+            </SidebarProvider>
+          </RequestsMailsProvider>
         </PlanTripProvider>
       </body>
     </html>

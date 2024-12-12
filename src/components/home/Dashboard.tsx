@@ -9,8 +9,12 @@ import {
   TicketsPlane,
   TrendingUp,
   TrendingDown,
+  Globe,
+  Star,
+  CloudLightning,
+  MailIcon,
 } from "lucide-react"
-import { PlanTripContext } from "../utils/ContextProvider"
+import { PlanTripContext, RequestsMailsContext } from "../utils/ContextProvider"
 import axios from "axios"
 import Link from "next/link"
 
@@ -19,9 +23,32 @@ interface DashboardStats {
   tourCount: number
   wellnessCount: number
   blogCount: number
-  planTripCount: number
-  pendingPlanTripCount: number
-  viewedPlanTripCount: number
+  planTripCount: {
+    total: number
+    pending: number
+    viewed: number
+    mailed: number
+  }
+  activityCount: {
+    total: number
+    popular: number
+    active: number
+  }
+  quoteAndCustomizeCount: {
+    quote: {
+      total: number
+      pending: number
+      viewed: number
+      mailed: number
+    }
+    customize: {
+      total: number
+      pending: number
+      viewed: number
+      mailed: number
+    }
+  }
+  usersCount: number
 }
 
 const Dashboard: React.FC = () => {
@@ -30,15 +57,41 @@ const Dashboard: React.FC = () => {
     tourCount: 0,
     wellnessCount: 0,
     blogCount: 0,
-    planTripCount: 0,
-    pendingPlanTripCount: 0,
-    viewedPlanTripCount: 0,
+    planTripCount: {
+      total: 0,
+      pending: 0,
+      viewed: 0,
+      mailed: 0,
+    },
+    activityCount: {
+      total: 0,
+      popular: 0,
+      active: 0,
+    },
+    quoteAndCustomizeCount: {
+      quote: {
+        total: 0,
+        pending: 0,
+        viewed: 0,
+        mailed: 0,
+      },
+      customize: {
+        total: 0,
+        pending: 0,
+        viewed: 0,
+        mailed: 0,
+      },
+    },
+    usersCount: 0,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const planTripContext = useContext(PlanTripContext)!
   const { setPendingData } = planTripContext
+
+  const requestsMailsContext = useContext(RequestsMailsContext)!
+  const { setPendingQuoteData, setPendingCustomizeData } = requestsMailsContext
 
   const fetchDashboardData = async () => {
     setLoading(true)
@@ -51,7 +104,11 @@ const Dashboard: React.FC = () => {
       if (response.data.success) {
         const dashboardStats = response.data.data
         setStats(dashboardStats)
-        setPendingData(dashboardStats.pendingPlanTripCount)
+        setPendingData(dashboardStats.planTripCount.pending)
+        setPendingQuoteData(dashboardStats.quoteAndCustomizeCount.quote.pending)
+        setPendingCustomizeData(
+          dashboardStats.quoteAndCustomizeCount.customize.pending
+        )
       } else {
         setError("Failed to fetch dashboard data")
       }
@@ -128,7 +185,12 @@ const Dashboard: React.FC = () => {
           <div className="flex space-x-4">
             <div className="flex items-center bg-white shadow-sm rounded-lg px-4 py-2">
               <Users className="mr-2 text-gray-600" />
-              <span className="font-medium text-gray-700">Active Users</span>
+              <span className="font-medium text-gray-700">
+                Users:{" "}
+                <span className="font-semibold text-primary">
+                  {stats?.usersCount ? stats.usersCount : "--"}
+                </span>
+              </span>
             </div>
           </div>
         </div>
@@ -158,45 +220,164 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Plan Trip Section */}
-        <Link href={"/plan-trip"} className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+        {/* Dashboard Sections */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Plan Trip Section */}
+          <Link
+            href={"/plan-trip"}
+            className="bg-white rounded-xl shadow-md p-6"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+              <Calendar className="mr-2 text-blue-500" />
               Plan Trip Overview
             </h2>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-blue-50 rounded-lg p-4 text-center">
-                <h3 className="text-gray-600 mb-2 font-semibold ">
+                <h3 className="text-gray-600 mb-2 font-semibold">
                   Total Requests
                 </h3>
-                <p className="text-3xl font-bold text-blue-600">
-                  {loading ? "--" : stats.planTripCount}
+                <p className="text-2xl font-bold text-blue-600">
+                  {loading ? "--" : stats.planTripCount.total}
+                </p>
+              </div>
+              <div className="bg-green-50 rounded-lg p-4 text-center">
+                <h3 className="text-gray-600 mb-2">Viewed</h3>
+                <p className="text-2xl font-bold text-green-600">
+                  {loading ? "--" : stats.planTripCount.viewed}
                 </p>
               </div>
               <div className="bg-blue-50 rounded-lg p-4 text-center">
-                <h3 className="text-gray-600 mb-2">Viewed Requests</h3>
-                <p className="text-3xl font-bold text-green-600">
-                  {loading ? "--" : stats.viewedPlanTripCount}
+                <h3 className="text-gray-600 mb-2">Mailed</h3>
+                <p className="text-2xl font-bold text-blue-600">
+                  {loading ? "--" : stats.planTripCount.mailed}
+                </p>
+              </div>
+              <div className="bg-red-50 rounded-lg p-4 text-center">
+                <h3 className="text-gray-600 mb-2">Pending</h3>
+                <p className="text-2xl font-bold text-red-600">
+                  {loading ? "--" : stats.planTripCount.pending}
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="space-y-6">
-            {/* Pending Requests */}
-            <div className="bg-red-50 rounded-xl shadow-md p-6 text-center">
-              <div className="flex justify-center items-center mb-4">
-                <AlertTriangle className="mr-2 text-red-500" />
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Pending Requests
+          {/* Activities Section */}
+          <Link
+            href={"/acitivities"}
+            className="bg-white rounded-xl shadow-md p-6"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+              <Globe className="mr-2 text-green-500" />
+              Activities Overview
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="bg-blue-50 rounded-lg p-4 text-center">
+                <h3 className="text-gray-600 mb-2 font-semibold">
+                  Total Activities
                 </h3>
+                <p className="text-2xl font-bold text-blue-600">
+                  {loading ? "--" : stats.activityCount.total}
+                </p>
               </div>
-              <p className="text-4xl font-bold text-red-600">
-                {loading ? "--" : stats.pendingPlanTripCount}
-              </p>
+              <div className="bg-green-50 rounded-lg p-4 text-center">
+                <h3 className="text-gray-600 mb-2 flex justify-center items-center">
+                  <Star className="mr-1 text-yellow-500" size={16} />
+                  Popular
+                </h3>
+                <p className="text-2xl font-bold text-green-600">
+                  {loading ? "--" : stats.activityCount.popular}
+                </p>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <h3 className="text-gray-600 mb-2 flex justify-center items-center">
+                  <CloudLightning className="mr-1 text-purple-500" size={16} />
+                  Active
+                </h3>
+                <p className="text-2xl font-bold text-purple-600">
+                  {loading ? "--" : stats.activityCount.active}
+                </p>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+
+          {/* Quotes & Customization Section */}
+          <Link
+            href={"/requests-mails"}
+            className="bg-white rounded-xl shadow-md p-6"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+              <MailIcon className="mr-2 text-orange-500" />
+              Requests And Mailing
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Quotes */}
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h3 className="text-center text-gray-600 mb-3 font-semibold">
+                  Quote Requests
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="text-xl font-bold text-green-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.quote.total}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Mailed</p>
+                    <p className="text-xl font-bold text-blue-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.quote.mailed}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Pending</p>
+                    <p className="text-xl font-bold text-red-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.quote.pending}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customize */}
+              <div className="bg-green-50 rounded-lg p-4">
+                <h3 className="text-center text-gray-600 mb-3 font-semibold">
+                  Customize Requests
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="text-xl font-bold text-green-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.customize.total}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Mailed</p>
+                    <p className="text-xl font-bold text-blue-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.customize.mailed}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Pending</p>
+                    <p className="text-xl font-bold text-red-600">
+                      {loading
+                        ? "--"
+                        : stats.quoteAndCustomizeCount.customize.pending}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   )

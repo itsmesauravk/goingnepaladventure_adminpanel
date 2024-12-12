@@ -236,6 +236,8 @@ const RequestsMailsHome: React.FC = () => {
                       className={`text-md ${
                         request.status === "pending"
                           ? "text-orange-600"
+                          : request.status === "mailed"
+                          ? "text-blue-600"
                           : "text-green-600"
                       } font-semibold `}
                     >
