@@ -51,8 +51,6 @@ const RequestsMailsHome: React.FC = () => {
     customizePending: 0,
   })
 
-  console.log(counts)
-
   // Fetch counts
   const getCounts = async () => {
     try {

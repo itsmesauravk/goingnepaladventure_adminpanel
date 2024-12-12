@@ -1,12 +1,19 @@
 "use client"
 
+import axios from "axios"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import React, { useState, useEffect } from "react"
+import { toast } from "sonner"
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const router = useRouter()
 
   useEffect(() => {
     setEmail("")
@@ -14,7 +21,7 @@ const LoginForm: React.FC = () => {
     setError("")
   }, [])
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // Basic validation for email and password
@@ -22,20 +29,57 @@ const LoginForm: React.FC = () => {
       setError("Please enter both email and password.")
       return
     }
-    setError("")
+    try {
+      setLoading(true)
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/login`,
+        { email, password },
+        {
+          withCredentials: true,
+        }
+      )
 
-    // Authentication logic here
-    // Example: Call an API to authenticate the admin
-    console.log("Logging in with:", { email, password })
+      if (response.data.success) {
+        toast.success(response.data.message)
+        setTimeout(() => {
+          router.push("/home")
+        }, 500)
+      } else {
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error("An error occurred. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFill = () => {
+    setEmail("shinchannahara4ku@gmail.com")
+    setPassword("secret123")
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
+    <div className="relative flex items-center justify-center min-h-screen bg-gray-100 bg-[url('/going.png')] bg-cover bg-center">
+      {/* <!-- Dark overlay --> */}
+      <div className="absolute inset-0 bg-black opacity-70"></div>
+
+      {/* <!-- Login Form --> */}
+      <div className="relative w-full max-w-md p-8 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           GNA ADMIN LOGIN
         </h2>
 
+        <div>
+          <button
+            onClick={handleFill}
+            className="bg-green-600 text-white p-2 rounded-md"
+          >
+            {" "}
+            Auto Fill
+          </button>
+        </div>
         <form onSubmit={handleLogin}>
           {/* Email Field */}
           <div className="mb-4">
@@ -81,9 +125,16 @@ const LoginForm: React.FC = () => {
           {/* Login Button */}
           <button
             type="submit"
+            disabled={loading}
             className="w-full p-3 text-white bg-secondary hover:bg-primary rounded  transition-colors duration-200"
           >
-            Login
+            {loading ? (
+              <div className="flex justify-center items-center gap-2">
+                <Loader2 className="mr-2 animate-spin" /> Logging In
+              </div>
+            ) : (
+              <>Login</>
+            )}
           </button>
         </form>
 

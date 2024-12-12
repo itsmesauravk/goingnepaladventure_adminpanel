@@ -86,3 +86,15 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: "GeistSans";
+  src: url("./fonts/GeistVF.woff") format("woff");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+:root {
+  --font-geist-sans: "GeistSans", sans-serif;
+  --font-geist-mono: "GeistMono", monospace;
+}

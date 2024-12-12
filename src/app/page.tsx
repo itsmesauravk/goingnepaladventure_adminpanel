@@ -1,13 +1,15 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function Home() {
   const router = useRouter()
 
+  const pathname = usePathname()
+
   useEffect(() => {
     router.push("/home")
-  }, [router])
+  }, [router, pathname])
 
   return null // Prevents any UI from rendering
 }
