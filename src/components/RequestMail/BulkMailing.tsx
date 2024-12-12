@@ -3,7 +3,6 @@ import React, { useState, useMemo, useEffect } from "react"
 import {
   Search,
   ArrowLeft,
-  User,
   Mail,
   Paperclip,
   X,
@@ -25,6 +24,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { useRouter } from "next/navigation"
 import axios from "axios"
+import { toast } from "sonner"
 
 interface User {
   _id: string
@@ -33,45 +33,6 @@ interface User {
   userAddress: string
   userCountry: string
 }
-
-// Dummy user data
-const DUMMY_USERS = [
-  {
-    _id: "1",
-    userName: "John Doe",
-    userEmail: "john.doe@example.com",
-    userAddress: "Admin",
-    userCountry: "Nepal",
-  },
-  {
-    _id: "2",
-    userName: "Jane Smith",
-    userEmail: "jane.smith@example.com",
-    userAddress: "Manager",
-    userCountry: "Nepal",
-  },
-  {
-    _id: "3",
-    userName: "Mike Johnson",
-    userEmail: "mike.johnson@example.com",
-    userAddress: "Sales",
-    userCountry: "Nepal",
-  },
-  {
-    _id: "4",
-    userName: "Emily Brown",
-    userEmail: "emily.brown@example.com",
-    userAddress: "Support",
-    userCountry: "Nepal",
-  },
-  {
-    _id: "5",
-    userName: "Alex Wilson",
-    userEmail: "alex.wilson@example.com",
-    userAddress: "Marketing",
-    userCountry: "Nepal",
-  },
-]
 
 const BulkMailing = () => {
   // State management
@@ -96,7 +57,7 @@ const BulkMailing = () => {
       (user) =>
         user?.userName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
         user?.userEmail?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-        user?.userAddress?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.userAddress?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
         user?.userCountry?.toLowerCase()?.includes(searchTerm.toLowerCase())
     )
   }, [searchTerm, users])
@@ -111,7 +72,7 @@ const BulkMailing = () => {
       )
       const data = response.data
       if (data.success) {
-        setUsers(data.data)
+        setUsers(data.data || [])
       } else {
         setError(data.message || "Failed to fetch users")
       }
@@ -145,7 +106,9 @@ const BulkMailing = () => {
   const handleFileAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files)
-      setAttachments((prev) => [...prev, ...newFiles])
+      // Limit total attachments to 5
+      const updatedAttachments = [...attachments, ...newFiles].slice(0, 5)
+      setAttachments(updatedAttachments)
     }
   }
 
@@ -177,30 +140,54 @@ const BulkMailing = () => {
     setIsEmailSending(true)
 
     try {
-      // Collect selected user details
-      const recipients = users.filter((user) =>
-        selectedUsers.includes(user._id)
+      // Prepare form data for file upload
+      const formData = new FormData()
+
+      // Add recipient emails
+      const recipients = users
+        .filter((user) => selectedUsers.includes(user._id))
+        .map((user) => user.userEmail)
+
+      // Add string data to form
+      formData.append("emails", JSON.stringify(recipients))
+      formData.append("subject", subject)
+      formData.append("message", message)
+
+      // Add attachments
+      attachments.forEach((file) => {
+        formData.append("attachments", file)
+      })
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/quote-and-customize/send-bulk-mail`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       )
 
-      // Simulate email sending (replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      console.log("Sending email to:", recipients)
-      console.log("Subject:", subject)
-      console.log("Message:", message)
-      console.log("Attachments:", attachments)
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to send emails")
+      }
 
       // Reset form
-      //   setSelectedUsers([])
-      //   setSubject("")
-      //   setMessage("")
-      //   setAttachments([])
+      setSelectedUsers([])
+      setSubject("")
+      setMessage("")
+      setAttachments([])
 
-      // Optional: Show success toast or alert
-      alert("Emails sent successfully!")
+      // Show success alert
+      toast.success("Emails sent successfully!")
     } catch (error) {
       console.error("Email sending failed:", error)
-      setEmailError("Failed to send emails. Please try again.")
+      toast.error("Failed to send emails. Please try again.")
+      setEmailError(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || "Failed to send emails"
+          : "Failed to send emails. Please try again."
+      )
     } finally {
       setIsEmailSending(false)
     }
@@ -225,9 +212,7 @@ const BulkMailing = () => {
         {/* Back Button */}
         <Button
           variant="outline"
-          onClick={() => {
-            router.back()
-          }}
+          onClick={() => router.back()}
           className="mb-6"
         >
           <ArrowLeft className="mr-2" />
@@ -384,7 +369,7 @@ const BulkMailing = () => {
           {/* File Attachment */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
-              Attachments
+              Attachments (Max 5 files)
             </label>
             <div className="flex items-center">
               <Input
