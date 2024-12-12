@@ -19,14 +19,14 @@ export function middleware(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    "/home/:path*",
+    // "/home/:path*",
     "/trekkings/:path*",
     "/tours/:path*",
     "/wellness/:path*",
     "/blogs/:path*",
     "/activities/:path*",
     "/plan-trip/:path*",
-    "/requests-mails/:path*",
+    // "/requests-mails/:path*",
     "/users-info/:path*",
   ],
 }
