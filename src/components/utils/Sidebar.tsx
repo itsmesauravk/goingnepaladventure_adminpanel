@@ -35,16 +35,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useContext } from "react"
 import { PlanTripContext, RequestsMailsContext } from "./ContextProvider"
 import { title } from "process"
+import axios from "axios"
+import { toast } from "sonner"
 
 export function AppSidebar() {
   const pathname = usePathname()
 
   const planTripContext = useContext(PlanTripContext)
   const requestsMailsContext = useContext(RequestsMailsContext)
+
+  const router = useRouter()
+
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      if (response.data.success) {
+        toast.success(response.data.message)
+        router.push("/login")
+      } else {
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      toast.error("Something went wrong")
+      console.log(error)
+    }
+  }
 
   if (!planTripContext) {
     throw new Error("PlanTripContext must be used within a PlanTripProvider")
@@ -184,7 +211,7 @@ export function AppSidebar() {
                 <DropdownMenuItem>
                   <span className="text-lg">Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={logoutHandler}>
                   <span className="text-lg">Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
