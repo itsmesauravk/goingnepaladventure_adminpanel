@@ -1,5 +1,6 @@
 "use client"
 
+import Cookies from "js-cookie"
 import axios from "axios"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -41,6 +42,9 @@ const LoginForm: React.FC = () => {
 
       if (response.data.success) {
         toast.success(response.data.message)
+        localStorage.setItem("accessToken", response.data.accessToken)
+        localStorage.setItem("refreshToken", response.data.refreshToken)
+        Cookies.set("accessTokenNew", response.data.accessToken)
         setTimeout(() => {
           router.push("/home")
         }, 500)
