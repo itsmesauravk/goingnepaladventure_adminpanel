@@ -125,9 +125,9 @@ const Dashboard: React.FC = () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/home/get-count-details`,
         {
-          // headers:{
-          //   Authorization: `Bearer ${token}`
-          // }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           withCredentials: true,
         }
       )
