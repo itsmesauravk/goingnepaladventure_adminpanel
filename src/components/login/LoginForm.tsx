@@ -30,6 +30,7 @@ const LoginForm: React.FC = () => {
       setError("Please enter both email and password.")
       return
     }
+
     try {
       setLoading(true)
       const response = await axios.post(
@@ -42,26 +43,24 @@ const LoginForm: React.FC = () => {
 
       if (response.data.success) {
         toast.success(response.data.message)
-        localStorage.setItem("accessToken", response.data.accessToken)
-        localStorage.setItem("refreshToken", response.data.refreshToken)
-        Cookies.set("accessTokenNew", response.data.accessToken)
+        Cookies.set("token", response.data.accessToken)
+        Cookies.set("refreshToken", response.data.refreshToken)
         setTimeout(() => {
           router.push("/home")
         }, 500)
       } else {
-        toast.error(response.data.message)
+        // Handle failed login attempt
+        toast.error(response.data.message || "Invalid email or password.")
       }
-    } catch (error) {
-      console.log(error)
-      toast.error("An error occurred. Please try again.")
+    } catch (error: any) {
+      // Network or server errors
+      console.error(error)
+      toast.error(
+        error.response?.data?.message || "An error occurred. Please try again."
+      )
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleFill = () => {
-    setEmail("shinchannahara4ku@gmail.com")
-    setPassword("secret123")
   }
 
   return (
@@ -75,15 +74,6 @@ const LoginForm: React.FC = () => {
           GNA ADMIN LOGIN
         </h2>
 
-        <div>
-          <button
-            onClick={handleFill}
-            className="bg-green-600 text-white p-2 rounded-md"
-          >
-            {" "}
-            Auto Fill
-          </button>
-        </div>
         <form onSubmit={handleLogin}>
           {/* Email Field */}
           <div className="mb-4">

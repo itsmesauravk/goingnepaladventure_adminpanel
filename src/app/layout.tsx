@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useContext } from "react"
 // import type { Metadata } from "next"
 import localFont from "next/font/local"
 import "./globals.css"
@@ -38,20 +38,18 @@ export default function RootLayout({
   const pathname = usePathname()
   const isLoginPage = pathname === "/login"
   const isForgotPasswordPage = pathname === "/forgot-password"
-  // const startPage = pathname === "/"
+  const startPage = pathname === "/"
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
-        {/* <PlanTripProvider> */}
         <PlanTripProvider>
-          {/* <RequestsMailsProvider> */}
           <RequestsMailsProvider>
             <Providers />
             <SidebarProvider>
-              {!isLoginPage && !isForgotPasswordPage && (
+              {!isLoginPage && !isForgotPasswordPage && !startPage && (
                 <>
                   <AppSidebar />
                   <SidebarTrigger />

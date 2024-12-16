@@ -145,7 +145,7 @@ const SingleRequest: React.FC<SingleRequestProps> = ({ requestId }) => {
                       <Link
                         className="text-blue-600 underline"
                         target="_blank"
-                        href={`https://going-nepal-adventure.vercel.app/${requestDetail.itemType}/${requestDetail.itemSlug}`}
+                        href={`${process.env.NEXT_PUBLIC_CLIENT_URL_PROD}/${requestDetail.itemType}/${requestDetail.itemSlug}`}
                       >
                         {requestDetail.itemName}
                       </Link>

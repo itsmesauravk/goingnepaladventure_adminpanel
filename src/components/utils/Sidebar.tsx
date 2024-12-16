@@ -41,6 +41,7 @@ import { PlanTripContext, RequestsMailsContext } from "./ContextProvider"
 import { title } from "process"
 import axios from "axios"
 import { toast } from "sonner"
+import Cookies from "js-cookie"
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -63,6 +64,8 @@ export function AppSidebar() {
       )
       if (response.data.success) {
         toast.success(response.data.message)
+        Cookies.remove("token")
+        Cookies.remove("accessToken")
         router.push("/login")
       } else {
         toast.error(response.data.message)

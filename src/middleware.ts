@@ -1,20 +1,51 @@
-// src/lib/middleware.ts
-import local from "next/font/local"
+import axios from "axios"
+import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("accessTokenNew")?.value
+  const token = request.cookies.get("token")?.value
+  const pathname = new URL(request.url).pathname
 
-  // const token = localStorage.getItem("accessToken")
+  // Paths where authentication should not redirect
+  const publicPaths = ["/login", "/forgot-password"]
 
-  // If no token, redirect to login
-  if (!token) {
+  // If the user is already authenticated, allow access to login or forgot-password pages
+  if (token && publicPaths.some((path) => pathname.startsWith(path))) {
+    return NextResponse.redirect(new URL("/home", request.url)) // Redirect to home or dashboard
+  }
+
+  // If no token, redirect to login (unless it's a public path)
+  if (!token && !publicPaths.some((path) => pathname.startsWith(path))) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // Optional: Add token verification logic here
-  // You might want to call your backend to verify the token
+  // const validateToken = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate-token`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       },
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     )
+
+  //     if (!response.data.success) {
+  //       return NextResponse.redirect(new URL("/login", request.url))
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //     return NextResponse.redirect(new URL("/login", request.url))
+  //   }
+  // }
+
+  // if (token) {
+  //   validateToken()
+  // }
 
   return NextResponse.next()
 }
@@ -31,5 +62,7 @@ export const config = {
     "/plan-trip/:path*",
     "/requests-mails/:path*",
     "/users-info/:path*",
+    "/login", // Include login in matcher
+    "/forgot-password", // Include forgot-password in matcher
   ],
 }
