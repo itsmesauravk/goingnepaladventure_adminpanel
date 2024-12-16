@@ -123,7 +123,13 @@ const Dashboard: React.FC = () => {
     setError(null)
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/home/get-count-details`
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/home/get-count-details`,
+        {
+          // headers:{
+          //   Authorization: `Bearer ${token}`
+          // }
+          withCredentials: true,
+        }
       )
 
       if (response.data.success) {

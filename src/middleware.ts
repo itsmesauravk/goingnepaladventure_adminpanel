@@ -1,56 +1,72 @@
-import axios from "axios"
-import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { verifyToken } from "./lib/verifyToken"
 
-export function middleware(request: NextRequest) {
+// Authentication configuration
+const AUTH_CONFIG = {
+  publicPaths: ["/login", "/forgot-password"],
+  protectedPaths: [
+    "/home",
+    "/trekkings",
+    "/tours",
+    "/wellness",
+    "/blogs",
+    "/activities",
+    "/plan-trip",
+    "/requests-mails",
+    "/users-info",
+  ],
+  loginPath: "/login",
+  homePath: "/home",
+}
+
+export async function middleware(request: NextRequest) {
+  // Get token from cookies
   const token = request.cookies.get("token")?.value
   const pathname = new URL(request.url).pathname
 
-  // Paths where authentication should not redirect
-  const publicPaths = ["/login", "/forgot-password"]
-
-  // If the user is already authenticated, allow access to login or forgot-password pages
-  if (token && publicPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL("/home", request.url)) // Redirect to home or dashboard
+  // Helper function to check path matching
+  const matchesPath = (paths: string[]) =>
+    paths.some((path) => pathname.startsWith(path))
+  // Scenario 1: No token - redirect to login for protected routes
+  if (!token) {
+    if (matchesPath(AUTH_CONFIG.protectedPaths)) {
+      return NextResponse.redirect(new URL(AUTH_CONFIG.loginPath, request.url))
+    }
+    return NextResponse.next()
   }
 
-  // If no token, redirect to login (unless it's a public path)
-  if (!token && !publicPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL("/login", request.url))
+  // Scenario 2: Token exists - validate token
+  try {
+    const isValidToken = await verifyToken(token)
+
+    // If token is invalid
+    if (!isValidToken) {
+      const response = NextResponse.redirect(
+        new URL(AUTH_CONFIG.loginPath, request.url)
+      )
+      response.cookies.delete("token")
+      return response
+    }
+
+    // Scenario 3: Valid token - prevent access to public paths
+    if (matchesPath(AUTH_CONFIG.publicPaths)) {
+      return NextResponse.redirect(new URL(AUTH_CONFIG.homePath, request.url))
+    }
+
+    // Allow access to protected routes
+    return NextResponse.next()
+  } catch (error) {
+    // Catch any unexpected errors during token validation
+    const response = NextResponse.redirect(
+      new URL(AUTH_CONFIG.loginPath, request.url)
+    )
+    response.cookies.delete("token")
+    return response
   }
-
-  // const validateToken = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate-token`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       },
-  //       {
-  //         withCredentials: true,
-  //       }
-  //     )
-
-  //     if (!response.data.success) {
-  //       return NextResponse.redirect(new URL("/login", request.url))
-  //     }
-  //   } catch (error) {
-  //     console.error(error)
-  //     return NextResponse.redirect(new URL("/login", request.url))
-  //   }
-  // }
-
-  // if (token) {
-  //   validateToken()
-  // }
-
-  return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
+// Matcher configuration
 export const config = {
   matcher: [
     "/home/:path*",
