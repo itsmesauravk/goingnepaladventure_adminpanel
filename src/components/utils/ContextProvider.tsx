@@ -26,11 +26,31 @@ interface PlanTripProviderProps {
   children: ReactNode
 }
 
+// admin details
+interface AdminDetails {
+  adminInfo: {
+    _id: string
+    fullName: string
+    email: string
+    password: string
+  }
+  setAdminInfo: Dispatch<
+    SetStateAction<{
+      _id: string
+      fullName: string
+      email: string
+      password: string
+    }>
+  >
+}
+
 // Create Context
+
 export const PlanTripContext = createContext<PlanTripContextType | null>(null)
 export const RequestsMailsContext = createContext<RequestsMailsType | null>(
   null
 )
+export const AdminDetailsContext = createContext<AdminDetails | null>(null)
 
 // first context
 const PlanTripProvider: FC<PlanTripProviderProps> = ({ children }) => {
@@ -61,5 +81,25 @@ const RequestsMailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
     </RequestsMailsContext.Provider>
   )
 }
+//third context
+const AdminDetailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
+  const [adminInfo, setAdminInfo] = useState<{
+    _id: string
+    fullName: string
+    email: string
+    password: string
+  }>({
+    _id: "",
+    fullName: "",
+    email: "",
+    password: "",
+  })
 
-export { PlanTripProvider, RequestsMailsProvider }
+  return (
+    <AdminDetailsContext.Provider value={{ adminInfo, setAdminInfo }}>
+      {children}
+    </AdminDetailsContext.Provider>
+  )
+}
+
+export { PlanTripProvider, RequestsMailsProvider, AdminDetailsProvider }

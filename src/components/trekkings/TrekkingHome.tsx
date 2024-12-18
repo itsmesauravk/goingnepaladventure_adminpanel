@@ -10,6 +10,7 @@ import { DeleteTrek } from "./DeleteTrek"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { get } from "http"
+import HomeLoading from "../home/HomeLoading"
 // import { toast } from "sonner"
 
 interface Trekking {
@@ -30,7 +31,7 @@ interface Trekking {
   }
   isFeatured: boolean
   isPopular: boolean
-  isRecommended: boolean
+  isActivated: boolean
   isNewItem: boolean
 }
 
@@ -210,11 +211,23 @@ const TrekkingHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">Visiblity</option>
+            <option value="all">All</option>
             <option value="isNewItem">New</option>
+            <option value="notNewItem" className="text-blue-600">
+              Not New
+            </option>
             <option value="isPopular">Popular</option>
-            <option value="isRecommended">Recommended</option>
+            <option value="notPopular" className="text-blue-600">
+              Not Popular
+            </option>
             <option value="isFeatured">Featured</option>
+            <option value="notFeatured" className="text-blue-600">
+              Not Featured
+            </option>
+            <option value="isActivated">Activated</option>
+            <option value="notActivated" className="text-red-600">
+              Not Activated
+            </option>
           </select>
         </div>
         {/* sort  */}
@@ -352,6 +365,7 @@ const TrekkingHome: React.FC = () => {
                         />
                       </div>
                     </div>
+                    {/* featured  */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-gray-600">
@@ -370,17 +384,21 @@ const TrekkingHome: React.FC = () => {
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Recommended
+                        <span
+                          className={`text-sm font-semibold ${
+                            trek.isActivated ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          Activated
                         </span>
                         <Switch
-                          checked={trek.isRecommended}
+                          checked={trek.isActivated}
                           disabled={updateLoading === trek._id}
                           onCheckedChange={() =>
                             handleSwitchChange(
                               trek._id,
-                              "isRecommended",
-                              trek.isRecommended
+                              "isActivated",
+                              trek.isActivated
                             )
                           }
                         />
@@ -416,8 +434,8 @@ const TrekkingHome: React.FC = () => {
 
       {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center mt-40">
+          <HomeLoading />
         </div>
       )}
 

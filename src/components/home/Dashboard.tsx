@@ -14,7 +14,11 @@ import {
   CloudLightning,
   MailIcon,
 } from "lucide-react"
-import { PlanTripContext, RequestsMailsContext } from "../utils/ContextProvider"
+import {
+  AdminDetailsContext,
+  PlanTripContext,
+  RequestsMailsContext,
+} from "../utils/ContextProvider"
 import axios from "axios"
 import Link from "next/link"
 import HomeLoading from "./HomeLoading"
@@ -89,6 +93,8 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [greet, setGreet] = useState<string>("")
+
   const [adminProfile, setAdminProfile] = useState<any>(null)
 
   const planTripContext = useContext(PlanTripContext)!
@@ -96,6 +102,8 @@ const Dashboard: React.FC = () => {
 
   const requestsMailsContext = useContext(RequestsMailsContext)!
   const { setPendingQuoteData, setPendingCustomizeData } = requestsMailsContext
+
+  const { adminInfo, setAdminInfo } = useContext(AdminDetailsContext)!
 
   const token = Cookies.get("token")
 
@@ -112,6 +120,7 @@ const Dashboard: React.FC = () => {
 
       if (response.data.success) {
         setAdminProfile(response.data.data)
+        setAdminInfo(response.data.data)
       }
     } catch (error) {
       console.error(error)
@@ -216,6 +225,22 @@ const Dashboard: React.FC = () => {
     )
   }
 
+  const greetingHandler = () => {
+    const currentHour = new Date().getHours()
+    console.log(currentHour)
+    if (currentHour < 12) {
+      setGreet("Good Morning")
+    } else if (currentHour < 18) {
+      setGreet("Good Afternoon")
+    } else {
+      setGreet("Good Evening")
+    }
+  }
+
+  useEffect(() => {
+    greetingHandler()
+  }, [])
+
   return (
     <>
       {loading ? (
@@ -226,14 +251,14 @@ const Dashboard: React.FC = () => {
             {/* Header */}
             <div className="flex justify-between items-center mb-10">
               <h1 className="text-3xl font-bold text-gray-800">
-                Good Morning,{" "}
+                {greet},{" "}
                 <span className="text-primary">{adminProfile?.fullName}</span>
               </h1>
               <div className="flex space-x-4">
                 <div className="flex items-center bg-white shadow-sm rounded-lg px-4 py-2">
                   <Users className="mr-2 text-gray-600" />
                   <span className="font-medium text-gray-700">
-                    Users:{" "}
+                    Clients:{" "}
                     <span className="font-semibold text-primary">
                       {stats?.usersCount ? stats.usersCount : "--"}
                     </span>

@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/utils/Sidebar"
 import { Providers } from "./providers"
 import {
+  AdminDetailsProvider,
   PlanTripProvider,
   RequestsMailsProvider,
 } from "@/components/utils/ContextProvider"
@@ -47,18 +48,20 @@ export default function RootLayout({
       >
         <PlanTripProvider>
           <RequestsMailsProvider>
-            <Providers />
-            <SidebarProvider>
-              {!isLoginPage && !isForgotPasswordPage && !startPage && (
-                <>
-                  <AppSidebar />
-                  <SidebarTrigger />
-                </>
-              )}
+            <AdminDetailsProvider>
+              <Providers />
+              <SidebarProvider>
+                {!isLoginPage && !isForgotPasswordPage && !startPage && (
+                  <>
+                    <AppSidebar />
+                    <SidebarTrigger />
+                  </>
+                )}
 
-              {children}
-              <Analytics />
-            </SidebarProvider>
+                {children}
+                <Analytics />
+              </SidebarProvider>
+            </AdminDetailsProvider>
           </RequestsMailsProvider>
         </PlanTripProvider>
       </body>

@@ -37,7 +37,11 @@ import {
 } from "../ui/dropdown-menu"
 import { usePathname, useRouter } from "next/navigation"
 import { useContext } from "react"
-import { PlanTripContext, RequestsMailsContext } from "./ContextProvider"
+import {
+  AdminDetailsContext,
+  PlanTripContext,
+  RequestsMailsContext,
+} from "./ContextProvider"
 import { title } from "process"
 import axios from "axios"
 import { toast } from "sonner"
@@ -49,10 +53,16 @@ export function AppSidebar() {
   const planTripContext = useContext(PlanTripContext)
   const requestsMailsContext = useContext(RequestsMailsContext)
 
+  const { adminInfo } = useContext(AdminDetailsContext)!
+
   const router = useRouter()
 
   const logoutHandler = async () => {
     try {
+      const confirmation = window.confirm("Are you sure you want to logout?")
+      if (!confirmation) {
+        return
+      }
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
         {
@@ -138,15 +148,9 @@ export function AppSidebar() {
       pendingData: pendingDataCount,
     },
     {
-      title: "Users Info",
+      title: "Clients Info",
       url: "/users-info",
       icon: Users2Icon,
-    },
-
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
     },
   ]
 
@@ -202,8 +206,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="text-xl font-semibold h-16 mb-6">
-                  <User2 /> Username
+                <SidebarMenuButton className="text-lg font-semibold h-16 mb-6">
+                  <User2 /> {adminInfo?.fullName}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -211,11 +215,13 @@ export function AppSidebar() {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <DropdownMenuItem>
-                  <span className="text-lg">Account</span>
-                </DropdownMenuItem>
+                <Link href={"/my-account"}>
+                  <DropdownMenuItem className="text-lg">
+                    My Account
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem onClick={logoutHandler}>
-                  <span className="text-lg">Sign out</span>
+                  <span className="text-lg text-red-800">Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

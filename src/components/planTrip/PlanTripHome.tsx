@@ -19,6 +19,7 @@ import { Switch } from "../ui/switch"
 
 import { toast } from "sonner"
 import { DeleteTripRequest } from "./DeleteTripRequest"
+import HomeLoading from "../home/HomeLoading"
 
 interface Trip {
   _id: string
@@ -252,9 +253,10 @@ const PlanTripHome: React.FC = () => {
       </div>
 
       {/* Loading and Empty States */}
+      {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center mt-40">
+          <HomeLoading />
         </div>
       )}
 

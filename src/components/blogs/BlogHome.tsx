@@ -11,6 +11,7 @@ import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { DeleteBlog } from "./DeleteBlog"
 import { toast } from "sonner"
+import HomeLoading from "../home/HomeLoading"
 
 interface Blog {
   _id: string
@@ -286,9 +287,10 @@ const BlogHome: React.FC = () => {
       </div>
 
       {/* Loading and Empty States */}
+      {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center mt-40">
+          <HomeLoading />
         </div>
       )}
 

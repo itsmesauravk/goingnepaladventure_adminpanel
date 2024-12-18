@@ -17,6 +17,7 @@ import { DeleteTour } from "./DeleteTour"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { toast } from "sonner"
+import HomeLoading from "../home/HomeLoading"
 
 interface Tour {
   _id: string
@@ -29,7 +30,7 @@ interface Tour {
   category: string
   isPopular: boolean
   isFeatured: boolean
-  isRecommended: boolean
+  isActivated: boolean
   isNewItem: boolean
 }
 
@@ -224,11 +225,23 @@ const TourHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">Visibility</option>
+            <option value="all">All</option>
             <option value="isNewItem">New</option>
+            <option value="notNewItem" className="text-blue-600">
+              Not New
+            </option>
             <option value="isPopular">Popular</option>
-            <option value="isRecommended">Recommended</option>
+            <option value="notPopular" className="text-blue-600">
+              Not Popular
+            </option>
             <option value="isFeatured">Featured</option>
+            <option value="notFeatured" className="text-blue-600">
+              Not Featured
+            </option>
+            <option value="isActivated">Activated</option>
+            <option value="notActivated" className="text-red-600">
+              Not Activated
+            </option>
           </select>
         </div>
 
@@ -376,17 +389,21 @@ const TourHome: React.FC = () => {
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Recommended
+                        <span
+                          className={`text-sm font-semibold ${
+                            tour.isActivated ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          Activated
                         </span>
                         <Switch
-                          checked={tour.isRecommended}
+                          checked={tour.isActivated}
                           disabled={updateLoading === tour._id}
                           onCheckedChange={() =>
                             handleSwitchChange(
                               tour._id,
-                              "isRecommended",
-                              tour.isRecommended
+                              "isActivated",
+                              tour.isActivated
                             )
                           }
                         />
@@ -422,8 +439,8 @@ const TourHome: React.FC = () => {
 
       {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center  mt-40">
+          <HomeLoading />
         </div>
       )}
 

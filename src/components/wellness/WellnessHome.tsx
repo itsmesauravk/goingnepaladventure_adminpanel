@@ -10,6 +10,7 @@ import { DeleteWellness } from "./DeleteWellness"
 import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { get } from "http"
+import HomeLoading from "../home/HomeLoading"
 
 interface Wellness {
   _id: string
@@ -22,7 +23,7 @@ interface Wellness {
   category: string
   isFeatured: boolean
   isPopular: boolean
-  isRecommended: boolean
+  isActivated: boolean
   isNewItem: boolean
 }
 
@@ -180,11 +181,23 @@ const WellnessHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">Visibility</option>
+            <option value="all">All</option>
             <option value="isNewItem">New</option>
+            <option value="notNewItem" className="text-blue-600">
+              Not New
+            </option>
             <option value="isPopular">Popular</option>
-            <option value="isRecommended">Recommended</option>
+            <option value="notPopular" className="text-blue-600">
+              Not Popular
+            </option>
             <option value="isFeatured">Featured</option>
+            <option value="notFeatured" className="text-blue-600">
+              Not Featured
+            </option>
+            <option value="isActivated">Activated</option>
+            <option value="notActivated" className="text-red-600">
+              Not Activated
+            </option>
           </select>
         </div>
 
@@ -317,17 +330,23 @@ const WellnessHome: React.FC = () => {
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600">
-                          Recommended
+                        <span
+                          className={`text-sm font-semibold ${
+                            wellness.isActivated
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          Activated
                         </span>
                         <Switch
-                          checked={wellness.isRecommended}
+                          checked={wellness.isActivated}
                           disabled={updateLoading === wellness._id}
                           onCheckedChange={() =>
                             handleSwitchChange(
                               wellness._id,
-                              "isRecommended",
-                              wellness.isRecommended
+                              "isActivated",
+                              wellness.isActivated
                             )
                           }
                         />
@@ -363,8 +382,8 @@ const WellnessHome: React.FC = () => {
 
       {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center mt-40">
+          <HomeLoading />
         </div>
       )}
 

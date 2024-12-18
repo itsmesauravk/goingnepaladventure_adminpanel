@@ -11,6 +11,7 @@ import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { DeleteActivity } from "./DeleteActivities"
 import { toast } from "sonner"
+import HomeLoading from "../home/HomeLoading"
 
 interface Activity {
   _id: string
@@ -279,7 +280,11 @@ const ActivitiesHome: React.FC = () => {
                   </div>
                   {/* for active  */}
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-sm font-medium text-gray-600">
+                    <span
+                      className={`text-sm font-semibold ${
+                        activity.isActivated ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
                       Activated
                     </span>
                     <Switch
@@ -324,9 +329,10 @@ const ActivitiesHome: React.FC = () => {
       </div>
 
       {/* Loading and Empty States */}
+      {/* Loading and Empty States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <Loader />
+        <div className="flex justify-center mt-40">
+          <HomeLoading />
         </div>
       )}
 
