@@ -12,6 +12,7 @@ import { Switch } from "../ui/switch"
 import { DeleteBlog } from "./DeleteBlog"
 import { toast } from "sonner"
 import HomeLoading from "../home/HomeLoading"
+import { get } from "http"
 
 interface Blog {
   _id: string
@@ -34,7 +35,7 @@ const BlogHome: React.FC = () => {
   const [search, setSearch] = useState<string>("")
   const [category, setCategory] = useState<string>("")
   const [sort, setSort] = useState<string>("-createdAt")
-  const [visibility, setVisibility] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("all")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedBlogToDelete, setSelectedBlogToDelete] = useState<
     string | null
@@ -87,7 +88,7 @@ const BlogHome: React.FC = () => {
             blog._id === blogId ? { ...blog, [field]: !currentValue } : blog
           )
         )
-        console.log(`${field} status updated successfully`)
+        // getBlogs()
       }
     } catch (error) {
       console.log("Failed to update status")
@@ -168,9 +169,15 @@ const BlogHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">Visibility</option>
+            <option value="all">Visibility</option>
             <option value="isNewBlog">New</option>
+            <option value="notNewBlog" className="text-blue-600">
+              Not New
+            </option>
             <option value="isActive">Active</option>
+            <option value="notActive" className="text-red-600">
+              Not Active
+            </option>
           </select>
         </div>
 
@@ -264,20 +271,16 @@ const BlogHome: React.FC = () => {
                   <div className="flex items-center justify-between mt-4">
                     <span
                       className={`text-sm font-semibold ${
-                        blog.isNewBlog ? "text-green-600" : "text-red-600"
+                        blog.isActive ? "text-green-600" : "text-red-600"
                       }`}
                     >
                       Activated
                     </span>
                     <Switch
-                      checked={blog.isNewBlog}
+                      checked={blog.isActive}
                       disabled={updateLoading === blog._id}
                       onCheckedChange={() =>
-                        handleSwitchChange(
-                          blog._id,
-                          "isAcitated",
-                          blog.isNewBlog
-                        )
+                        handleSwitchChange(blog._id, "isActive", blog.isActive)
                       }
                     />
                   </div>

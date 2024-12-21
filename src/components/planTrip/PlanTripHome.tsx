@@ -40,7 +40,7 @@ const PlanTripHome: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [sort, setSort] = useState<string>("-startDate")
-  const [visibility, setVisibility] = useState<string>("")
+  const [status, setStatus] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTripToDelete, setSelectedTripToDelete] = useState<
     string | null
@@ -59,13 +59,13 @@ const PlanTripHome: React.FC = () => {
             limit,
             search,
             sort,
-            visibility,
+            status,
           },
         }
       )
       if (response.data.success) {
         setTrips(response.data.data)
-        // setTotalPages(response.data.totalPages)
+        setTotalPages(response.data.totalPages)
       }
     } catch (error) {
       console.log("Failed to fetch trip data")
@@ -84,7 +84,7 @@ const PlanTripHome: React.FC = () => {
       setDeleteLoading(true)
       if (selectedTripToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trips/delete-trip/${selectedTripToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/plan-trip/delete-request/${selectedTripToDelete}`
         )
         if (response.data.success) {
           setDeleteLoading(false)
@@ -103,9 +103,17 @@ const PlanTripHome: React.FC = () => {
     }
   }
 
+  //debouncing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getTrips()
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [search])
+
   useEffect(() => {
     getTrips()
-  }, [page, limit, sort, visibility])
+  }, [page, limit, sort, status])
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
@@ -125,13 +133,13 @@ const PlanTripHome: React.FC = () => {
           <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
           <select
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-            value={visibility}
+            value={status}
             onChange={(e) => {
-              setVisibility(e.target.value)
+              setStatus(e.target.value)
               setPage(1)
             }}
           >
-            <option value="">Trip Status</option>
+            <option value="">Trip Status (All)</option>
             <option value="pending">Pending</option>
             <option value="viewed">Viewed</option>
           </select>
@@ -148,10 +156,10 @@ const PlanTripHome: React.FC = () => {
             }}
           >
             <option value="">Sort by...</option>
-            <option value="-startDate">Newest First</option>
-            <option value="startDate">Oldest First</option>
-            <option value="fullname">Name A-Z</option>
-            <option value="-fullname">Name A-Z</option>
+            <option value="-createdAt">Newest First</option>
+            <option value="createdAt">Oldest First</option>
+            <option value="fullName">Name A-Z</option>
+            <option value="-fullName">Name Z-A</option>
           </select>
         </div>
 

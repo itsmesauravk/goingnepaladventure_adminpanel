@@ -12,6 +12,7 @@ import { Switch } from "../ui/switch"
 
 import { toast } from "sonner"
 import HomeLoading from "../home/HomeLoading"
+import { DeleteClient } from "./DeleteClient"
 
 interface User {
   _id: string
@@ -32,11 +33,11 @@ const UsersInfoHome: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
   const [sort, setSort] = useState<string>("-date")
-  // const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  // const [selectedActivityToDelete, setSelectedActivityToDelete] = useState<
-  //   string | null
-  // >(null)
-  // const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<
+    string | null
+  >(null)
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
 
   // Fetch activities data with filters
   const getUsers = async () => {
@@ -64,34 +65,34 @@ const UsersInfoHome: React.FC = () => {
     }
   }
 
-  // const handleDeleteClick = (activityId: string) => {
-  //   setSelectedActivityToDelete(activityId)
-  //   setDeleteModalOpen(true)
-  // }
+  const handleDeleteClick = (activityId: string) => {
+    setSelectedUserToDelete(activityId)
+    setDeleteModalOpen(true)
+  }
 
-  // const confirmDelete = async () => {
-  //   try {
-  //     setDeleteLoading(true)
-  //     if (selectedActivityToDelete) {
-  //       const response = await axios.delete(
-  //         `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/delete-activity/${selectedActivityToDelete}`
-  //       )
-  //       if (response.data.success) {
-  //         setDeleteLoading(false)
-  //         toast.success(response.data.message)
-  //         getActivities()
-  //       } else {
-  //         setDeleteLoading(false)
-  //         toast.error(response.data.message)
-  //       }
-  //     }
-  //   } catch (error) {
-  //     setDeleteLoading(false)
-  //     toast.error("Failed to delete activity")
-  //   } finally {
-  //     setDeleteModalOpen(false)
-  //   }
-  // }
+  const confirmDelete = async () => {
+    try {
+      setDeleteLoading(true)
+      if (selectedUserToDelete) {
+        const response = await axios.delete(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/users/delete/${selectedUserToDelete}`
+        )
+        if (response.data.success) {
+          setDeleteLoading(false)
+          toast.success(response.data.message)
+          getUsers()
+        } else {
+          setDeleteLoading(false)
+          toast.error(response.data.message)
+        }
+      }
+    } catch (error) {
+      setDeleteLoading(false)
+      toast.error("Failed to delete activity")
+    } finally {
+      setDeleteModalOpen(false)
+    }
+  }
 
   useEffect(() => {
     const searchData = setTimeout(() => {
@@ -114,26 +115,8 @@ const UsersInfoHome: React.FC = () => {
         <p className="text-gray-600">Manage your user details options</p>
       </div>
 
-      {/* Filters Section */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="relative">
-          <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
-          <select
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-            value={visibility}
-            onChange={(e) => {
-              setVisibility(e.target.value)
-              setPage(1)
-            }}
-          >
-            <option value="all">Visibility (All)</option>
-            <option value="isPopular">Popular</option>
-            <option value="isActivated">Active</option>
-            <option value="notPopular">Not Popular</option>
-            <option value="notActivated">Not Active</option>
-          </select>
-        </div>
-
+      {/* Filters Section  */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="relative">
           <SortAsc className="absolute left-3 top-2 text-gray-400" size={20} />
           <select
@@ -147,10 +130,8 @@ const UsersInfoHome: React.FC = () => {
             <option value="">Sort by...</option>
             <option value="-createdAt">Newest First</option>
             <option value="createdAt">Oldest First</option>
-            <option value="price">Price: Low to High</option>
-            <option value="-price">Price: High to Low</option>
-            <option value="viewsCount">Views: Low to High</option>
-            <option value="-viewsCount">Views: High to Low</option>
+            <option value="userName">Name: A - Z</option>
+            <option value="-userName">Name: Z - A</option>
           </select>
         </div>
 
@@ -163,7 +144,7 @@ const UsersInfoHome: React.FC = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
-      </div> */}
+      </div>
 
       {/* Activities List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -228,8 +209,7 @@ const UsersInfoHome: React.FC = () => {
                   <div className="flex items-center justify-center space-x-3">
                     <Button
                       variant="destructive"
-                      // onClick={() => handleDeleteClick(user._id)}
-                      onClick={() => toast.warning("Not now")}
+                      onClick={() => handleDeleteClick(user._id)}
                       className="px-4 py-2 rounded-lg"
                     >
                       <Trash2 size={18} />
@@ -269,6 +249,16 @@ const UsersInfoHome: React.FC = () => {
           />
         </div>
       )}
+
+      <DeleteClient
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirmDelete={confirmDelete}
+        loading={deleteLoading}
+        itemName={
+          users.find((b) => b._id === selectedUserToDelete)?.userName || ""
+        }
+      />
     </div>
   )
 }

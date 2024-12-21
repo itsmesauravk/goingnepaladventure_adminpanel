@@ -3,7 +3,7 @@ import Image from "next/image"
 
 const HomeLoading = () => {
   return (
-    <div className="flex items-center justify-center h-full w-full bg-white relative">
+    <div className="flex items-center justify-center h-full w-full  relative">
       {/* Spinner */}
       <div className="absolute animate-spin rounded-full border-t-4 border-primary border-solid border-opacity-75 h-[150px] w-[150px]"></div>
 

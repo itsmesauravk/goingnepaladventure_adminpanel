@@ -190,6 +190,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
             <Input
               placeholder="Enter Blog Title"
               value={title}
+              required
               onChange={(e) => setTitle(e.target.value)}
               className="w-full text-lg"
               disabled={isSubmitting}
@@ -203,6 +204,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
               <input
                 type="file"
                 ref={fileInputRef}
+                required
                 accept="image/jpeg,image/png,image/gif"
                 onChange={handleImageChange}
                 className="hidden"
@@ -340,7 +342,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
               !image ||
               isSubmitting
             }
-            className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
+            className="w-full bg-primary mb-10 text-white hover:bg-primary/90 transition-colors"
           >
             <Save className="mr-2" />
             {isSubmitting

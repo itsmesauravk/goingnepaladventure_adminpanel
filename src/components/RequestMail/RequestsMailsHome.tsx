@@ -10,6 +10,8 @@ import { CustomPagination } from "../utils/Pagination"
 import { toast } from "sonner"
 import Link from "next/link"
 import HomeLoading from "../home/HomeLoading"
+import { DeleteRequestMail } from "./DeleteRequestMail"
+import { get } from "http"
 
 interface RequestMail {
   _id: string
@@ -117,6 +119,30 @@ const RequestsMailsHome: React.FC = () => {
     },
   ]
 
+  const confirmDelete = async () => {
+    try {
+      setDeleteLoading(true)
+      if (selectedRequestToDelete) {
+        const response = await axios.delete(
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/quote-and-customize/delete/${selectedRequestToDelete}`
+        )
+        if (response.data.success) {
+          setDeleteLoading(false)
+          toast.success(response.data.message)
+          getRequests()
+        } else {
+          setDeleteLoading(false)
+          toast.error(response.data.message)
+        }
+      }
+    } catch (error) {
+      setDeleteLoading(false)
+      toast.error("Failed to delete blog")
+    } finally {
+      setDeleteModalOpen(false)
+    }
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
       {/* Header Section */}
@@ -151,9 +177,11 @@ const RequestsMailsHome: React.FC = () => {
             >
               {tab.label}
             </button>
-            <p className="absolute flex top-0 right-0 bg-orange-500 text-white p-1 h-6 w-6 rounded-full justify-center items-center">
-              {tab.count}
-            </p>
+            {tab?.count > 0 && (
+              <p className="absolute flex top-0 right-0 bg-orange-500 text-white p-1 h-6 w-6 rounded-full justify-center items-center">
+                {tab.count}
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -257,6 +285,7 @@ const RequestsMailsHome: React.FC = () => {
                     >
                       View Details
                     </Button>
+
                     <Button
                       variant="destructive"
                       onClick={() => handleDeleteClick(request._id)}
@@ -290,6 +319,17 @@ const RequestsMailsHome: React.FC = () => {
           </p>
         </div>
       )}
+
+      {/* Delete Modal */}
+      <DeleteRequestMail
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirmDelete={confirmDelete}
+        loading={deleteLoading}
+        itemName={
+          requests.find((b) => b._id === selectedRequestToDelete)?.name || ""
+        }
+      />
 
       {/* Pagination */}
       {requests.length > 0 && (

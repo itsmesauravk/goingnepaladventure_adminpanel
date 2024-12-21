@@ -1,109 +1,93 @@
 "use client"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useState, useEffect, useContext } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  ComposedChart,
+} from "recharts"
 import {
   Users,
   BookOpen,
   Calendar,
-  AlertTriangle,
   MountainSnow,
+  Compass,
+  Heart,
+  Activity,
+  Mail,
+  BarChart3,
+  AlertTriangle,
+  Sailboat,
   TicketsPlane,
-  TrendingUp,
-  TrendingDown,
-  Globe,
-  Star,
-  CloudLightning,
-  MailIcon,
 } from "lucide-react"
+import axios from "axios"
+import Cookies from "js-cookie"
 import {
   AdminDetailsContext,
   PlanTripContext,
   RequestsMailsContext,
 } from "../utils/ContextProvider"
-import axios from "axios"
-import Link from "next/link"
 import HomeLoading from "./HomeLoading"
-import Cookies from "js-cookie"
 
-interface DashboardStats {
-  trekkingCount: number
-  tourCount: number
-  wellnessCount: number
-  blogCount: number
-  planTripCount: {
-    total: number
-    pending: number
-    viewed: number
-    mailed: number
-  }
-  activityCount: {
-    total: number
-    popular: number
-    active: number
-  }
-  quoteAndCustomizeCount: {
-    quote: {
-      total: number
-      pending: number
-      viewed: number
-      mailed: number
-    }
-    customize: {
-      total: number
-      pending: number
-      viewed: number
-      mailed: number
-    }
-  }
-  usersCount: number
-}
-
-const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<DashboardStats>({
-    trekkingCount: 0,
-    tourCount: 0,
-    wellnessCount: 0,
-    blogCount: 0,
-    planTripCount: {
-      total: 0,
-      pending: 0,
-      viewed: 0,
-      mailed: 0,
-    },
-    activityCount: {
-      total: 0,
-      popular: 0,
-      active: 0,
-    },
-    quoteAndCustomizeCount: {
-      quote: {
-        total: 0,
-        pending: 0,
-        viewed: 0,
-        mailed: 0,
-      },
-      customize: {
-        total: 0,
-        pending: 0,
-        viewed: 0,
-        mailed: 0,
-      },
-    },
-    usersCount: 0,
-  })
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const [greet, setGreet] = useState<string>("")
-
+const AdminDashboard = () => {
+  const [greet, setGreet] = useState("")
   const [adminProfile, setAdminProfile] = useState<any>(null)
-
-  const planTripContext = useContext(PlanTripContext)!
-  const { setPendingData } = planTripContext
-
-  const requestsMailsContext = useContext(RequestsMailsContext)!
-  const { setPendingQuoteData, setPendingCustomizeData } = requestsMailsContext
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState<any>(null)
 
   const { adminInfo, setAdminInfo } = useContext(AdminDetailsContext)!
+  const { setPendingQuoteData, setPendingCustomizeData } =
+    useContext(RequestsMailsContext)!
+  const { setPendingData } = useContext(PlanTripContext)!
+
+  const [monthlyCountsPlanTrip, setMonthlyCountsPlanTrip] = useState<any[]>([])
+  const [monthlyCountsRequestMails, setMonthlyCountsRequestMails] = useState<
+    any[]
+  >([])
+
+  const fetchDashboardData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/home/get-count-details`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+
+      if (response.data.success) {
+        const dashboardStats = response.data.data
+        setStats(dashboardStats)
+        setPendingData(dashboardStats.planTripCount.pending)
+        setPendingQuoteData(dashboardStats.quoteAndCustomizeCount.quote.pending)
+        setPendingCustomizeData(
+          dashboardStats.quoteAndCustomizeCount.customize.pending
+        )
+        setMonthlyCountsPlanTrip(dashboardStats.monthlyCountsPlanTrip)
+        setMonthlyCountsRequestMails(dashboardStats.monthlyCountsRequestMails)
+      } else {
+        setError("Failed to fetch dashboard data")
+      }
+    } catch (error) {
+      console.error("Dashboard data fetch error:", error)
+      setError("An error occurred while fetching dashboard data")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const token = Cookies.get("token")
 
@@ -127,42 +111,14 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  const fetchDashboardData = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/home/get-count-details`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-
-      if (response.data.success) {
-        const dashboardStats = response.data.data
-
-        setStats(dashboardStats)
-        setPendingData(dashboardStats.planTripCount.pending)
-        setPendingQuoteData(dashboardStats.quoteAndCustomizeCount.quote.pending)
-        setPendingCustomizeData(
-          dashboardStats.quoteAndCustomizeCount.customize.pending
-        )
-      } else {
-        setError("Failed to fetch dashboard data")
-      }
-    } catch (error) {
-      console.error("Dashboard data fetch error:", error)
-      setError("An error occurred while fetching dashboard data")
-    } finally {
-      setLoading(false)
-    }
-  }
+  useEffect(() => {
+    const currentHour = new Date().getHours()
+    if (currentHour < 12) setGreet("Good Morning")
+    else if (currentHour < 18) setGreet("Good Afternoon")
+    else setGreet("Good Evening")
+  }, [])
 
   useEffect(() => {
-    // Use an immediately invoked async function to handle the async calls
     const initializeDashboard = async () => {
       await fetchDashboardData()
       await fetchAdminProfile()
@@ -171,43 +127,6 @@ const Dashboard: React.FC = () => {
     initializeDashboard()
   }, [])
 
-  // Rest of the component remains the same...
-  const packageCategories = [
-    {
-      name: "Treks",
-      count: stats.trekkingCount,
-      icon: MountainSnow,
-      color: "bg-blue-100/50",
-      trend: TrendingUp,
-      link: "/trekkings",
-    },
-    {
-      name: "Tours",
-      count: stats.tourCount,
-      icon: Calendar,
-      color: "bg-green-100/50",
-      trend: TrendingUp,
-      link: "/tours",
-    },
-    {
-      name: "Wellness",
-      count: stats.wellnessCount,
-      icon: TicketsPlane,
-      color: "bg-purple-100/50",
-      trend: null,
-      link: "/wellness",
-    },
-    {
-      name: "Blogs",
-      count: stats.blogCount,
-      icon: BookOpen,
-      color: "bg-orange-100/50",
-      trend: TrendingDown,
-      link: "/blogs",
-    },
-  ]
-
-  // Rest of the render logic remains the same...
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-red-50">
@@ -225,234 +144,419 @@ const Dashboard: React.FC = () => {
     )
   }
 
-  const greetingHandler = () => {
-    const currentHour = new Date().getHours()
-    console.log(currentHour)
-    if (currentHour < 12) {
-      setGreet("Good Morning")
-    } else if (currentHour < 18) {
-      setGreet("Good Afternoon")
-    } else {
-      setGreet("Good Evening")
-    }
-  }
+  // Transform monthly data for the chart
+  const monthlyData =
+    stats?.monthlyCountsRequestMails?.map((item: any) => ({
+      month: new Date(item._id.year, item._id.month - 1).toLocaleString(
+        "default",
+        { month: "short" }
+      ),
+      planTrips: item.totalCount,
+      quotes: item.quoteCount,
+      customize: item.customizeCount,
+    })) || []
 
+  // State to hold selected year and filtered data
+  const [selectedYear, setSelectedYear] = useState<number>(2024) // Set default year
+  const [filteredPlanTripsData, setFilteredPlanTripsData] = useState<any[]>([])
+  const [filteredRequestsData, setFilteredRequestsData] = useState<any[]>([])
+
+  // Get unique years from the data (both plan trips and request mails)
+  const years = [
+    ...new Set([
+      ...monthlyCountsPlanTrip.map((item) => item._id.year),
+      ...monthlyCountsRequestMails.map((item) => item._id.year),
+    ]),
+  ]
+
+  // Filter data based on selected year
   useEffect(() => {
-    greetingHandler()
-  }, [])
+    const filteredPlanTrips = monthlyCountsPlanTrip.filter(
+      (item) => item._id.year === selectedYear
+    )
+    const filteredRequests = monthlyCountsRequestMails.filter(
+      (item) => item._id.year === selectedYear
+    )
+    setFilteredPlanTripsData(filteredPlanTrips)
+    setFilteredRequestsData(filteredRequests)
+  }, [selectedYear, monthlyCountsPlanTrip, monthlyCountsRequestMails])
+
+  // Merge both datasets (PlanTrip and Request Mails) for chart
+  const mergedData = filteredPlanTripsData.map((planTripData, index) => {
+    const requestMailData = filteredRequestsData.find(
+      (requestData) => requestData._id.month === planTripData._id.month
+    )
+
+    return {
+      month: planTripData._id.month,
+      planTrips: planTripData.totalCount,
+      quotes: requestMailData ? requestMailData.quoteCount : 0,
+      customize: requestMailData ? requestMailData.customizeCount : 0,
+    }
+  })
 
   return (
     <>
       {loading ? (
         <HomeLoading />
       ) : (
-        <div className="bg-gray-50 min-h-screen p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-10">
-              <h1 className="text-3xl font-bold text-gray-800">
+        <div className="p-6 space-y-6 bg-slate-50 min-h-screen">
+          {/* Header Section */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">
                 {greet},{" "}
-                <span className="text-primary">{adminProfile?.fullName}</span>
+                <span className="text-primary text-3xl">
+                  {adminInfo.fullName}
+                </span>
               </h1>
-              <div className="flex space-x-4">
-                <div className="flex items-center bg-white shadow-sm rounded-lg px-4 py-2">
-                  <Users className="mr-2 text-gray-600" />
-                  <span className="font-medium text-gray-700">
-                    Clients:{" "}
-                    <span className="font-semibold text-primary">
-                      {stats?.usersCount ? stats.usersCount : "--"}
-                    </span>
+              <p className="text-slate-600 mt-1">
+                Here's what's happening today
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Card className="bg-white border-none shadow-sm">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">
+                      Total Users
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {stats?.usersCount || 0}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <MountainSnow className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <span className="text-blue-600 text-sm font-medium">
+                    {stats?.trekking?.total > 0
+                      ? Math.round(
+                          (stats.trekking.active / stats.trekking.total) * 100
+                        )
+                      : 0}
+                    % ({stats?.trekking?.active}) Active
                   </span>
                 </div>
-              </div>
-            </div>
+                <h3 className="text-lg font-medium text-slate-900">Trekking</h3>
+                <p className="text-3xl font-bold text-blue-600 mt-2">
+                  {stats?.trekking?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
 
-            {/* Package Overview Grid */}
-            <div className="grid md:grid-cols-4 gap-6 mb-10">
-              {packageCategories.map((category) => (
-                <Link
-                  key={category.name}
-                  href={category.link}
-                  className={`${category.color} rounded-xl shadow-md hover:shadow-lg transition-all p-6 group`}
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <Compass className="h-6 w-6 text-green-600" />
+                  </div>
+                  <span className="text-green-600 text-sm font-medium">
+                    {stats?.tour?.total > 0
+                      ? Math.round((stats.tour.active / stats.tour.total) * 100)
+                      : 0}
+                    % Active
+                  </span>
+                </div>
+                <h3 className="text-lg font-medium text-slate-900">Tours</h3>
+                <p className="text-3xl font-bold text-green-600 mt-2">
+                  {stats?.tour?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* wellness  */}
+
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <TicketsPlane className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <span className="text-purple-600 text-sm font-medium">
+                    {stats?.wellness?.total > 0
+                      ? Math.round(
+                          (stats.wellness.active / stats.wellness.total) * 100
+                        )
+                      : 0}
+                    % ({stats?.wellness.active}) Active
+                  </span>
+                </div>
+                <h3 className="text-lg font-medium text-slate-900">Wellness</h3>
+                <p className="text-3xl font-bold text-purple-600 mt-2">
+                  {stats?.wellness?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
+            {/* activity count  */}
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Sailboat className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <span className="text-orange-600 text-sm font-medium">
+                    {stats?.activityCount?.total > 0
+                      ? Math.round(
+                          (stats.activityCount.active /
+                            stats.activityCount.total) *
+                            100
+                        )
+                      : 0}
+                    % ({stats?.activityCount.active}) Active
+                  </span>
+                </div>
+                <h3 className="text-lg font-medium text-slate-900">Activity</h3>
+                <p className="text-3xl font-bold text-orange-600 mt-2">
+                  {stats?.activityCount?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
+            {/* blog  */}
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <BookOpen className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <span className="text-yellow-600 text-sm font-medium">
+                    {stats?.blog?.total > 0
+                      ? Math.round((stats.blog.active / stats.blog.total) * 100)
+                      : 0}
+                    % ({stats?.blog.active}) Active
+                  </span>
+                </div>
+                <h3 className="text-lg font-medium text-slate-900">Blogs</h3>
+                <p className="text-3xl font-bold text-yellow-600 mt-2">
+                  {stats?.blog?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Monthly Trends Chart */}
+          {/* <Card className="bg-white border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-slate-900">
+                Monthly Request Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="planTrips" fill="#2563eb" name="Plan Trips" />
+                  <Bar dataKey="quotes" fill="#16a34a" name="Quotes" />
+                  <Bar dataKey="customize" fill="#9333ea" name="Customize" />
+                  <Line
+                    type="monotone"
+                    dataKey="planTrips"
+                    stroke="#1e40af"
+                    name="Trend"
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card> */}
+
+          <Card className="bg-white border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-slate-900">
+                Monthly Request Analysis
+              </CardTitle>
+              {/* Year filter dropdown */}
+              <div className="mt-2">
+                <label
+                  htmlFor="year-select"
+                  className="text-sm font-medium text-gray-600"
                 >
+                  Select Year:
+                </label>
+                <select
+                  id="year-select"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="ml-2 p-2 border rounded"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={mergedData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="planTrips" fill="#2563eb" name="Plan Trips" />
+                  <Bar dataKey="quotes" fill="#16a34a" name="Quotes" />
+                  <Bar dataKey="customize" fill="#9333ea" name="Customize" />
+                  <Line
+                    type="monotone"
+                    dataKey="planTrips"
+                    stroke="#1e40af"
+                    name="Trend"
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Request Status Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-white border-none shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                  Trip Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                        {category.name}
-                      </h3>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-2xl font-bold text-gray-800">
-                          {loading ? "--" : category.count}
-                        </p>
-                      </div>
-                    </div>
-                    <category.icon className="text-gray-500 opacity-70 group-hover:scale-110 transition-transform" />
+                    <span className="text-slate-600">Total</span>
+                    <span className="font-semibold text-slate-900">
+                      {stats?.planTripCount?.total || 0}
+                    </span>
                   </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Dashboard Sections */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Plan Trip Section */}
-              <Link
-                href={"/plan-trip"}
-                className="bg-white rounded-xl shadow-md p-6"
-              >
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                  <Calendar className="mr-2 text-blue-500" />
-                  Plan Trip Overview
-                </h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-blue-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2 font-semibold">
-                      Total Requests
-                    </h3>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {loading ? "--" : stats.planTripCount.total}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Pending</span>
+                    <span className="font-semibold text-yellow-600">
+                      {stats?.planTripCount?.pending || 0}
+                    </span>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2">Viewed</h3>
-                    <p className="text-2xl font-bold text-green-600">
-                      {loading ? "--" : stats.planTripCount.viewed}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Completed</span>
+                    <span className="font-semibold text-green-600">
+                      {stats?.planTripCount?.mailed || 0}
+                    </span>
                   </div>
-                  <div className="bg-blue-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2">Mailed</h3>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {loading ? "--" : stats.planTripCount.mailed}
-                    </p>
-                  </div>
-                  <div className="bg-red-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2">Pending</h3>
-                    <p className="text-2xl font-bold text-red-600">
-                      {loading ? "--" : stats.planTripCount.pending}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Conversion</span>
+                    <span className="font-semibold text-blue-600">
+                      {stats?.planTripCount?.total > 0
+                        ? Math.round(
+                            (stats.planTripCount.mailed /
+                              stats.planTripCount.total) *
+                              100
+                          )
+                        : 0}
+                      %
+                    </span>
                   </div>
                 </div>
-              </Link>
+              </CardContent>
+            </Card>
 
-              {/* Activities Section */}
-              <Link
-                href={"/acitivities"}
-                className="bg-white rounded-xl shadow-md p-6"
-              >
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                  <Globe className="mr-2 text-green-500" />
-                  Activities Overview
-                </h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-blue-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2 font-semibold">
-                      Total Activities
-                    </h3>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {loading ? "--" : stats.activityCount.total}
-                    </p>
+            <Card className="bg-white border-none shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-green-600" />
+                  Quote Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Total</span>
+                    <span className="font-semibold text-slate-900">
+                      {stats?.quoteAndCustomizeCount?.quote?.total || 0}
+                    </span>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2 flex justify-center items-center">
-                      <Star className="mr-1 text-yellow-500" size={16} />
-                      Popular
-                    </h3>
-                    <p className="text-2xl font-bold text-green-600">
-                      {loading ? "--" : stats.activityCount.popular}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Pending</span>
+                    <span className="font-semibold text-yellow-600">
+                      {stats?.quoteAndCustomizeCount?.quote?.pending || 0}
+                    </span>
                   </div>
-                  <div className="bg-purple-50 rounded-lg p-4 text-center">
-                    <h3 className="text-gray-600 mb-2 flex justify-center items-center">
-                      <CloudLightning
-                        className="mr-1 text-purple-500"
-                        size={16}
-                      />
-                      Active
-                    </h3>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {loading ? "--" : stats.activityCount.active}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Completed</span>
+                    <span className="font-semibold text-green-600">
+                      {stats?.quoteAndCustomizeCount?.quote?.mailed || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Conversion</span>
+                    <span className="font-semibold text-blue-600">
+                      {stats?.quoteAndCustomizeCount?.quote?.total > 0
+                        ? Math.round(
+                            (stats.quoteAndCustomizeCount.quote.mailed /
+                              stats.quoteAndCustomizeCount.quote.total) *
+                              100
+                          )
+                        : 0}
+                      %
+                    </span>
                   </div>
                 </div>
-              </Link>
+              </CardContent>
+            </Card>
 
-              {/* Quotes & Customization Section */}
-              <Link
-                href={"/requests-mails"}
-                className="bg-white rounded-xl shadow-md p-6"
-              >
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-                  <MailIcon className="mr-2 text-orange-500" />
-                  Requests And Mailing
-                </h2>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Quotes */}
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <h3 className="text-center text-gray-600 mb-3 font-semibold">
-                      Quote Requests
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Total</p>
-                        <p className="text-xl font-bold text-green-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.quote.total}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Mailed</p>
-                        <p className="text-xl font-bold text-blue-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.quote.mailed}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Pending</p>
-                        <p className="text-xl font-bold text-red-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.quote.pending}
-                        </p>
-                      </div>
-                    </div>
+            <Card className="bg-white border-none shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-purple-600" />
+                  Customize Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Total</span>
+                    <span className="font-semibold text-slate-900">
+                      {stats?.quoteAndCustomizeCount?.customize?.total || 0}
+                    </span>
                   </div>
-
-                  {/* Customize */}
-                  <div className="bg-green-50 rounded-lg p-4">
-                    <h3 className="text-center text-gray-600 mb-3 font-semibold">
-                      Customize Requests
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Total</p>
-                        <p className="text-xl font-bold text-green-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.customize.total}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Mailed</p>
-                        <p className="text-xl font-bold text-blue-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.customize.mailed}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Pending</p>
-                        <p className="text-xl font-bold text-red-600">
-                          {loading
-                            ? "--"
-                            : stats.quoteAndCustomizeCount.customize.pending}
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Pending</span>
+                    <span className="font-semibold text-yellow-600">
+                      {stats?.quoteAndCustomizeCount?.customize?.pending || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Completed</span>
+                    <span className="font-semibold text-green-600">
+                      {stats?.quoteAndCustomizeCount?.customize?.mailed || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Conversion</span>
+                    <span className="font-semibold text-blue-600">
+                      {stats?.quoteAndCustomizeCount?.customize?.total > 0
+                        ? Math.round(
+                            (stats.quoteAndCustomizeCount.customize.mailed /
+                              stats.quoteAndCustomizeCount.customize.total) *
+                              100
+                          )
+                        : 0}
+                      %
+                    </span>
                   </div>
                 </div>
-              </Link>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}
@@ -460,4 +564,4 @@ const Dashboard: React.FC = () => {
   )
 }
 
-export default Dashboard
+export default AdminDashboard
