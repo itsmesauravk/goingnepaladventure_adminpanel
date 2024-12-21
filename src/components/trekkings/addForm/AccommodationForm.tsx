@@ -23,6 +23,7 @@ const Accommodation: React.FC<AccommodationProps> = ({
           onChange={(e) => handleAccommodationChange(index, e.target.value)}
           className="border border-gray-300 p-2 rounded-md flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder={`Accommodation ${index + 1}`}
+          required
         />
         <button
           type="button"

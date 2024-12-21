@@ -75,6 +75,7 @@ const PackagingForm: React.FC<PackagingProps> = ({
                   type="text"
                   placeholder={`Add ${title} Item`}
                   value={item}
+                  required
                   onChange={(e) =>
                     handleUpdateItem(list, updater, index, e.target.value)
                   }

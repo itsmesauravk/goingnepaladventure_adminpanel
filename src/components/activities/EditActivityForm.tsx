@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useRef } from "react"
-import { useRouter } from "next/navigation"
+import React, { useState, useRef, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
@@ -12,7 +12,7 @@ import axios from "axios"
 import { Separator } from "@radix-ui/react-separator"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
-const CreateActivityForm: React.FC = () => {
+const EditActivityForm: React.FC = () => {
   const router = useRouter()
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
@@ -41,6 +41,8 @@ const CreateActivityForm: React.FC = () => {
     isPopular: false,
     isActivated: true,
   })
+
+  const slug = useParams().slug as string
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -159,6 +161,50 @@ const CreateActivityForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, FAQs: newFAQs }))
   }
 
+  //get activity by slug
+  // get form
+  const handleGetTourData = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/get-activity-by-slug/${slug}`
+      )
+      if (response.data.success) {
+        const tour = response.data.data
+        setFormData({
+          title: tour.title,
+          price: tour.price,
+          country: tour.country,
+          location: tour.location,
+          groupSizeMin: tour.groupSize.min,
+          groupSizeMax: tour.groupSize.max,
+          seasons: {
+            spring: tour.bestSeason.includes("spring"),
+            summer: tour.bestSeason.includes("summer"),
+            autumn: tour.bestSeason.includes("autumn"),
+            winter: tour.bestSeason.includes("winter"),
+          },
+          overview: tour.overview,
+          serviceIncludes: tour.serviceIncludes,
+          thingsToKnow: tour.thingsToKnow,
+          FAQs: tour.FAQs,
+          thumbnail: null,
+          thumbnailPreview: tour.thumbnail,
+          gallery: [],
+          galleryPreviews: tour.gallery,
+          isPopular: tour.isPopular,
+          isActivated: tour.isActivated,
+        })
+        setLoading(false)
+      }
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+    }
+  }
+
+  //submit form
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -255,13 +301,19 @@ const CreateActivityForm: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    if (slug) {
+      handleGetTourData()
+    }
+  }, [slug])
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4">
+    <div className="w-fill min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4">
       <form onSubmit={handleSubmit} className=" mx-auto">
         <Card className="shadow-xl">
           <CardHeader className="text-center bg-gray-50 rounded-t-xl border-b">
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Create New Activity
+              Edit Activity
             </CardTitle>
           </CardHeader>
 
@@ -393,7 +445,7 @@ const CreateActivityForm: React.FC = () => {
                           season as keyof typeof formData.seasons
                         )
                       }
-                      className="data-[state=checked]:bg-blue-600 bg-white"
+                      className="data-[state=checked]:bg-blue-600 text-white"
                     />
                     <label className="text-sm font-medium">
                       {season.charAt(0).toUpperCase() + season.slice(1)}
@@ -615,10 +667,10 @@ const CreateActivityForm: React.FC = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
                   Gallery Images
                 </h3>
-                <div className="space-y-4 max-w-[600px]">
+                <div className="space-y-4 max-w-[600px]  ">
                   <div className="flex items-center justify-center w-full">
                     <label className="w-full flex flex-col items-center justify-center px-4 py-6 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer hover:bg-gray-100">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6 ">
                         <Upload className="h-12 w-12 text-gray-400 mb-3" />
                         <p className="mb-2 text-sm text-gray-500">
                           <span className="font-semibold">Click to upload</span>
@@ -666,7 +718,7 @@ const CreateActivityForm: React.FC = () => {
               disabled={loading}
               className="w-full text-white text-lg bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-indigo-700"
             >
-              {loading ? "Creating, Please Wait..." : "Create Activity"}
+              {loading ? "Updating, Please Wait..." : "Edit Activity"}
             </Button>
           </CardContent>
         </Card>
@@ -675,4 +727,4 @@ const CreateActivityForm: React.FC = () => {
   )
 }
 
-export default CreateActivityForm
+export default EditActivityForm

@@ -14,6 +14,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
     <h2 className="text-lg font-semibold text-primary">Country</h2>
     <select
       id="country"
+      required
       value={country}
       onChange={handleCountryChange}
       className="w-full p-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

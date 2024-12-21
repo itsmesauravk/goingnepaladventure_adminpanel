@@ -20,6 +20,7 @@ const ThingsToKnow: React.FC<ThingsToKnowProps> = ({
         <input
           type="text"
           value={things}
+          required
           onChange={(e) => handleThingsToKnowChange(index, e.target.value)}
           className="border border-gray-300 p-2 rounded-md flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder={`Things to know  ${index + 1}`}

@@ -100,6 +100,7 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
           id="tripType"
           value={tripType.title}
           onChange={onTripTypeChange}
+          required
           className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="" disabled>

@@ -1,10 +1,10 @@
-import TrekkingHome from "@/components/trekkings/TrekkingHome"
+import EditActivityForm from "@/components/activities/EditActivityForm"
 import React from "react"
 
 const page = () => {
   return (
     <div className="w-full">
-      <TrekkingHome />
+      <EditActivityForm />
     </div>
   )
 }

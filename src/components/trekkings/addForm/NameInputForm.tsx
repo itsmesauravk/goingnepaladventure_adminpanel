@@ -12,6 +12,7 @@ const NameInput: FC<NameInputProps> = ({ value, onChange }) => (
       type="text"
       id="name"
       name="name"
+      required
       value={value}
       onChange={onChange}
       className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

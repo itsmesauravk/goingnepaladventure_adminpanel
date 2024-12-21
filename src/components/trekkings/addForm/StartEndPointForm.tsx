@@ -30,6 +30,7 @@ const StartingEndingPointInput: React.FC<StartingEndingPointInputProps> = ({
         type="text"
         id="startingPoint"
         name="startingPoint"
+        required
         value={startingPoint}
         onChange={handleStartingPointChange}
         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -48,6 +49,7 @@ const StartingEndingPointInput: React.FC<StartingEndingPointInputProps> = ({
         type="text"
         id="endingPoint"
         name="endingPoint"
+        required
         value={endingPoint}
         onChange={handleEndingPointChange}
         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

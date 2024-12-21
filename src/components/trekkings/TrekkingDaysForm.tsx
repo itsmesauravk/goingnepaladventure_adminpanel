@@ -13,7 +13,7 @@ const TrekkingDaysInput: React.FC<TrekkingDaysInputProps> = ({
   handleMinDaysChange,
   handleMaxDaysChange,
 }) => (
-  <div className="mb-4 mt-5">
+  <div className="">
     <h2 className="text-lg font-semibold mb-2  text-primary">Total Days</h2>
 
     <div className="flex gap-4">
@@ -28,6 +28,7 @@ const TrekkingDaysInput: React.FC<TrekkingDaysInputProps> = ({
           type="number"
           id="minDays"
           name="minDays"
+          required
           value={minDays}
           onChange={handleMinDaysChange}
           className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -45,6 +46,7 @@ const TrekkingDaysInput: React.FC<TrekkingDaysInputProps> = ({
           type="number"
           id="maxDays"
           name="maxDays"
+          required
           value={maxDays}
           onChange={handleMaxDaysChange}
           className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

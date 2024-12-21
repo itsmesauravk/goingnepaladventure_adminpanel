@@ -56,6 +56,7 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
       <div className="flex items-center justify-between">
         <Input
           type="text"
+          required
           placeholder="Highlight Content"
           value={highlight.content}
           onChange={(e) => updateContent(e.target.value)}

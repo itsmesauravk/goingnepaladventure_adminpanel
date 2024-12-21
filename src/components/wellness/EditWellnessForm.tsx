@@ -496,268 +496,282 @@ const EditWellnessForm: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center   gap-4 mb-4 pb-4 pt-4 ">
-        {/* Back Button */}
-        <div
-          onClick={() => route.back()}
-          className=" font-bold py-2 px-4 rounded cursor-pointer"
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="w-full mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => route.back()}
+              className="hover:bg-teal-700 p-2 rounded-full transition-colors"
+            >
+              <FaArrowLeft size={24} />
+            </button>
+            <h1 className="text-3xl font-bold">
+              Edit Wellness Experience - {name}
+            </h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <p className="flex items-center space-x-2">
+              <FaEye className="text-white" />
+              <span>{tourViews} views</span>
+            </p>
+          </div>
+        </div>
+
+        <form
+          typeof="multipart/form-data"
+          onSubmit={handleSubmit}
+          className="p-8 space-y-8"
         >
-          <FaArrowLeft size={24} />
-        </div>
+          {/* Basic Information Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
+              Basic Wellness Information
+            </h2>
 
-        {/* Title */}
-        <h1 className="text-2xl font-semibold bg-tourPrimary text-white text-center flex-1  px-12 py-2 ">
-          Edit Wellness - {name}
-        </h1>
-      </div>
-      {/* Separator */}
-      <hr className="border-gray-300 mb-6" />
+            <div className="mb-6">
+              <NameInput value={name} onChange={handleNameChange} />
+            </div>
 
-      {/* Loading */}
-      {loading && <Loader height="50px" width="50px" />}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <PriceInput value={price} onChange={handlePriceChange} />
+              <CountrySelect
+                country={country}
+                handleCountryChange={handleCountryChange}
+              />
+              <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
+            </div>
 
-      <form
-        typeof="multipart/form-data"
-        onSubmit={handleSubmit}
-        className=" items-center px-10"
-      >
-        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
-          Part 1 (Basic Information)
-        </h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <TourLanguage
+                value={tourLanguage}
+                onChange={handleTourLanguageChange}
+              />
+              <ClothesType
+                value={clothesType}
+                onChange={handleClothesTypeChange}
+              />
+              <SuitableAge value={suitableAge} onChange={suitableAgeChange} />
+            </div>
 
-        {/* views  */}
-        <p className="flex gap-2 items-center text-tourPrimary text-lg font-bold ">
-          <FaEye /> {tourViews}
-        </p>
+            <div className="mt-6">
+              <ThumbnailInput
+                preview={thumbnailPreview}
+                handleImageChange={handleThumbnailChange}
+              />
+            </div>
+          </div>
 
-        {/* Name */}
-        <NameInput value={name} onChange={handleNameChange} />
-        {/* second compartement */}
-        <div className="flex justify-between">
-          {/* Price */}
-          <PriceInput value={price} onChange={handlePriceChange} />
+          {/* Wellness Specifics Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
+              Wellness Experience Details
+            </h2>
 
-          {/* Max Altitude */}
-          <MaxAltitude value={maxAltitude} onChange={handleAltidueChange} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <BestSeasonsSelect
+                selectedSeasons={selectedSeasons}
+                handleSeasonChange={handleSeasonChange}
+              />
+              <LocationInput
+                location={location}
+                handleLocationChange={handleLocationChange}
+              />
+              <MealSelect meal={meal} handleMealChange={handleMealChange} />
+            </div>
 
-          {/* Country */}
-          <CountrySelect
-            country={country}
-            handleCountryChange={handleCountryChange}
-          />
-        </div>
-        {/* third compartment */}
-        <div className="flex justify-between">
-          {/* Tour Language */}
-          <TourLanguage
-            value={tourLanguage}
-            onChange={handleTourLanguageChange}
-          />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <TrekkingDaysInput
+                minDays={minDays}
+                maxDays={maxDays}
+                handleMinDaysChange={handleMinDaysChange}
+                handleMaxDaysChange={handleMaxDaysChange}
+              />
+              <GroupSizeInput
+                minGroupSize={minGroupSize}
+                maxGroupSize={maxGroupSize}
+                handleMinChange={handleMinChange}
+                handleMaxChange={handleMaxChange}
+              />
+            </div>
 
-          {/* Clothes Type */}
-          <ClothesType value={clothesType} onChange={handleClothesTypeChange} />
-
-          {/* suitable age  */}
-          <SuitableAge value={suitableAge} onChange={suitableAgeChange} />
-        </div>
-
-        {/* Thumbnail */}
-        <ThumbnailInput
-          preview={thumbnailPreview}
-          handleImageChange={handleThumbnailChange}
-        />
-
-        {/* compartment 3  */}
-        <div className="flex justify-between">
-          {/* Best Seasons */}
-          <BestSeasonsSelect
-            selectedSeasons={selectedSeasons}
-            handleSeasonChange={handleSeasonChange}
-          />
-          {/* Location */}
-          <LocationInput
-            location={location}
-            handleLocationChange={handleLocationChange}
-          />
-          {/* Meal */}
-          <MealSelect meal={meal} handleMealChange={handleMealChange} />
-        </div>
-        {/* Trekking Days */}
-        <TrekkingDaysInput
-          minDays={minDays}
-          maxDays={maxDays}
-          handleMinDaysChange={handleMinDaysChange}
-          handleMaxDaysChange={handleMaxDaysChange}
-        />
-
-        {/* Group Size */}
-        <GroupSizeInput
-          minGroupSize={minGroupSize}
-          maxGroupSize={maxGroupSize}
-          handleMinChange={handleMinChange}
-          handleMaxChange={handleMaxChange}
-        />
-        {/* Arrival Location */}
-        <ArrivalLocation
-          arrivalLocation={arrivalLocation}
-          departureLocation={departureLocation}
-          handleArrivalLocationChange={handleArrivalLocationChange}
-          handleDepartureLocationChange={handleDepartureLocationChange}
-        />
-        {/* Starting & Ending Points */}
-        <StartingEndingPointInput
-          startingPoint={startingPoint}
-          endingPoint={endingPoint}
-          handleStartingPointChange={handleStartingPointChange}
-          handleEndingPointChange={handleEndingPointChange}
-        />
-        {/* Accommodation */}
-        <Accommodation
-          accommodations={accommodations}
-          handleAccommodationChange={handleAccommodationChange}
-          handleAddAccommodation={handleAddAccommodation}
-          handleRemoveAccommodation={handleRemoveAccommodation}
-        />
-
-        {/* Overview */}
-
-        <OverviewForm value={overview} onChange={handleOverviewChange} />
-
-        <NoteForm value={note} onChange={setNote} />
-
-        {/* Things To Know */}
-        <ThingsToKnow
-          thingsToKnow={thingsToKnow}
-          handleThingsToKnowChange={handleThingsToKnowChange}
-          handleAddThingsToKnow={handleAddThingsToKnow}
-          handleRemoveThingsToKnow={handleRemoveThingsToKnow}
-        />
-
-        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
-          Part 2 (highlights, Itenaries & faq)
-        </h1>
-
-        {/* Highlight */}
-
-        <div>
-          <h1 className="mb-4 text-2xl font-bold">Highlight</h1>
-
-          {highlights.map((highlight, index) => (
-            <HighlightForm
-              key={index}
-              index={index}
-              highlight={highlight}
-              updateHighlight={(updatedHighlight) =>
-                updateHighlights(index, updatedHighlight)
-              }
-              removeHighlight={() => removeHighlight(index)}
-            />
-          ))}
-
-          <Button
-            type="button"
-            onClick={addHighlight}
-            className="flex items-center text-white"
-          >
-            Add Highlight
-          </Button>
-        </div>
-
-        {/* Itinerary */}
-
-        <div className="mt-5">
-          <h1 className="mb-4 text-2xl font-bold">Itineraries</h1>
-
-          {itineraries.map((itinerary, index) => (
-            <ItineraryForm
-              key={index}
-              index={index}
-              itinerary={itinerary}
-              updateItinerary={(updatedItinerary) =>
-                updateItineraries(index, updatedItinerary)
-              }
-              removeItinerary={() => removeItinerary(index)}
-            />
-          ))}
-
-          <Button
-            type="button"
-            onClick={addItinerary}
-            className="flex items-center mt-4 text-white"
-          >
-            Add New Itinerary
-          </Button>
-        </div>
-
-        {/* FAQ */}
-        <div className="mt-5">
-          <h1 className="mb-4 text-2xl font-bold">FAQs</h1>
-
-          {faqs.map((faq, index) => (
-            <FAQForm
-              key={index}
-              index={index}
-              faq={faq}
-              updateFAQ={(updatedFAQ) => updateFAQ(index, updatedFAQ)}
-              removeFAQ={() => removeFAQ(index)}
-            />
-          ))}
-
-          <Button
-            type="button"
-            onClick={addFAQ}
-            className="flex items-center mt-4 text-white"
-          >
-            Add New Question
-          </Button>
-        </div>
-
-        {/* Services  */}
-        <InclusiveExclusiveServicesForm
-          inclusives={inclusives}
-          exclusives={exclusives}
-          onUpdateInclusives={setInclusives}
-          onUpdateExclusives={setExclusives}
-        />
-
-        <h1 className="text-red-600 text-2xl font-bold mt-10 mb-10 items-center flex justify-center">
-          Part 3 (images & video)
-        </h1>
-
-        {/* Image Upload */}
-        <ImageUpload
-          images={images}
-          previews={previews}
-          handleImageChange={handleImageChange}
-          removeImage={removeImage}
-        />
-        {/* Video Upload */}
-        <VideoUpload
-          video={video}
-          handleVideoChange={handleVideoChange}
-          removeVideo={removeVideo}
-        />
-        {/* Submit Button */}
-        <div className="flex justify-center items-center mt-16 mb-16">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-8 py-4 bg-primary text-white font-semibold rounded
-                     hover:bg-primary transition-colors duration-200
-                     focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
-          >
-            {loading ? (
-              <div className="flex gap-2">
-                <p>Uploading Your Tour, Please Wait...</p>
-                <Loader height="20px" width="20px" />
+            <div className="mt-6">
+              <ArrivalLocation
+                arrivalLocation={arrivalLocation}
+                departureLocation={departureLocation}
+                handleArrivalLocationChange={handleArrivalLocationChange}
+                handleDepartureLocationChange={handleDepartureLocationChange}
+              />
+              <div className="mt-6">
+                <StartingEndingPointInput
+                  startingPoint={startingPoint}
+                  endingPoint={endingPoint}
+                  handleStartingPointChange={handleStartingPointChange}
+                  handleEndingPointChange={handleEndingPointChange}
+                />
               </div>
-            ) : (
-              "Submit Details"
-            )}
-          </button>
-        </div>
-      </form>
+            </div>
+          </div>
+
+          {/* Accommodation and Description */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
+              Accommodation & Description
+            </h2>
+
+            <Accommodation
+              accommodations={accommodations}
+              handleAccommodationChange={handleAccommodationChange}
+              handleAddAccommodation={handleAddAccommodation}
+              handleRemoveAccommodation={handleRemoveAccommodation}
+            />
+
+            <div className="mt-6">
+              <OverviewForm value={overview} onChange={handleOverviewChange} />
+            </div>
+
+            <div className="mt-6">
+              <NoteForm value={note} onChange={setNote} />
+            </div>
+
+            <div className="mt-6">
+              <ThingsToKnow
+                thingsToKnow={thingsToKnow}
+                handleThingsToKnowChange={handleThingsToKnowChange}
+                handleAddThingsToKnow={handleAddThingsToKnow}
+                handleRemoveThingsToKnow={handleRemoveThingsToKnow}
+              />
+            </div>
+          </div>
+
+          {/* Highlights Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6 border-b pb-3">
+              <h2 className="text-2xl font-semibold text-teal-700">
+                Highlights
+              </h2>
+              <Button
+                type="button"
+                onClick={addHighlight}
+                className="bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                Add Highlight
+              </Button>
+            </div>
+            {highlights.map((highlight, index) => (
+              <HighlightForm
+                key={index}
+                index={index}
+                highlight={highlight}
+                updateHighlight={(updatedHighlight) =>
+                  updateHighlights(index, updatedHighlight)
+                }
+                removeHighlight={() => removeHighlight(index)}
+              />
+            ))}
+          </div>
+
+          {/* Itineraries Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6 border-b pb-3">
+              <h2 className="text-2xl font-semibold text-teal-700">
+                Itineraries
+              </h2>
+              <Button
+                type="button"
+                onClick={addItinerary}
+                className="bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                Add Itinerary
+              </Button>
+            </div>
+            {itineraries.map((itinerary, index) => (
+              <ItineraryForm
+                key={index}
+                index={index}
+                itinerary={itinerary}
+                updateItinerary={(updatedItinerary) =>
+                  updateItineraries(index, updatedItinerary)
+                }
+                removeItinerary={() => removeItinerary(index)}
+              />
+            ))}
+          </div>
+
+          {/* FAQs Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6 border-b pb-3">
+              <h2 className="text-2xl font-semibold text-teal-700">FAQs</h2>
+              <Button
+                type="button"
+                onClick={addFAQ}
+                className="bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                Add FAQ
+              </Button>
+            </div>
+            {faqs.map((faq, index) => (
+              <FAQForm
+                key={index}
+                index={index}
+                faq={faq}
+                updateFAQ={(updatedFAQ) => updateFAQ(index, updatedFAQ)}
+                removeFAQ={() => removeFAQ(index)}
+              />
+            ))}
+          </div>
+
+          {/* Services */}
+          <InclusiveExclusiveServicesForm
+            inclusives={inclusives}
+            exclusives={exclusives}
+            onUpdateInclusives={setInclusives}
+            onUpdateExclusives={setExclusives}
+          />
+
+          {/* Media Upload Section */}
+          <div className="bg-gray-100 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
+              Media Upload
+            </h2>
+            <ImageUpload
+              images={images}
+              previews={previews}
+              handleImageChange={handleImageChange}
+              removeImage={removeImage}
+            />
+            <div className="mt-6">
+              <VideoUpload
+                video={video}
+                handleVideoChange={handleVideoChange}
+                removeVideo={removeVideo}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-center mt-12">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full max-w-md px-8 py-4 bg-gradient-to-r from-teal-600 to-teal-800 
+              text-white font-bold rounded-lg shadow-lg hover:opacity-90 
+              transition-all duration-300 focus:outline-none focus:ring-4 
+              focus:ring-teal-300 disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="flex justify-center items-center space-x-3">
+                  <Loader height="24px" width="24px" />
+                  <p>Updating Wellness Details...</p>
+                </div>
+              ) : (
+                "Update Wellness Information"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

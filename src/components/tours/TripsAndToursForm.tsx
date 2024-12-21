@@ -202,26 +202,27 @@ const TripsAndToursManagement: React.FC = () => {
         {/* Create Form */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Create New Trip/Tour</CardTitle>
+            <CardTitle className="text-lg">Create New Trip/Tour</CardTitle>
             <CardDescription>Add a new trip or tour category</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="title">
+                <Label htmlFor="title" className="text-lg">
                   Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="title"
                   value={title}
+                  required
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter title"
-                  className="mt-2"
+                  className="mt-2 text-lg"
                 />
               </div>
 
               <div>
-                <Label htmlFor="description">
+                <Label htmlFor="description" className="text-lg">
                   Description <span className="text-gray-400">(optional)</span>
                 </Label>
                 <Textarea
@@ -229,12 +230,12 @@ const TripsAndToursManagement: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter trip/tour description"
-                  className="mt-2 min-h-[100px]"
+                  className="mt-2 min-h-[100px] text-lg"
                 />
               </div>
 
               <div>
-                <Label>
+                <Label className="text-lg">
                   Cover Image <span className="text-red-500">*</span>
                 </Label>
                 <div className="mt-2 flex items-center space-x-4">
@@ -243,11 +244,12 @@ const TripsAndToursManagement: React.FC = () => {
                     accept="image/*"
                     onChange={handleImageUpload}
                     className="hidden"
+                    required
                     id="coverImageUpload"
                   />
                   <Label
                     htmlFor="coverImageUpload"
-                    className="cursor-pointer flex items-center gap-2 bg-secondary text-white hover:bg-secondary/80 py-2 px-4 rounded-md"
+                    className="cursor-pointer flex items-center gap-2 text-lg bg-secondary text-white hover:bg-secondary/80 py-2 px-4 rounded-md"
                   >
                     <ImagePlus className="h-5 w-5" />
                     Upload Image
@@ -268,7 +270,7 @@ const TripsAndToursManagement: React.FC = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center text-white space-x-2"
+                  className="flex items-center text-white space-x-2 text-lg"
                 >
                   {loading ? (
                     <>
@@ -389,7 +391,7 @@ const TripsAndToursManagement: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="edit-title">
+                  <Label htmlFor="edit-title" className="text-lg">
                     Title <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -406,7 +408,7 @@ const TripsAndToursManagement: React.FC = () => {
                     id="edit-description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="mt-2 min-h-[100px]"
+                    className="mt-2 min-h-[100px] text-lg"
                   />
                 </div>
 
@@ -424,7 +426,7 @@ const TripsAndToursManagement: React.FC = () => {
                     />
                     <Label
                       htmlFor="editCoverImageUpload"
-                      className="cursor-pointer flex items-center gap-2 bg-secondary text-white hover:bg-secondary/80 py-2 px-4 rounded-md"
+                      className="cursor-pointer text-lg flex items-center gap-2 bg-secondary text-white hover:bg-secondary/80 py-2 px-4 rounded-md"
                     >
                       <ImagePlus className="h-5 w-5" />
                       Change Image
@@ -443,7 +445,7 @@ const TripsAndToursManagement: React.FC = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center text-white space-x-2"
+                  className="flex items-center text-lg text-white space-x-2"
                 >
                   {loading ? (
                     <>

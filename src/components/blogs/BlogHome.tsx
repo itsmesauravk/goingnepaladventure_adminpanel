@@ -243,6 +243,7 @@ const BlogHome: React.FC = () => {
                 </td>
 
                 <td className="px-6 py-4">
+                  {/* new  */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600">
                       New
@@ -254,6 +255,27 @@ const BlogHome: React.FC = () => {
                         handleSwitchChange(
                           blog._id,
                           "isNewBlog",
+                          blog.isNewBlog
+                        )
+                      }
+                    />
+                  </div>
+                  {/* activated  */}
+                  <div className="flex items-center justify-between mt-4">
+                    <span
+                      className={`text-sm font-semibold ${
+                        blog.isNewBlog ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      Activated
+                    </span>
+                    <Switch
+                      checked={blog.isNewBlog}
+                      disabled={updateLoading === blog._id}
+                      onCheckedChange={() =>
+                        handleSwitchChange(
+                          blog._id,
+                          "isAcitated",
                           blog.isNewBlog
                         )
                       }

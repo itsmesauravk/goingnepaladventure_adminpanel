@@ -13,7 +13,18 @@ import {
   Users2Icon,
   Mails,
 } from "lucide-react"
-import { TbTrekking } from "react-icons/tb"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 import {
   Sidebar,
@@ -36,7 +47,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { usePathname, useRouter } from "next/navigation"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import {
   AdminDetailsContext,
   PlanTripContext,
@@ -46,6 +57,7 @@ import { title } from "process"
 import axios from "axios"
 import { toast } from "sonner"
 import Cookies from "js-cookie"
+import LogoutModal from "../home/LogoutAlert"
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -57,34 +69,7 @@ export function AppSidebar() {
 
   const router = useRouter()
 
-  const logoutHandler = async () => {
-    try {
-      const confirmation = window.confirm("Are you sure you want to logout?")
-      if (!confirmation) {
-        return
-      }
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      if (response.data.success) {
-        toast.success(response.data.message)
-        Cookies.remove("token")
-        Cookies.remove("accessToken")
-        router.push("/login")
-      } else {
-        toast.error(response.data.message)
-      }
-    } catch (error) {
-      toast.error("Something went wrong")
-      console.log(error)
-    }
-  }
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   if (!planTripContext) {
     throw new Error("PlanTripContext must be used within a PlanTripProvider")
@@ -154,80 +139,114 @@ export function AppSidebar() {
     },
   ]
 
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      if (response.data.success) {
+        toast.success(response.data.message)
+        Cookies.remove("token")
+        Cookies.remove("refreshToken")
+        router.push("/login")
+      } else {
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      toast.error("Something went wrong")
+      console.log(error)
+    }
+  }
+
   return (
-    <Sidebar>
-      <SidebarHeader>
-        {/* <SidebarMenu> */}
-        {/* <SidebarMenuItem> */}
-        <Image src="/going.png" alt="Logo" width={140} height={140} />
-        {/* </SidebarMenuItem>
+    <>
+      <Sidebar>
+        <SidebarHeader>
+          {/* <SidebarMenu> */}
+          {/* <SidebarMenuItem> */}
+          <Image src="/going.png" alt="Logo" width={140} height={140} />
+          {/* </SidebarMenuItem>
         </SidebarMenu> */}
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-2xl mt-4 text-primary font-semibold">
-            Application
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      className={`mt-2  hover:text-primary ${
-                        resource && resource === item.title.toLocaleLowerCase()
-                          ? "bg-secondary text-white"
-                          : ""
-                      } `}
-                      href={item.url}
-                    >
-                      <item.icon />
-                      <span className="text-xl">{item.title}</span>
-                      {item.notificationCount && pendingPlanTripData > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          {pendingPlanTripData}
-                        </span>
-                      )}
-                      {item.pendingData && pendingDataCount > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          {pendingDataCount}
-                        </span>
-                      )}
-                    </Link>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-2xl mt-4 text-primary font-semibold">
+              Application
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        className={`mt-2  hover:text-primary ${
+                          resource &&
+                          resource === item.title.toLocaleLowerCase()
+                            ? "bg-secondary text-white"
+                            : ""
+                        } `}
+                        href={item.url}
+                      >
+                        <item.icon />
+                        <span className="text-xl">{item.title}</span>
+                        {item.notificationCount && pendingPlanTripData > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            {pendingPlanTripData}
+                          </span>
+                        )}
+                        {item.pendingData && pendingDataCount > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            {pendingDataCount}
+                          </span>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton className="text-lg font-semibold h-16 mb-6">
+                    <User2 /> {adminInfo?.fullName}
+                    <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="text-lg font-semibold h-16 mb-6">
-                  <User2 /> {adminInfo?.fullName}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <Link href={"/my-account"}>
-                  <DropdownMenuItem className="text-lg">
-                    My Account
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width]"
+                >
+                  <Link href={"/my-account"}>
+                    <DropdownMenuItem className="text-lg">
+                      My Account
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuItem onClick={() => setIsLogoutModalOpen(true)}>
+                    <span className="text-lg text-red-800">Sign out</span>
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem onClick={logoutHandler}>
-                  <span className="text-lg text-red-800">Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={logoutHandler}
+      />
+    </>
   )
 }

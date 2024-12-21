@@ -222,14 +222,7 @@ const AddTrekForm: React.FC = () => {
   ) => {
     setEndingPoint(event.target.value)
   }
-  // best seasons
-  // const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const options = Array.from(
-  //     event.target.selectedOptions,
-  //     (option) => option.value
-  //   )
-  //   setSelectedSeasons(options)
-  // }
+
   // Handler function for season changes
   const handleSeasonChange = (season: string) => {
     setSelectedSeasons(
@@ -352,164 +345,6 @@ const AddTrekForm: React.FC = () => {
     setOverview(newValue)
   }
 
-  //autofill function
-  const autoFillHandler = () => {
-    // Basic Information
-    setName("Everest Base Camp Trek")
-    setPrice(1499)
-    setCountry("Nepal")
-    setLocation("Khumbu Region")
-    setDifficulty("Moderate")
-    setMinDays(12)
-    setMaxDays(14)
-    setMinGroupSize(2)
-    setMaxGroupSize(16)
-    setStartingPoint("Kathmandu")
-    setEndingPoint("Lukla")
-    setMeal("Inclusive")
-    setSelectedSeasons(["Spring", "Autumn"])
-
-    // Accommodations
-    setAccommodations([
-      "Luxury Hotel in Kathmandu",
-      "Tea House Lodge in Namche",
-      "Mountain Lodge in Dingboche",
-      "Basic Guesthouse in Gorak Shep",
-    ])
-
-    // Overview
-    setOverview(
-      `Experience the adventure of a lifetime on our Everest Base Camp Trek. This iconic journey takes you through the stunning Khumbu region, past charming Sherpa villages, and into the heart of the Himalayas. Witness breathtaking mountain views, experience rich local culture, and achieve your dreams of reaching the base of the world's highest peak.`
-    )
-
-    // Note
-    setNote(
-      "Please ensure you have adequate travel insurance and are physically prepared for high-altitude trekking."
-    )
-
-    // Highlights
-    setHighlights([
-      {
-        content: "Stand at Everest Base Camp (5,364m)",
-        links: [
-          { text: "Everest Base Camp", url: "https://example.com/base-camp" },
-        ],
-      },
-      {
-        content: "Visit the historic Tengboche Monastery",
-        links: [
-          { text: "Tengboche Monastery", url: "https://example.com/tengboche" },
-        ],
-      },
-      {
-        content: "Spectacular sunrise view from Kala Patthar view point",
-        links: [
-          { text: "Kala Patthar", url: "https://example.com/kala-patthar" },
-        ],
-      },
-    ])
-
-    // Itineraries
-    setItineraries([
-      {
-        day: 1,
-        title: "Arrival in Kathmandu",
-        details:
-          "Welcome meeting and trek briefing on Thangaland Restro and stay there.",
-        accommodations: "5-star hotel",
-        meals: "Welcome dinner",
-        links: [
-          { text: "Thangaland Restro", url: "https://example.com/kathmandu" },
-        ],
-      },
-      {
-        day: 2,
-        title: "Fly to Lukla, Trek to Phakding",
-        details: "Scenic mountain flight and easy trek and stay as Hotel Taj.",
-        accommodations: "Tea house",
-        meals: "Breakfast, lunch, dinner",
-        links: [{ text: "Hotel Taj", url: "https://example.com/lukla" }],
-      },
-      {
-        day: 3,
-        title: "Trek to Namche Bazaar",
-        details:
-          "Challenging ascent to Sherpa capital with Namche Guide helping you.",
-        accommodations: "Mountain lodge",
-        meals: "All meals included",
-        links: [{ text: "Namche Guide", url: "https://example.com/namche" }],
-      },
-    ])
-
-    // FAQs
-    setFaqs([
-      {
-        question: "What is the best time to trek?",
-        answer:
-          "March to May and September to November offer the best weather conditions.",
-      },
-      {
-        question: "Do I need prior trekking experience?",
-        answer:
-          "While prior experience is beneficial, this trek is suitable for beginners with good fitness levels.",
-      },
-      {
-        question: "What about altitude sickness?",
-        answer:
-          "Our itinerary includes proper acclimatization days to minimize the risk of altitude sickness.",
-      },
-    ])
-
-    // Services
-    setInclusives([
-      "All domestic flights",
-      "Professional licensed guide",
-      "Porters (1 porter for 2 trekkers)",
-      "All permits and fees",
-      "All accommodations during trek",
-      "Three meals per day during trek",
-    ])
-
-    setExclusives([
-      "International flights",
-      "Travel insurance",
-      "Personal trekking gear",
-      "Tips for guides and porters",
-      "Personal expenses",
-      "Alcoholic beverages",
-    ])
-
-    // Packaging Lists
-    setGeneral([
-      "Backpack (40-60L)",
-      "Daypack (20-30L)",
-      "Sleeping bag (-20°C rated)",
-      "Trekking poles",
-    ])
-
-    setClothes([
-      "Down jacket",
-      "Waterproof jacket and pants",
-      "Thermal base layers",
-      "Trekking pants",
-      "Hiking boots",
-    ])
-
-    setFirstAid([
-      "Altitude sickness medication",
-      "Basic first aid kit",
-      "Personal medications",
-      "Bandages and antiseptic wipes",
-    ])
-
-    setOtherEssentials([
-      "Headlamp with spare batteries",
-      "Water purification tablets",
-      "Sun protection (hat, sunscreen, sunglasses)",
-      "Camera with extra batteries",
-    ])
-  }
-
   // function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -592,13 +427,6 @@ const AddTrekForm: React.FC = () => {
             </button>
             <h1 className="text-3xl font-bold">Add New Trek</h1>
           </div>
-          <Button
-            type="button"
-            onClick={autoFillHandler}
-            className="bg-green-500 hover:bg-green-600 text-white transition-colors"
-          >
-            Debug: Auto Fill
-          </Button>
         </div>
 
         <form
@@ -641,14 +469,14 @@ const AddTrekForm: React.FC = () => {
             </div>
 
             {/* trek pdf */}
-            <div className="mt-6">
+            {/* <div className="mt-6">
               <TrekPdfForm
                 preview={trekPdfPreview}
                 handlePdfChange={handlePdfChange}
                 pdfFileSize={pdfFileSize}
                 maxFileSize={maxSizeMB}
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Seasonal and Location Details */}

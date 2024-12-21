@@ -67,12 +67,14 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
           placeholder="Title"
           value={itinerary.title}
           onChange={(e) => updateField("title", e.target.value)}
+          required
         />
 
         <textarea
           className="w-full p-2 border border-gray-300 rounded-md"
           placeholder="Enter itinerary details"
           value={itinerary.details}
+          required
           onChange={(e) => updateField("details", e.target.value)}
         />
 
@@ -121,6 +123,7 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
       <Input
         type="text"
         placeholder="Accommodation"
+        required
         value={itinerary.accommodations}
         onChange={(e) => updateField("accommodations", e.target.value)}
       />
@@ -131,6 +134,7 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
         type="text"
         placeholder="Meals"
         value={itinerary.meals}
+        required
         onChange={(e) => updateField("meals", e.target.value)}
       />
 

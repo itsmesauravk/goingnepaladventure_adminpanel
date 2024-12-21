@@ -64,6 +64,7 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
                 type="text"
                 placeholder="Add Inclusive Service"
                 value={inclusive}
+                required
                 onChange={(e) => handleUpdateInclusive(index, e.target.value)}
                 className="flex-grow"
               />
@@ -94,6 +95,7 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
                 type="text"
                 placeholder="Add Exclusive Service"
                 value={exclusive}
+                required
                 onChange={(e) => handleUpdateExclusive(index, e.target.value)}
                 className="flex-grow"
               />

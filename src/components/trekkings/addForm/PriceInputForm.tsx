@@ -19,6 +19,7 @@ const PriceInput: React.FC<PriceInputProps> = ({ value, onChange }) => (
         id="price"
         name="price"
         value={value}
+        required
         onChange={onChange}
         className="border border-gray-300 rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         placeholder="Enter price"
