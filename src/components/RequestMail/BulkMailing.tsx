@@ -10,21 +10,32 @@ import {
   Send,
   Loader2,
   AlertCircle,
+  Square,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog"
+
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { toast } from "sonner"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@radix-ui/react-collapsible"
+import UserCard from "./UserCard"
+import { Select } from "../ui/select"
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select"
+
+import { User as UserType } from "./UserCard"
 
 interface User {
   _id: string
@@ -51,16 +62,59 @@ const BulkMailing = () => {
 
   const router = useRouter()
 
-  // Filtered users based on search
+  const [selectedCountry, setSelectedCountry] = useState("all")
+
+  // Filter users based on search term and selected country
   const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        user?.userName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-        user?.userEmail?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-        user?.userAddress?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-        user?.userCountry?.toLowerCase()?.includes(searchTerm.toLowerCase())
+    return users.filter((user) => {
+      const matchesSearch = searchTerm
+        ? user?.userName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+          user?.userEmail?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+          user?.userAddress
+            ?.toLowerCase()
+            .includes(searchTerm?.toLowerCase()) ||
+          user?.userCountry?.toLowerCase().includes(searchTerm?.toLowerCase())
+        : true
+
+      const matchesCountry =
+        selectedCountry === "all" || user.userCountry === selectedCountry
+
+      return matchesSearch && matchesCountry
+    })
+  }, [users, searchTerm, selectedCountry])
+
+  // Get unique countries from users
+  const countries = useMemo(() => {
+    const uniqueCountries = Array.from(
+      new Set(users.map((user) => user.userCountry))
+    ).filter(Boolean)
+    return ["all", ...uniqueCountries].sort()
+  }, [users])
+
+  // Handle select all for filtered users
+  const handleSelectAll = () => {
+    const filteredUserIds = filteredUsers.map((user) => user._id)
+    const allSelected = filteredUserIds.every((id) =>
+      selectedUsers.includes(id)
     )
-  }, [searchTerm, users])
+    if (allSelected) {
+      // Deselect all filtered users
+      setSelectedUsers((prev) =>
+        prev.filter((id) => !filteredUserIds.includes(id))
+      )
+    } else {
+      // Select all filtered users
+      setSelectedUsers((prev) => {
+        const newSelection = [...prev]
+        filteredUserIds.forEach((id) => {
+          if (!newSelection.includes(id)) {
+            newSelection.push(id)
+          }
+        })
+        return newSelection
+      })
+    }
+  }
 
   // Get users
   const getUsers = async () => {
@@ -88,7 +142,7 @@ const BulkMailing = () => {
     }
   }
 
-  // Toggle user selection
+  // Toggle individual user selection
   const toggleUserSelection = (userId: string) => {
     setSelectedUsers((prev) =>
       prev.includes(userId)
@@ -111,7 +165,6 @@ const BulkMailing = () => {
       setAttachments(updatedAttachments)
     }
   }
-
   // Remove attachment
   const removeAttachment = (index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index))
@@ -223,111 +276,107 @@ const BulkMailing = () => {
         </h1>
 
         {/* User Selection */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-2">
-            Select Recipients
-          </label>
 
-          {/* Search and Selection Dialog */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 animate-spin" />
-                ) : (
-                  <Search className="mr-2" />
-                )}
-                {selectedUsers.length > 0
-                  ? `${selectedUsers.length} users selected`
-                  : "Select users"}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Select Recipients</DialogTitle>
-              </DialogHeader>
+        <div className="space-y-4">
+          <div className="flex gap-4 mb-4">
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search users by name, email, or address"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 ml-2 text-2xl"
+              />
+            </div>
 
-              {/* Search Input */}
-              <div className="mb-4">
-                <Input
-                  placeholder="Search users by name, email, or role"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                />
-              </div>
+            <div className="text-gray-500">
+              Total selected user{" "}
+              <span className="font-semibold text-primary">
+                ({selectedUsers.length > 0 ? selectedUsers.length : 0})
+              </span>
+            </div>
 
-              {/* User List */}
-              <div className="max-h-80 overflow-y-auto">
-                {isLoading ? (
-                  <div className="flex justify-center items-center h-full">
-                    <Loader2 className="animate-spin text-blue-600" />
-                  </div>
-                ) : error ? (
-                  <div className="text-center text-red-600">
-                    Failed to load users
-                  </div>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <div
-                      key={user._id}
-                      className={`flex items-center justify-between p-3 hover:bg-gray-100 rounded 
-                        ${
-                          selectedUsers.includes(user._id) ? "bg-blue-50" : ""
-                        }`}
-                    >
-                      <div className="flex items-center">
-                        <CheckSquare
-                          className={`mr-3 cursor-pointer 
-                            ${
-                              selectedUsers.includes(user._id)
-                                ? "text-blue-600"
-                                : "text-gray-300"
-                            }`}
-                          onClick={() => toggleUserSelection(user._id)}
-                        />
-                        <div>
-                          <p className="font-semibold">{user.userName}</p>
-                          <p className="text-sm text-gray-500">
-                            {user.userEmail}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {user.userAddress}, {user.userCountry}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+            {/* Country Filter */}
+            <Select
+              value={selectedCountry}
+              onValueChange={(value) => setSelectedCountry(value)}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Filter by country" />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country === "all" ? "All Countries" : country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Selected Users Display */}
-          {selectedUsers.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {selectedUsers.map((userId) => {
-                const user = users.find((u) => u._id === userId)
-                return (
-                  <div
-                    key={userId}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full 
-                      flex items-center gap-2"
-                  >
-                    {user?.userName}
-                    <X
-                      className="w-4 h-4 cursor-pointer hover:text-red-600"
-                      onClick={() => removeSelectedUser(userId)}
-                    />
-                  </div>
-                )
-              })}
+          {/* Select All Option */}
+          {filteredUsers.length > 0 && (
+            <div
+              className="flex items-center p-3 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={handleSelectAll}
+            >
+              {filteredUsers.every((user) =>
+                selectedUsers.includes(user._id)
+              ) ? (
+                <CheckSquare className="w-5 h-5 text-blue-600 mr-2" />
+              ) : (
+                <Square className="w-5 h-5 text-gray-400 mr-2" />
+              )}
+              <span className="font-medium">
+                Select All Filtered Users ({filteredUsers.length})
+              </span>
             </div>
           )}
+
+          {/* User List */}
+          <div className="max-h-[400px] overflow-y-auto space-y-2">
+            {selectedCountry === "all"
+              ? // Group by country when showing all
+                countries
+                  .filter((country) => country !== "all")
+                  .map((country) => {
+                    const countryUsers = filteredUsers.filter(
+                      (user) => user.userCountry === country
+                    )
+                    if (countryUsers.length === 0) return null
+
+                    return (
+                      <Collapsible key={country} className="space-y-2">
+                        <CollapsibleTrigger className="flex items-center w-full p-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                          <ChevronDown className="w-4 h-4 mr-2" />
+                          <span className="font-medium">
+                            {country} ({countryUsers.length})
+                          </span>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-2 pt-2">
+                          {countryUsers.map((user) => (
+                            <UserCard
+                              key={user._id}
+                              user={user}
+                              isSelected={selectedUsers.includes(user._id)}
+                              onToggle={() => toggleUserSelection(user._id)}
+                            />
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    )
+                  })
+              : // Show flat list when filtered by country
+                filteredUsers.map((user) => (
+                  <UserCard
+                    key={user._id}
+                    user={user}
+                    isSelected={selectedUsers.includes(user._id)}
+                    onToggle={() => toggleUserSelection(user._id)}
+                  />
+                ))}
+          </div>
         </div>
 
         {/* Email Details */}
@@ -342,7 +391,7 @@ const BulkMailing = () => {
           )}
 
           {/* Subject Input */}
-          <div>
+          <div className="mt-8">
             <label className="block text-gray-700 font-semibold mb-2">
               Subject
             </label>
