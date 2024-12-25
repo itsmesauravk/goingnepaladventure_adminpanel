@@ -21,6 +21,7 @@ interface User {
   userPhone: string
   userAddress: string
   userCountry: string
+  userCompany: string
 }
 
 const UsersInfoHome: React.FC = () => {
@@ -111,6 +112,13 @@ const UsersInfoHome: React.FC = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Users Manager</h2>
+          <Button
+            onClick={() => router.push("/users-info/add-client")}
+            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add New Client
+          </Button>
         </div>
         <p className="text-gray-600">Manage your user details options</p>
       </div>
@@ -154,11 +162,15 @@ const UsersInfoHome: React.FC = () => {
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Name
               </th>
+
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Email
+              </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Contact
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Email
+                Company
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Address
@@ -179,14 +191,7 @@ const UsersInfoHome: React.FC = () => {
                     </h3>
                   </div>
                 </td>
-                {/* contact  */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">
-                      {user.userPhone ? user.userPhone : "-"}
-                    </span>
-                  </div>
-                </td>
+
                 {/* email  */}
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-between">
@@ -195,12 +200,30 @@ const UsersInfoHome: React.FC = () => {
                     </span>
                   </div>
                 </td>
+                {/* contact  */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">
+                      {user.userPhone ? user.userPhone : "-"}
+                    </span>
+                  </div>
+                </td>
+                {/* company  */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">
+                      {user.userCompany ? user.userCompany : "-"}
+                    </span>
+                  </div>
+                </td>
                 {/* address  */}
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600">
                       {user.userAddress ? user.userAddress : "-"},{" "}
-                      {user.userCountry ? user.userCountry : "-"}
+                      <span className="text-primary font-semibold">
+                        {user.userCountry ? user.userCountry : "-"}
+                      </span>
                     </span>
                   </div>
                 </td>
