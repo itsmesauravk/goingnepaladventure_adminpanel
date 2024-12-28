@@ -37,6 +37,7 @@ import ThingsToKnow from "../tours/form/ThingsToKnow"
 import ArrivalLocation from "../tours/form/ArrivalLocation"
 import ClothesType from "./form/ClothesType"
 import MaxAltitude from "../tours/form/MaxAltitude"
+import { toast } from "sonner"
 
 interface FAQ {
   question: string
@@ -357,146 +358,6 @@ const AddWellnessForm: React.FC = () => {
     setOverview(newValue)
   }
 
-  //autofill function
-  const autoFillHandler = () => {
-    // Basic Information
-    setName("Everest Base Camp Trek")
-    setMaxAltitude(5364)
-    setTourLanguage("English")
-    setClothesType("Casual")
-    setSuitableAge("+16")
-    setPrice(1499)
-    setCountry("Nepal")
-    setLocation("Khumbu Region")
-    setArrivalLocation("Kathmandu")
-    setDepartureLocation("Kathmandu")
-    setMinDays(12)
-    setMaxDays(14)
-    setMinGroupSize(2)
-    setMaxGroupSize(16)
-    setStartingPoint("Kathmandu")
-    setEndingPoint("Lukla")
-    setMeal("Inclusive")
-    setSelectedSeasons(["Spring", "Autumn"])
-
-    // Accommodations
-    setAccommodations([
-      "Luxury Hotel in Kathmandu",
-      "Tea House Lodge in Namche",
-      "Mountain Lodge in Dingboche",
-      "Basic Guesthouse in Gorak Shep",
-    ])
-
-    // things to know
-    setThingsToKnow([
-      "You must have a valid passport with at least 6 months validity.",
-      "You must have a valid visa to enter Nepal.",
-      "You must have travel insurance that covers trekking up to 6000m.",
-    ])
-
-    // Overview
-    setOverview(
-      `Experience the adventure of a lifetime on our Everest Base Camp Trek. This iconic journey takes you through the stunning Khumbu region, past charming Sherpa villages, and into the heart of the Himalayas. Witness breathtaking mountain views, experience rich local culture, and achieve your dreams of reaching the base of the world's highest peak.`
-    )
-
-    // Note
-    setNote(
-      "Please ensure you have adequate travel insurance and are physically prepared for high-altitude trekking."
-    )
-
-    // Highlights
-    setHighlights([
-      {
-        content: "Stand at Everest Base Camp (5,364m)",
-        links: [
-          { text: "Everest Base Camp", url: "https://example.com/base-camp" },
-        ],
-      },
-      {
-        content: "Visit the historic Tengboche Monastery",
-        links: [
-          { text: "Tengboche Monastery", url: "https://example.com/tengboche" },
-        ],
-      },
-      {
-        content: "Spectacular sunrise view from Kala Patthar view point",
-        links: [
-          { text: "Kala Patthar", url: "https://example.com/kala-patthar" },
-        ],
-      },
-    ])
-
-    // Itineraries
-    setItineraries([
-      {
-        day: 1,
-        title: "Arrival in Kathmandu",
-        details:
-          "Welcome meeting and trek briefing on Thangaland Restro and stay there.",
-        accommodations: "5-star hotel",
-        meals: "Welcome dinner",
-        links: [
-          { text: "Thangaland Restro", url: "https://example.com/kathmandu" },
-        ],
-      },
-      {
-        day: 2,
-        title: "Fly to Lukla, Trek to Phakding",
-        details: "Scenic mountain flight and easy trek and stay as Hotel Taj.",
-        accommodations: "Tea house",
-        meals: "Breakfast, lunch, dinner",
-        links: [{ text: "Hotel Taj", url: "https://example.com/lukla" }],
-      },
-      {
-        day: 3,
-        title: "Trek to Namche Bazaar",
-        details:
-          "Challenging ascent to Sherpa capital with Namche Guide helping you.",
-        accommodations: "Mountain lodge",
-        meals: "All meals included",
-        links: [{ text: "Namche Guide", url: "https://example.com/namche" }],
-      },
-    ])
-
-    // FAQs
-    setFaqs([
-      {
-        question: "What is the best time to trek?",
-        answer:
-          "March to May and September to November offer the best weather conditions.",
-      },
-      {
-        question: "Do I need prior trekking experience?",
-        answer:
-          "While prior experience is beneficial, this trek is suitable for beginners with good fitness levels.",
-      },
-      {
-        question: "What about altitude sickness?",
-        answer:
-          "Our itinerary includes proper acclimatization days to minimize the risk of altitude sickness.",
-      },
-    ])
-
-    // Services
-    setInclusives([
-      "All domestic flights",
-      "Professional licensed guide",
-      "Porters (1 porter for 2 trekkers)",
-      "All permits and fees",
-      "All accommodations during trek",
-      "Three meals per day during trek",
-    ])
-
-    setExclusives([
-      "International flights",
-      "Travel insurance",
-      "Personal trekking gear",
-      "Tips for guides and porters",
-      "Personal expenses",
-      "Alcoholic beverages",
-    ])
-  }
-
   // function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -554,16 +415,16 @@ const AddWellnessForm: React.FC = () => {
       )
 
       if (response.data.success) {
-        alert(response.data.message)
+        toast.success(response.data.message || "Wellness added successfully.")
         setLoading(false)
         route.push("/wellness")
       } else {
-        alert(response.data.message)
+        toast.error(response.data.message || "Failed to add wellness.")
         setLoading(false)
       }
     } catch (error) {
       console.error("Error:", error)
-      alert("Error occurred while submitting the form.")
+      toast.error("Error occurred while submitting the form.")
       setLoading(false)
     }
   }
@@ -582,13 +443,6 @@ const AddWellnessForm: React.FC = () => {
             </button>
             <h1 className="text-3xl font-bold">Add New Wellness Experience</h1>
           </div>
-          <Button
-            type="button"
-            onClick={autoFillHandler}
-            className="bg-green-500 hover:bg-green-600 text-white transition-colors"
-          >
-            Debug: Auto Fill
-          </Button>
         </div>
 
         <form

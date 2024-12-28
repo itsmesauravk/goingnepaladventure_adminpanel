@@ -34,6 +34,10 @@ import { FaArrowLeft } from "react-icons/fa6"
 import { FaEye } from "react-icons/fa6"
 import { Loader } from "../loading/Loader"
 import TrekPdfForm from "./addForm/TrekPdfForm"
+import { toast } from "sonner"
+import ImageUploadEdit from "./addForm/ImageUploadEdit"
+
+import Cookies from "js-cookie"
 
 interface FAQ {
   question: string
@@ -122,8 +126,84 @@ const EditTrekForm: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [views, setViews] = useState(0)
 
+  //for deleting
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
+  const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
+  const [videoToDelete, setVideoToDelete] = useState(false)
+
   const slugId = useParams()
   const slug = slugId.slug
+
+  const [originalTrekData, setOriginalTrekData] = useState<{
+    name: string
+    price: number
+    thumbnail: string
+    trekPdf: string
+    country: string
+    days: { min: number; max: number }
+    location: string
+    difficulty: string
+    groupSize: { min: number; max: number }
+    meal: string
+    bestSeason: string[]
+    startingPoint: string
+    endingPoint: string
+    overview: string
+    trekHighlights: Highlight[]
+    itinerary: Itinerary[]
+    servicesCostIncludes: string[]
+    servicesCostExcludes: string[]
+    packingList: {
+      general: string[]
+      clothes: string[]
+      firstAid: string[]
+      otherEssentials: string[]
+    }
+    faq: FAQ[]
+    note: string
+    images: string[]
+    video: string
+    accommodations: string[]
+  }>({
+    name: "",
+    price: 0,
+    thumbnail: "",
+    trekPdf: "",
+    country: "",
+    days: { min: 0, max: 0 },
+    location: "",
+    difficulty: "",
+    groupSize: { min: 0, max: 0 },
+    meal: "",
+    startingPoint: "",
+    endingPoint: "",
+    bestSeason: [],
+    overview: "",
+    trekHighlights: [{ content: "", links: [{ text: "", url: "" }] }],
+    itinerary: [
+      {
+        day: 0,
+        title: "",
+        details: "",
+        accommodations: "",
+        meals: "",
+        links: [{ text: "", url: "" }],
+      },
+    ],
+    servicesCostIncludes: [],
+    servicesCostExcludes: [],
+    packingList: {
+      general: [],
+      clothes: [],
+      firstAid: [],
+      otherEssentials: [],
+    },
+    faq: [{ question: "", answer: "" }],
+    note: "",
+    images: [],
+    video: "",
+    accommodations: [],
+  })
 
   // Event handlers
 
@@ -348,7 +428,7 @@ const EditTrekForm: React.FC = () => {
     setOverview(newValue)
   }
 
-  //   const trekSlug = "everest-base-camp-trek-6738c8b330898dabe45628c7"
+  const [trekId, setTrekId] = useState("")
 
   //getting the data of trekking
   const handleGetTrekData = async () => {
@@ -357,16 +437,18 @@ const EditTrekForm: React.FC = () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/get-trek/${slug}`
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
         setLoading(false)
         const trekData = response.data.data
+        setOriginalTrekData(trekData)
+        setTrekId(trekData._id)
         setName(trekData.name)
         setViews(trekData.viewsCount)
         setPreviews(trekData.viewsCount)
         setPrice(trekData.price)
         setThumbnailPreview(trekData.thumbnail)
-        setTrekPdfPreview(trekData.trekPdf)
+        setAccommodations(trekData.accommodation)
         setCountry(trekData.country)
         setMinDays(trekData.days.min)
         setMaxDays(trekData.days.max)
@@ -405,74 +487,183 @@ const EditTrekForm: React.FC = () => {
     handleGetTrekData()
   }, [])
 
-  // function
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const formData = new FormData()
 
-    formData.append("name", name)
+    // Add trek ID
+    formData.append("trekId", trekId) // Make sure you have trekId from your route params
 
-    formData.append("price", price.toString())
-    formData.append("thumbnail", thumbnail as File)
-    formData.append("trekPdf", trekPdf as File)
-    formData.append("country", country)
-    formData.append("location", location)
-    formData.append("difficulty", difficulty)
-    formData.append("minDays", minDays.toString())
-    formData.append("maxDays", maxDays.toString())
-    formData.append("groupSizeMin", minGroupSize.toString())
-    formData.append("groupSizeMax", maxGroupSize.toString())
-    formData.append("startingPoint", startingPoint)
-    formData.append("endingPoint", endingPoint)
-    formData.append("accommodation", JSON.stringify(accommodations))
-    formData.append("meal", meal)
-    formData.append("bestSeason", JSON.stringify(selectedSeasons))
-    formData.append("overview", overview)
-    formData.append("trekHighlights", JSON.stringify(highlights))
-    formData.append("itinerary", JSON.stringify(itineraries))
-    formData.append("servicesCostIncludes", JSON.stringify(inclusives))
-    formData.append("servicesCostExcludes", JSON.stringify(exclusives))
-    formData.append(
-      "packingList",
-      JSON.stringify({ general, clothes, firstAid, otherEssentials })
-    )
-    formData.append("faq", JSON.stringify(faqs))
-    formData.append("note", note)
+    // Add basic fields only if they've changed from original data
+    if (name !== originalTrekData.name) {
+      formData.append("name", name)
+    }
+    if (price !== originalTrekData.price) {
+      formData.append("price", price.toString())
+    }
+    if (country !== originalTrekData.country) {
+      formData.append("country", country)
+    }
+    if (location !== originalTrekData.location) {
+      formData.append("location", location)
+    }
+    if (difficulty !== originalTrekData.difficulty) {
+      formData.append("difficulty", difficulty)
+    }
+    if (minDays !== originalTrekData.days.min) {
+      formData.append("minDays", minDays.toString())
+    }
+    if (maxDays !== originalTrekData.days.max) {
+      formData.append("maxDays", maxDays.toString())
+    }
+    if (minGroupSize !== originalTrekData.groupSize.min) {
+      formData.append("groupSizeMin", minGroupSize.toString())
+    }
+    if (maxGroupSize !== originalTrekData.groupSize.max) {
+      formData.append("groupSizeMax", maxGroupSize.toString())
+    }
+    if (startingPoint !== originalTrekData.startingPoint) {
+      formData.append("startingPoint", startingPoint)
+    }
+    if (endingPoint !== originalTrekData.endingPoint) {
+      formData.append("endingPoint", endingPoint)
+    }
+    if (meal !== originalTrekData.meal) {
+      formData.append("meal", meal)
+    }
+    if (overview !== originalTrekData.overview) {
+      formData.append("overview", overview)
+    }
+    if (note !== originalTrekData.note) {
+      formData.append("note", note)
+    }
 
-    previews.forEach(
-      (_, index) => formData.append("images", images[index]) // Attach image files
-    )
+    // Handle complex JSON fields
+    if (
+      JSON.stringify(accommodations) !==
+      JSON.stringify(originalTrekData.accommodations)
+    ) {
+      formData.append("accommodation", JSON.stringify(accommodations))
+    }
+    if (
+      JSON.stringify(selectedSeasons) !==
+      JSON.stringify(originalTrekData.bestSeason)
+    ) {
+      formData.append("bestSeason", JSON.stringify(selectedSeasons))
+    }
+    if (
+      JSON.stringify(highlights) !==
+      JSON.stringify(originalTrekData.trekHighlights)
+    ) {
+      formData.append("trekHighlights", JSON.stringify(highlights))
+    }
+    if (
+      JSON.stringify(itineraries) !== JSON.stringify(originalTrekData.itinerary)
+    ) {
+      formData.append("itinerary", JSON.stringify(itineraries))
+    }
+    if (
+      JSON.stringify(inclusives) !==
+      JSON.stringify(originalTrekData.servicesCostIncludes)
+    ) {
+      formData.append("servicesCostIncludes", JSON.stringify(inclusives))
+    }
+    if (
+      JSON.stringify(exclusives) !==
+      JSON.stringify(originalTrekData.servicesCostExcludes)
+    ) {
+      formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+    }
 
-    if (video) {
-      formData.append("video", video) // Attach video file
+    // Handle packing list
+    const newPackingList = { general, clothes, firstAid, otherEssentials }
+    if (
+      JSON.stringify(newPackingList) !==
+      JSON.stringify(originalTrekData.packingList)
+    ) {
+      formData.append("packingList", JSON.stringify(newPackingList))
+    }
+
+    // Handle FAQs
+    if (JSON.stringify(faqs) !== JSON.stringify(originalTrekData.faq)) {
+      formData.append("faq", JSON.stringify(faqs))
+    }
+
+    // Handle file deletions
+    if (imagesToDelete.length > 0) {
+      formData.append("imagesToDelete", JSON.stringify(imagesToDelete))
+    }
+    if (thumbnailToDelete) {
+      formData.append("thumbnailToDelete", "true")
+    }
+    if (videoToDelete) {
+      formData.append("videoToDelete", "true")
+    }
+
+    // Handle new file uploads
+    if (thumbnail instanceof File) {
+      formData.append("thumbnail", thumbnail)
+    }
+    if (trekPdf instanceof File) {
+      formData.append("trekPdf", trekPdf)
+    }
+    if (images.length > 0) {
+      images.forEach((image, index) => {
+        if (image instanceof File) {
+          formData.append("images", image)
+        }
+      })
+    }
+    if (video instanceof File) {
+      formData.append("video", video)
     }
 
     try {
       setLoading(true)
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/add-trek`,
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/edit-trek`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
+          withCredentials: true,
         }
       )
-      console.log("Response:", response.data)
+
       if (response.data.success) {
-        alert(response.data.message)
+        toast.success(response.data.message || "Trek Updated Successfully")
         setLoading(false)
-        route.push("/trekking")
+        route.push("/trekkings")
       } else {
-        alert(response.data.message)
+        toast.error(
+          response.data.message || "Unable to Update Trek, Please Try Again!"
+        )
         setLoading(false)
       }
     } catch (error) {
       console.error("Error:", error)
-      alert("Error occurred while submitting the form.")
+      toast.error("Error occurred while updating the trek.")
       setLoading(false)
     }
+  }
+
+  //  helper functions for handling image deletions
+  const handleImageDelete = (imageUrl: string) => {
+    setImagesToDelete((prev) => [...prev, imageUrl])
+    setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
+  }
+
+  // const handleThumbnailDelete = () => {
+  //   setThumbnailToDelete(true)
+  //   setThumbnailPreview(null)
+  // }
+
+  const handleVideoDelete = () => {
+    setVideoToDelete(true)
+    setVideo(null)
   }
 
   return (
@@ -530,15 +721,6 @@ const EditTrekForm: React.FC = () => {
               <ThumbnailInput
                 preview={thumbnailPreview}
                 handleImageChange={handleThumbnailChange}
-              />
-            </div>
-
-            <div className="mt-6">
-              <TrekPdfForm
-                preview={trekPdfPreview}
-                handlePdfChange={handlePdfChange}
-                pdfFileSize={pdfFileSize}
-                maxFileSize={maxSizeMB}
               />
             </div>
           </div>
@@ -710,17 +892,18 @@ const EditTrekForm: React.FC = () => {
             <h2 className="text-2xl font-semibold text-blue-700 mb-6 border-b pb-3">
               Media Upload
             </h2>
-            <ImageUpload
+            <ImageUploadEdit
               images={images}
               previews={previews}
               handleImageChange={handleImageChange}
               removeImage={removeImage}
+              handleImageDelete={handleImageDelete}
             />
             <div className="mt-6">
               <VideoUpload
                 video={video}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
+                removeVideo={handleVideoDelete}
               />
             </div>
           </div>

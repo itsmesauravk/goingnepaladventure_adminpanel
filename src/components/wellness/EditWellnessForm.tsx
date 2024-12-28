@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react"
 
-import { nanoid } from "nanoid"
+import Cookies from "js-cookie"
 import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "../ui/button"
@@ -38,6 +38,8 @@ import ClothesType from "./form/ClothesType"
 import MaxAltitude from "../tours/form/MaxAltitude"
 
 import { FaEye } from "react-icons/fa6"
+import { toast } from "sonner"
+import ImageUploadEdit from "../trekkings/addForm/ImageUploadEdit"
 
 interface FAQ {
   question: string
@@ -128,6 +130,80 @@ const EditWellnessForm: React.FC = () => {
   //slug
   const slugId = useParams()
   const slug = slugId.slug
+
+  //for deleting
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
+  const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
+  const [videoToDelete, setVideoToDelete] = useState(false)
+
+  const [originalTrekData, setOriginalTrekData] = useState<{
+    name: string
+    price: number
+    thumbnail: string
+    clothesType: string
+    maxAltitude: number
+    tourLanguage: string
+    suitableAge: string
+    country: string
+    days: { min: number; max: number }
+    location: string
+    difficulty: string
+    groupSize: { min: number; max: number }
+    meal: string
+    bestSeason: string[]
+    startingPoint: string
+    endingPoint: string
+    overview: string
+    trekHighlights: Highlight[]
+    itinerary: Itinerary[]
+    servicesCostIncludes: string[]
+    servicesCostExcludes: string[]
+
+    faq: FAQ[]
+    note: string
+    images: string[]
+    video: string
+    accommodations: string[]
+    thingsToKnow: string[]
+  }>({
+    name: "",
+    price: 0,
+    thumbnail: "",
+    clothesType: "",
+    maxAltitude: 0,
+    tourLanguage: "",
+    suitableAge: "",
+    country: "",
+    days: { min: 0, max: 0 },
+    location: "",
+    difficulty: "",
+    groupSize: { min: 0, max: 0 },
+    meal: "",
+    startingPoint: "",
+    endingPoint: "",
+    bestSeason: [],
+    overview: "",
+    trekHighlights: [{ content: "", links: [{ text: "", url: "" }] }],
+    itinerary: [
+      {
+        day: 0,
+        title: "",
+        details: "",
+        accommodations: "",
+        meals: "",
+        links: [{ text: "", url: "" }],
+      },
+    ],
+    servicesCostIncludes: [],
+    servicesCostExcludes: [],
+
+    faq: [{ question: "", answer: "" }],
+    note: "",
+    images: [],
+    video: "",
+    accommodations: [],
+    thingsToKnow: [],
+  })
 
   // Event handlers
 
@@ -369,8 +445,10 @@ const EditWellnessForm: React.FC = () => {
     setOverview(newValue)
   }
 
+  const [wellnessId, setWellnessId] = useState<string>("")
+
   // get form
-  const handleGetTourData = async () => {
+  const handleGetWellnessData = async () => {
     try {
       setLoading(true)
       const response = await axios.get(
@@ -379,6 +457,8 @@ const EditWellnessForm: React.FC = () => {
       if (response.data.success) {
         setLoading(false)
         const trekData = response.data.data
+        setOriginalTrekData(trekData)
+        setWellnessId(trekData._id)
         setTourViews(trekData.viewsCount)
         setName(trekData.name)
         setPrice(trekData.price)
@@ -411,9 +491,9 @@ const EditWellnessForm: React.FC = () => {
         setNote(trekData.note)
         // setImages(trekData.images)
         setPreviews(trekData.images)
-        // if (trekData.video) {
-        //   setVideo(trekData.video)
-        // }
+        if (trekData.video) {
+          setVideo(trekData.video)
+        }
       }
     } catch (error) {
       setLoading(false)
@@ -422,7 +502,7 @@ const EditWellnessForm: React.FC = () => {
   }
 
   useEffect(() => {
-    handleGetTourData()
+    handleGetWellnessData()
   }, [])
 
   // function
@@ -431,68 +511,177 @@ const EditWellnessForm: React.FC = () => {
 
     const formData = new FormData()
 
-    formData.append("name", name)
-    formData.append("maxAltitude", maxAltitude.toString())
-    formData.append("tourLanguage", tourLanguage)
-    formData.append("suitableAge", suitableAge)
-    formData.append("price", price.toString())
-    formData.append("thumbnail", thumbnail as File)
-    formData.append("country", country)
-    formData.append("location", location)
-    formData.append("arrivalLocation", arrivalLocation)
-    formData.append("departureLocation", departureLocation)
-    formData.append("tripType", tripType)
-    formData.append("minDays", minDays.toString())
-    formData.append("maxDays", maxDays.toString())
-    formData.append("groupSizeMin", minGroupSize.toString())
-    formData.append("groupSizeMax", maxGroupSize.toString())
-    formData.append("startingPoint", startingPoint)
-    formData.append("endingPoint", endingPoint)
-    formData.append("accommodation", JSON.stringify(accommodations))
-    formData.append("thingsToKnow", JSON.stringify(thingsToKnow))
-    formData.append("meal", meal)
-    formData.append("bestSeason", JSON.stringify(selectedSeasons))
-    formData.append("overview", overview)
-    formData.append("highlights", JSON.stringify(highlights))
-    formData.append("itinerary", JSON.stringify(itineraries))
-    formData.append("servicesCostIncludes", JSON.stringify(inclusives))
-    formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+    // Add trek ID
+    formData.append("wellnessId", wellnessId)
 
-    formData.append("faq", JSON.stringify(faqs))
-    formData.append("note", note)
+    // Add basic fields only if they've changed from original data
+    if (name !== originalTrekData.name) {
+      formData.append("name", name)
+    }
+    if (price !== originalTrekData.price) {
+      formData.append("price", price.toString())
+    }
+    if (country !== originalTrekData.country) {
+      formData.append("country", country)
+    }
+    if (location !== originalTrekData.location) {
+      formData.append("location", location)
+    }
 
-    previews.forEach(
-      (_, index) => formData.append("images", images[index]) // Attach image files
-    )
+    if (minDays !== originalTrekData.days.min) {
+      formData.append("minDays", minDays.toString())
+    }
+    if (maxDays !== originalTrekData.days.max) {
+      formData.append("maxDays", maxDays.toString())
+    }
+    if (minGroupSize !== originalTrekData.groupSize.min) {
+      formData.append("groupSizeMin", minGroupSize.toString())
+    }
+    if (maxGroupSize !== originalTrekData.groupSize.max) {
+      formData.append("groupSizeMax", maxGroupSize.toString())
+    }
+    if (startingPoint !== originalTrekData.startingPoint) {
+      formData.append("startingPoint", startingPoint)
+    }
+    if (endingPoint !== originalTrekData.endingPoint) {
+      formData.append("endingPoint", endingPoint)
+    }
+    if (meal !== originalTrekData.meal) {
+      formData.append("meal", meal)
+    }
+    if (overview !== originalTrekData.overview) {
+      formData.append("overview", overview)
+    }
+    if (note !== originalTrekData.note) {
+      formData.append("note", note)
+    }
+    if (clothesType !== originalTrekData.clothesType) {
+      formData.append("clothesType", clothesType)
+    }
+    if (maxAltitude !== originalTrekData.maxAltitude) {
+      formData.append("maxAltitude", maxAltitude.toString())
+    }
+    if (tourLanguage !== originalTrekData.tourLanguage) {
+      formData.append("tourLanguage", tourLanguage)
+    }
+    if (suitableAge !== originalTrekData.suitableAge) {
+      formData.append("suitableAge", suitableAge)
+    }
 
-    if (video) {
-      formData.append("video", video) // Attach video file
+    // Handle complex JSON fields
+    if (
+      JSON.stringify(accommodations) !==
+      JSON.stringify(originalTrekData.accommodations)
+    ) {
+      formData.append("accommodation", JSON.stringify(accommodations))
+    }
+    if (
+      JSON.stringify(selectedSeasons) !==
+      JSON.stringify(originalTrekData.bestSeason)
+    ) {
+      formData.append("bestSeason", JSON.stringify(selectedSeasons))
+    }
+    if (
+      JSON.stringify(highlights) !==
+      JSON.stringify(originalTrekData.trekHighlights)
+    ) {
+      formData.append("trekHighlights", JSON.stringify(highlights))
+    }
+    if (
+      JSON.stringify(itineraries) !== JSON.stringify(originalTrekData.itinerary)
+    ) {
+      formData.append("itinerary", JSON.stringify(itineraries))
+    }
+    if (
+      JSON.stringify(inclusives) !==
+      JSON.stringify(originalTrekData.servicesCostIncludes)
+    ) {
+      formData.append("servicesCostIncludes", JSON.stringify(inclusives))
+    }
+    if (
+      JSON.stringify(exclusives) !==
+      JSON.stringify(originalTrekData.servicesCostExcludes)
+    ) {
+      formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+    }
+
+    // Handle FAQs
+    if (JSON.stringify(faqs) !== JSON.stringify(originalTrekData.faq)) {
+      formData.append("faq", JSON.stringify(faqs))
+    }
+
+    // Handle file deletions
+    if (imagesToDelete.length > 0) {
+      formData.append("imagesToDelete", JSON.stringify(imagesToDelete))
+    }
+    if (thumbnailToDelete) {
+      formData.append("thumbnailToDelete", "true")
+    }
+    if (videoToDelete) {
+      formData.append("videoToDelete", "true")
+    }
+
+    // Handle new file uploads
+    if (thumbnail instanceof File) {
+      formData.append("thumbnail", thumbnail)
+    }
+
+    if (images.length > 0) {
+      images.forEach((image, index) => {
+        if (image instanceof File) {
+          formData.append("images", image)
+        }
+      })
+    }
+    if (video instanceof File) {
+      formData.append("video", video)
     }
 
     try {
       setLoading(true)
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/edit-wellness/${slug}`,
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/edit-wellness`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
+          withCredentials: true,
         }
       )
 
       if (response.data.success) {
-        alert(response.data.message)
+        toast.success(response.data.message || "Wellness Updated Successfully")
         setLoading(false)
         route.push("/wellness")
       } else {
-        alert(response.data.message)
+        toast.error(
+          response.data.message ||
+            "Unable to Update Wellness, Please Try Again!"
+        )
         setLoading(false)
       }
     } catch (error) {
-      alert("Error occurred while submitting the form.")
+      console.error("Error:", error)
+      toast.error("Error occurred while updating the wellness.")
       setLoading(false)
     }
+  }
+
+  const handleImageDelete = (imageUrl: string) => {
+    setImagesToDelete((prev) => [...prev, imageUrl])
+    setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
+  }
+
+  // const handleThumbnailDelete = () => {
+  //   setThumbnailToDelete(true)
+  //   setThumbnailPreview(null)
+  // }
+
+  const handleVideoDelete = () => {
+    setVideoToDelete(true)
+    setVideo(null)
   }
 
   return (
@@ -735,17 +924,18 @@ const EditWellnessForm: React.FC = () => {
             <h2 className="text-2xl font-semibold text-teal-700 mb-6 border-b pb-3">
               Media Upload
             </h2>
-            <ImageUpload
+            <ImageUploadEdit
               images={images}
               previews={previews}
               handleImageChange={handleImageChange}
               removeImage={removeImage}
+              handleImageDelete={handleImageDelete}
             />
             <div className="mt-6">
               <VideoUpload
                 video={video}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
+                removeVideo={handleVideoDelete}
               />
             </div>
           </div>

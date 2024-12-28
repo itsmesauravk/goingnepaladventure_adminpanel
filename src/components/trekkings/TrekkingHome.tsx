@@ -11,6 +11,7 @@ import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { get } from "http"
 import HomeLoading from "../home/HomeLoading"
+import { toast } from "sonner"
 // import { toast } from "sonner"
 
 interface Trekking {
@@ -134,15 +135,17 @@ const TrekkingHome: React.FC = () => {
     try {
       if (selectedTrekToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/treks/${selectedTrekToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/trekking/delete-trek/${selectedTrekToDelete}`
         )
         if (response.data.success) {
-          console.log("Trek deleted successfully")
+          toast.success(response.data.message || "Trek deleted successfully")
           getTrekking()
+        } else {
+          toast.error(response.data.message || "Failed to delete trek")
         }
       }
     } catch (error) {
-      console.log("Failed to delete trek")
+      toast.error("Failed to delete trek")
     } finally {
       setDeleteModalOpen(false)
     }

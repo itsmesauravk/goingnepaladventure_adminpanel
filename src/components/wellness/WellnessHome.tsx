@@ -11,6 +11,7 @@ import { CustomPagination } from "../utils/Pagination"
 import { Switch } from "../ui/switch"
 import { get } from "http"
 import HomeLoading from "../home/HomeLoading"
+import { toast } from "sonner"
 
 interface Wellness {
   _id: string
@@ -108,15 +109,20 @@ const WellnessHome: React.FC = () => {
     try {
       if (selectedWellnessToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/delete/${selectedWellnessToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/wellness/delete-wellness/${selectedWellnessToDelete}`
         )
         if (response.data.success) {
-          console.log("Wellness deleted successfully")
+          toast.success(
+            response.data.message || "Wellness deleted successfully"
+          )
           getWellnessHandler()
+        } else {
+          toast.error(response.data.message || "Unable to delete Wellness")
         }
       }
     } catch (error) {
-      console.log("Failed to delete wellness")
+      toast.error("Failed to delete wellness")
+      // console.log(error)
     } finally {
       setDeleteModalOpen(false)
     }

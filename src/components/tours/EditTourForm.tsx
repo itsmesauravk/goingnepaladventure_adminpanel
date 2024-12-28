@@ -2,10 +2,11 @@
 
 import React, { useState, useCallback, useEffect } from "react"
 
-import { nanoid } from "nanoid"
 import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "../ui/button"
+
+import Cookies from "js-cookie"
 
 import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
@@ -39,6 +40,7 @@ import ArrivalLocation from "./form/ArrivalLocation"
 
 import { FaEye } from "react-icons/fa6"
 import { json } from "stream/consumers"
+import { toast } from "sonner"
 
 interface FAQ {
   question: string
@@ -131,6 +133,72 @@ const EditTourForm: React.FC = () => {
   //slug
   const slugId = useParams()
   const slug = slugId.slug
+
+  //for deleting
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
+  const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
+  const [videoToDelete, setVideoToDelete] = useState(false)
+
+  const [originalTourData, setOriginalTourData] = useState<{
+    name: string
+    maxAltitude: number
+    tourLanguage: string
+    suitableAge: string
+    price: number
+    thumbnail: string | File
+    accommodations: string[]
+    country: string
+    minDays: number
+    maxDays: number
+    location: string
+    highlights: Highlight[]
+    arrivalLocation: string
+    departureLocation: string
+    minGroupSize: number
+    maxGroupSize: number
+    meal: string
+    startingPoint: string
+    endingPoint: string
+    selectedTripType: {
+      id: string
+      title: string
+    }
+    itineraries: Itinerary[]
+    selectedSeasons: string[]
+    inclusives: string[]
+    exclusives: string[]
+    overview: string
+    note: string
+    faqs: FAQ[]
+  }>({
+    name: "",
+    maxAltitude: 0,
+    tourLanguage: "",
+    suitableAge: "",
+    price: 0,
+    thumbnail: "",
+    accommodations: [],
+    country: "",
+    minDays: 1,
+    maxDays: 1,
+    location: "",
+    highlights: [],
+    arrivalLocation: "",
+    departureLocation: "",
+    minGroupSize: 0,
+    maxGroupSize: 0,
+    meal: "",
+    startingPoint: "",
+    endingPoint: "",
+    selectedTripType: { id: "", title: "" },
+    itineraries: [],
+    selectedSeasons: [],
+    inclusives: [],
+    exclusives: [],
+    overview: "",
+    note: "",
+    faqs: [],
+  })
 
   // Event handlers
 
@@ -360,6 +428,8 @@ const EditTourForm: React.FC = () => {
     setOverview(newValue)
   }
 
+  const [tourId, setTourId] = useState<string>("")
+
   // get form
   const handleGetTourData = async () => {
     try {
@@ -370,6 +440,8 @@ const EditTourForm: React.FC = () => {
       if (response.data.success) {
         setLoading(false)
         const trekData = response.data.data
+        setOriginalTourData(trekData)
+        setTourId(trekData._id)
         setTourViews(trekData.viewsCount)
         setName(trekData.name)
         setPrice(trekData.price)
@@ -401,9 +473,9 @@ const EditTourForm: React.FC = () => {
         setNote(trekData.note)
         // setImages(trekData.images)
         setPreviews(trekData.images)
-        // if (trekData.video) {
-        //   setVideo(trekData.video)
-        // }
+        if (trekData.video) {
+          setVideo(trekData.video)
+        }
       }
     } catch (error) {
       setLoading(false)
@@ -421,66 +493,143 @@ const EditTourForm: React.FC = () => {
 
     const formData = new FormData()
 
-    formData.append("name", name)
-    formData.append("maxAltitude", maxAltitude.toString())
-    formData.append("tourLanguage", tourLanguage)
-    formData.append("suitableAge", suitableAge)
-    formData.append("price", price.toString())
-    formData.append("thumbnail", thumbnail as File)
-    formData.append("country", country)
-    formData.append("location", location)
-    formData.append("arrivalLocation", arrivalLocation)
-    formData.append("departureLocation", departureLocation)
-    formData.append("tripType", JSON.stringify(selectedTripType))
-    formData.append("minDays", minDays.toString())
-    formData.append("maxDays", maxDays.toString())
-    formData.append("groupSizeMin", minGroupSize.toString())
-    formData.append("groupSizeMax", maxGroupSize.toString())
-    formData.append("startingPoint", startingPoint)
-    formData.append("endingPoint", endingPoint)
-    formData.append("accommodation", JSON.stringify(accommodations))
-    formData.append("thingsToKnow", JSON.stringify(thingsToKnow))
-    formData.append("meal", meal)
-    formData.append("bestSeason", JSON.stringify(selectedSeasons))
-    formData.append("overview", overview)
-    formData.append("highlights", JSON.stringify(highlights))
-    formData.append("itinerary", JSON.stringify(itineraries))
-    formData.append("servicesCostIncludes", JSON.stringify(inclusives))
-    formData.append("servicesCostExcludes", JSON.stringify(exclusives))
+    // Add tour ID
+    formData.append("tourId", tourId) // Ensure tourId is available
 
-    formData.append("faq", JSON.stringify(faqs))
-    formData.append("note", note)
+    // Add basic fields only if they've changed from original data
+    if (name !== originalTourData.name) {
+      formData.append("name", name)
+    }
+    if (price !== originalTourData.price) {
+      formData.append("price", price.toString())
+    }
+    if (country !== originalTourData.country) {
+      formData.append("country", country)
+    }
+    if (location !== originalTourData.location) {
+      formData.append("location", location)
+    }
+    if (minDays !== originalTourData.minDays) {
+      formData.append("minDays", minDays.toString())
+    }
+    if (maxDays !== originalTourData.maxDays) {
+      formData.append("maxDays", maxDays.toString())
+    }
+    if (minGroupSize !== originalTourData.minGroupSize) {
+      formData.append("minGroupSize", minGroupSize.toString())
+    }
+    if (maxGroupSize !== originalTourData.maxGroupSize) {
+      formData.append("maxGroupSize", maxGroupSize.toString())
+    }
+    if (startingPoint !== originalTourData.startingPoint) {
+      formData.append("startingPoint", startingPoint)
+    }
+    if (endingPoint !== originalTourData.endingPoint) {
+      formData.append("endingPoint", endingPoint)
+    }
+    if (meal !== originalTourData.meal) {
+      formData.append("meal", meal)
+    }
+    if (overview !== originalTourData.overview) {
+      formData.append("overview", overview)
+    }
+    if (note !== originalTourData.note) {
+      formData.append("note", note)
+    }
 
-    previews.forEach(
-      (_, index) => formData.append("images", images[index]) // Attach image files
-    )
+    // Handle complex JSON fields
+    if (
+      JSON.stringify(accommodations) !==
+      JSON.stringify(originalTourData.accommodations)
+    ) {
+      formData.append("accommodations", JSON.stringify(accommodations))
+    }
+    if (
+      JSON.stringify(selectedSeasons) !==
+      JSON.stringify(originalTourData.selectedSeasons)
+    ) {
+      formData.append("selectedSeasons", JSON.stringify(selectedSeasons))
+    }
+    if (
+      JSON.stringify(highlights) !== JSON.stringify(originalTourData.highlights)
+    ) {
+      formData.append("highlights", JSON.stringify(highlights))
+    }
+    if (
+      JSON.stringify(itineraries) !==
+      JSON.stringify(originalTourData.itineraries)
+    ) {
+      formData.append("itineraries", JSON.stringify(itineraries))
+    }
+    if (
+      JSON.stringify(inclusives) !== JSON.stringify(originalTourData.inclusives)
+    ) {
+      formData.append("inclusives", JSON.stringify(inclusives))
+    }
+    if (
+      JSON.stringify(exclusives) !== JSON.stringify(originalTourData.exclusives)
+    ) {
+      formData.append("exclusives", JSON.stringify(exclusives))
+    }
 
-    if (video) {
-      formData.append("video", video) // Attach video file
+    // Handle FAQs
+    if (JSON.stringify(faqs) !== JSON.stringify(originalTourData.faqs)) {
+      formData.append("faqs", JSON.stringify(faqs))
+    }
+
+    // Handle file deletions
+    if (imagesToDelete.length > 0) {
+      formData.append("imagesToDelete", JSON.stringify(imagesToDelete))
+    }
+    if (thumbnailToDelete) {
+      formData.append("thumbnailToDelete", "true")
+    }
+    if (videoToDelete) {
+      formData.append("videoToDelete", "true")
+    }
+
+    // Handle new file uploads
+    if (thumbnail instanceof File) {
+      formData.append("thumbnail", thumbnail)
+    }
+    if (images.length > 0) {
+      images.forEach((image, index) => {
+        if (image instanceof File) {
+          formData.append("images", image)
+        }
+      })
+    }
+    if (video instanceof File) {
+      formData.append("video", video)
     }
 
     try {
       setLoading(true)
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/add-tour`,
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/edit-tour`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
+          withCredentials: true,
         }
       )
 
       if (response.data.success) {
-        alert(response.data.message)
+        toast.success(response.data.message || "Tour Updated Successfully")
         setLoading(false)
         route.push("/tours")
       } else {
-        alert(response.data.message)
+        toast.error(
+          response.data.message || "Unable to Update Tour, Please Try Again!"
+        )
         setLoading(false)
       }
     } catch (error) {
-      alert("Error occurred while submitting the form.")
+      console.error("Error:", error)
+      toast.error("Error occurred while updating the tour.")
       setLoading(false)
     }
   }

@@ -137,9 +137,10 @@ const TourHome: React.FC = () => {
 
   const confirmDelete = async () => {
     try {
+      setDeleteLoading(true)
       if (selectedTourToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/tours/delete-tour/${selectedTourToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/tour/delete-tour/${selectedTourToDelete}`
         )
         if (response.data.success) {
           toast.success(response.data.message)
