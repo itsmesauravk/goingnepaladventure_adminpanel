@@ -395,7 +395,7 @@ const TourHome: React.FC = () => {
                             tour.isActivated ? "text-green-600" : "text-red-600"
                           }`}
                         >
-                          Activated
+                          {tour.isActivated ? "Activated" : "Not Activated"}
                         </span>
                         <Switch
                           checked={tour.isActivated}

@@ -392,7 +392,7 @@ const TrekkingHome: React.FC = () => {
                             trek.isActivated ? "text-green-600" : "text-red-600"
                           }`}
                         >
-                          Activated
+                          {trek.isActivated ? "Activated" : "Not Activated"}
                         </span>
                         <Switch
                           checked={trek.isActivated}

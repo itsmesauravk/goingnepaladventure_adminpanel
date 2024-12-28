@@ -343,7 +343,7 @@ const WellnessHome: React.FC = () => {
                               : "text-red-600"
                           }`}
                         >
-                          Activated
+                          {wellness.isActivated ? "Activated" : "Not Activated"}
                         </span>
                         <Switch
                           checked={wellness.isActivated}

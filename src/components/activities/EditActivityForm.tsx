@@ -12,12 +12,15 @@ import axios from "axios"
 import { Separator } from "@radix-ui/react-separator"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
+import Cookies from "js-cookie"
+
 const EditActivityForm: React.FC = () => {
   const router = useRouter()
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
+    id: "",
     title: "",
     price: "",
     country: "",
@@ -161,17 +164,17 @@ const EditActivityForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, FAQs: newFAQs }))
   }
 
-  //get activity by slug
   // get form
   const handleGetTourData = async () => {
     try {
       setLoading(true)
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/get-activity-by-slug/${slug}`
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/get-activity-by-slug/${slug}?q=a`
       )
       if (response.data.success) {
         const tour = response.data.data
         setFormData({
+          id: tour._id,
           title: tour.title,
           price: tour.price,
           country: tour.country,
@@ -232,8 +235,9 @@ const EditActivityForm: React.FC = () => {
       return value === "" || value === "0"
     })
 
-    if (missingFields.length > 0 || !formData.thumbnail) {
-      toast.error("Please fill all required fields and upload a thumbnail")
+    // For edit, we might not need to require thumbnail if it already exists
+    if (missingFields.length > 0) {
+      toast.error("Please fill all required fields")
       return
     }
 
@@ -242,7 +246,7 @@ const EditActivityForm: React.FC = () => {
     )
 
     const formDataToSubmit = new FormData()
-
+    formDataToSubmit.append("id", formData.id)
     formDataToSubmit.append("title", formData.title)
     formDataToSubmit.append("price", formData.price)
     formDataToSubmit.append("country", formData.country)
@@ -261,43 +265,43 @@ const EditActivityForm: React.FC = () => {
     )
     formDataToSubmit.append("FAQs", JSON.stringify(formData.FAQs))
 
-    // Append thumbnail
-    if (formData.thumbnail) {
+    // Only append files if they're new (instanceof File)
+    if (formData.thumbnail instanceof File) {
       formDataToSubmit.append("thumbnail", formData.thumbnail)
     }
 
-    // Append gallery images
+    // Append only new gallery images
     formData.gallery.forEach((file) => {
-      formDataToSubmit.append("image", file)
+      if (file instanceof File) {
+        formDataToSubmit.append("image", file)
+      }
     })
 
-    console.log(formDataToSubmit)
-
-    // Uncomment for actual API submission
     try {
       setLoading(true)
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/create-activity`,
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/edit-activity`,
         formDataToSubmit,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
+          withCredentials: true,
         }
       )
 
       if (response.data.success) {
-        toast.success(response.data.message)
+        toast.success(response.data.message || "Activity updated successfully")
         router.push("/activities")
-        setLoading(false)
       } else {
-        setLoading(false)
-        toast.error(response.data.message)
+        toast.error(response.data.message || "Failed to update activity")
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update activity")
+      console.error("Error updating activity:", error)
+    } finally {
       setLoading(false)
-      toast.error("Failed to create activity")
-      console.error(error)
     }
   }
 
@@ -716,6 +720,7 @@ const EditActivityForm: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
+              onClick={handleSubmit}
               className="w-full text-white text-lg bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-indigo-700"
             >
               {loading ? "Updating, Please Wait..." : "Edit Activity"}

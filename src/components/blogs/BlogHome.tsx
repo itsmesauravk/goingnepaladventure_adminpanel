@@ -267,14 +267,14 @@ const BlogHome: React.FC = () => {
                       }
                     />
                   </div>
-                  {/* activated  */}
+                  {/* {wellness.isActivated ? "Activated" : "Not Activated"}  */}
                   <div className="flex items-center justify-between mt-4">
                     <span
                       className={`text-sm font-semibold ${
                         blog.isActive ? "text-green-600" : "text-red-600"
                       }`}
                     >
-                      Activated
+                      {blog.isActive ? "Activated" : "Not Activated"}
                     </span>
                     <Switch
                       checked={blog.isActive}

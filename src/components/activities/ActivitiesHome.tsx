@@ -90,7 +90,6 @@ const ActivitiesHome: React.FC = () => {
               : activity
           )
         )
-        console.log(`${field} status updated successfully`)
       }
     } catch (error) {
       console.log("Failed to update status")
@@ -272,7 +271,7 @@ const ActivitiesHome: React.FC = () => {
                       onCheckedChange={() =>
                         handleSwitchChange(
                           activity._id,
-                          "isUpcoming",
+                          "isPopular",
                           activity.isPopular
                         )
                       }
@@ -285,7 +284,7 @@ const ActivitiesHome: React.FC = () => {
                         activity.isActivated ? "text-green-600" : "text-red-600"
                       }`}
                     >
-                      Activated
+                      {activity.isActivated ? "Activated" : "Not Activated"}
                     </span>
                     <Switch
                       checked={activity.isActivated}
@@ -293,7 +292,7 @@ const ActivitiesHome: React.FC = () => {
                       onCheckedChange={() =>
                         handleSwitchChange(
                           activity._id,
-                          "isUpcoming",
+                          "isActivated",
                           activity.isActivated
                         )
                       }
