@@ -13,6 +13,8 @@ import { DeleteActivity } from "./DeleteActivities"
 import { toast } from "sonner"
 import HomeLoading from "../home/HomeLoading"
 
+import Cookies from "js-cookie"
+
 interface Activity {
   _id: string
   title: string
@@ -79,6 +81,7 @@ const ActivitiesHome: React.FC = () => {
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/edit-activity-visibility/${activityId}`,
+
         { [field]: !currentValue }
       )
 
@@ -108,7 +111,13 @@ const ActivitiesHome: React.FC = () => {
       setDeleteLoading(true)
       if (selectedActivityToDelete) {
         const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/delete-activity/${selectedActivityToDelete}`
+          `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/delete-activity/${selectedActivityToDelete}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            withCredentials: true,
+          }
         )
         if (response.data.success) {
           setDeleteLoading(false)

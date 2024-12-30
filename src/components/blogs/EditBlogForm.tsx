@@ -31,13 +31,14 @@ interface BlogPostProps {
   }) => Promise<void> | void
 }
 
-const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
+const EditBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [links, setLinks] = useState<BlogLink[]>([{ text: "", url: "" }])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [blogId, setBlogId] = useState<string | null>(null)
   // const [isClient, setIsClient] = useState(false)
   const editorRef = useRef<TinyMCEEditor | null>(null)
   const route = useRouter()
@@ -84,63 +85,6 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
     setLinks(newLinks)
   }
 
-  const handleAddBlog = async () => {
-    // Validate inputs
-    if (!title || !description.replace(/<[^>]*>/g, "").trim() || !image) {
-      toast.error("Please fill in all required fields")
-      return
-    }
-
-    // Validate links
-    const validLinks = links.filter(
-      (link) => link.text.trim() && link.url.trim()
-    )
-
-    try {
-      setIsSubmitting(true)
-
-      const formData = new FormData()
-      formData.append("title", title)
-      formData.append("description", description)
-
-      // // Append links
-      // validLinks.forEach((link, index) => {
-      //   formData.append(`links[${index}][text]`, link.text)
-      //   formData.append(`links[${index}][url]`, link.url)
-      // })
-
-      formData.append("links", JSON.stringify(validLinks))
-
-      // Only append image if it exists
-      if (image) {
-        formData.append("image", image as Blob)
-      }
-
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/add-blog`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-
-      if (response.data.success) {
-        toast.success(response.data.message)
-        resetForm()
-        route.push("/blogs") // Optional: redirect after successful post
-      } else {
-        toast.error(response.data.message)
-      }
-    } catch (error) {
-      toast.error("Failed to create blog post")
-      console.error(error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   const resetForm = () => {
     setTitle("")
     setDescription("")
@@ -174,6 +118,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
 
       if (response.data.success) {
         const blogData = response.data.data
+        setBlogId(blogData._id)
         setTitle(blogData.title)
         setDescription(blogData.description)
         setImagePreview(blogData.blogImage)
@@ -183,6 +128,61 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const handleEditBlog = async () => {
+    // Validate inputs
+    if (!title || !description.replace(/<[^>]*>/g, "").trim()) {
+      toast.error("Please fill in all required fields")
+      return
+    }
+
+    // Validate links
+    const validLinks = links.filter(
+      (link) => link.text.trim() && link.url.trim()
+    )
+
+    if (!blogId) {
+      toast.error("Cannot find blog post to update, try reloading the page")
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      const formData = new FormData()
+      formData.append("id", blogId)
+      formData.append("title", title)
+      formData.append("description", description)
+      formData.append("links", JSON.stringify(validLinks))
+
+      // Only append image if a new image is selected
+      if (image) {
+        formData.append("image", image as Blob)
+      }
+
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/blogs/edit-blog`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Blog post updated successfully")
+        route.push("/blogs")
+      } else {
+        toast.error(response.data.message || "Failed to update blog post")
+      }
+    } catch (error: any) {
+      console.error("Error updating blog:", error)
+      toast.error(error.response?.data?.message || "Failed to update blog post")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -361,13 +361,8 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
 
           {/* Submit Button */}
           <Button
-            onClick={handleAddBlog}
-            disabled={
-              !title ||
-              !description.replace(/<[^>]*>/g, "").trim() ||
-              !image ||
-              isSubmitting
-            }
+            onClick={handleEditBlog}
+            disabled={isSubmitting}
             className="w-full bg-primary text-white hover:bg-primary/90 transition-colors"
           >
             <Save className="mr-2" />
@@ -381,4 +376,4 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
   )
 }
 
-export default AddBlogForm
+export default EditBlogForm

@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import axios from "axios"
 import { Separator } from "@radix-ui/react-separator"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import Cookies from "js-cookie"
 
 const CreateActivityForm: React.FC = () => {
   const router = useRouter()
@@ -225,8 +226,6 @@ const CreateActivityForm: React.FC = () => {
       formDataToSubmit.append("image", file)
     })
 
-    console.log(formDataToSubmit)
-
     // Uncomment for actual API submission
     try {
       setLoading(true)
@@ -236,7 +235,9 @@ const CreateActivityForm: React.FC = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
+          withCredentials: true,
         }
       )
 
