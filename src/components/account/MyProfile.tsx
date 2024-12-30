@@ -1,10 +1,8 @@
 "use client"
-import React, { useState, ChangeEvent, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import {
   User,
   Camera,
-  Edit,
-  Save,
   Lock,
   Shield,
   Clock,
@@ -16,6 +14,8 @@ import {
 
 import axios from "axios"
 import Cookies from "js-cookie"
+
+import { useRouter } from "next/navigation"
 
 // Type definitions for the profile data
 interface SecurityQuestion {
@@ -42,17 +42,9 @@ interface ProfileData {
   profilePicture: string | null
 }
 
-// Type for input field props
-interface InputFieldProps {
-  label: string
-  name: string
-  value: string
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void
-  disabled?: boolean
-  type?: string
-}
-
 const MyProfile: React.FC = () => {
+  const router = useRouter()
+  const [hideView, setHideView] = useState<Boolean>(true)
   // Initial state with more robust default values
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "N/A",
@@ -66,7 +58,7 @@ const MyProfile: React.FC = () => {
     failedLoginAttempts: 0,
     twoFactorEnabled: false,
     securityQuestions: [
-      { question: "What is your mother's maiden name?", answer: "" },
+      { question: "What is your favourite movie?", answer: "" },
       { question: "What was your first pet's name?", answer: "" },
     ],
     oneTimePassword: null,
@@ -107,58 +99,6 @@ const MyProfile: React.FC = () => {
     }
   }
 
-  // Edit mode state
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-
-  // Temporary state for editing
-  const [editedData, setEditedData] = useState<ProfileData>({ ...profileData })
-
-  // Handle input changes during editing
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setEditedData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  // Handle security question changes
-  const handleSecurityQuestionChange = (
-    index: number,
-    field: keyof SecurityQuestion,
-    value: string
-  ) => {
-    const updatedQuestions = [...(editedData.securityQuestions || [])]
-    // Ensure the question exists before modifying
-    if (!updatedQuestions[index]) {
-      updatedQuestions[index] = { question: "", answer: "" }
-    }
-    updatedQuestions[index][field] = value
-    setEditedData((prev) => ({
-      ...prev,
-      securityQuestions: updatedQuestions,
-    }))
-  }
-
-  // Save changes handler
-  const handleSaveChanges = () => {
-    console.log("Saving Profile Data:", editedData)
-
-    // Update profile data
-    setProfileData(editedData)
-
-    // Exit edit mode
-    setIsEditing(false)
-  }
-
-  // Toggle switches
-  const toggleSwitch = (field: keyof ProfileData) => {
-    setEditedData((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }))
-  }
-
   useEffect(() => {
     if (token) {
       getUserProfile()
@@ -169,39 +109,36 @@ const MyProfile: React.FC = () => {
     <div className="w-full bg-gray-100 p-6">
       <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         {/* Profile Header */}
-        <div className="bg-primary text-white p-6 flex items-center">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center">
-              {profileData.profilePicture ? (
-                <img
-                  src={profileData.profilePicture}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <User className="w-16 h-16 text-primary" />
-              )}
+        <div className="bg-primary text-white p-6 flex items-center justify-between">
+          <div className="flex justify-center items-center gap-4">
+            <div>
+              <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center">
+                {profileData.profilePicture ? (
+                  <img
+                    src={profileData.profilePicture}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <User className="w-16 h-16 text-primary" />
+                )}
+              </div>
             </div>
+            <div className="">
+              <h1 className="text-2xl font-bold">{profileData.fullName}</h1>
+              <p className="text-blue-200">{profileData.role}</p>
+            </div>
+          </div>
+          <div>
             <button
-              className="absolute bottom-0 right-0 bg-white text-primary p-2 rounded-full shadow-md"
               onClick={() => {
-                /* Implement profile picture upload */
+                router.push("/my-account/edit-profile")
               }}
+              className="bg-white text-primary font-semibold px-4 py-2 rounded-full shadow-md"
             >
-              <Camera className="w-5 h-5" />
+              Edit Profile
             </button>
           </div>
-          <div className="ml-6">
-            <h1 className="text-2xl font-bold">{profileData.fullName}</h1>
-            <p className="text-blue-200">{profileData.role}</p>
-          </div>
-          <button
-            className="ml-auto bg-white text-blue-600 px-4 py-2 rounded-md flex items-center"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? "Cancel" : "Edit Profile"}
-            <Edit className="ml-2 w-5 h-5" />
-          </button>
         </div>
 
         {/* Profile Details */}
@@ -214,33 +151,39 @@ const MyProfile: React.FC = () => {
                 Personal Information
               </h2>
               <div className="space-y-4">
-                <InputField
-                  label="Full Name"
-                  name="fullName"
-                  value={isEditing ? editedData.fullName : profileData.fullName}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                />
-                <InputField
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  value={isEditing ? editedData.email : profileData.email}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                />
-                <InputField
-                  label="Phone Number"
-                  name="phoneNumber"
-                  type="tel"
-                  value={
-                    isEditing
-                      ? editedData.phoneNumber || ""
-                      : profileData.phoneNumber || "Not provided"
-                  }
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                />
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={profileData.fullName}
+                    disabled
+                    className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={profileData.email}
+                    disabled
+                    className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={profileData.phoneNumber || "Not provided"}
+                    disabled
+                    className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500"
+                  />
+                </div>
               </div>
             </div>
 
@@ -251,74 +194,20 @@ const MyProfile: React.FC = () => {
                 Account Security
               </h2>
               <div className="space-y-4">
-                {/* Two-Factor Authentication */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Lock className="mr-3 text-gray-600" />
-                    <span>Two-Factor Authentication</span>
-                  </div>
-                  {isEditing ? (
-                    <button
-                      onClick={() => toggleSwitch("twoFactorEnabled")}
-                      className={`toggle-switch ${
-                        editedData.twoFactorEnabled
-                          ? "bg-green-500"
-                          : "bg-gray-300"
-                      } relative inline-block w-12 h-6 rounded-full`}
-                    >
-                      <span
-                        className={`dot absolute top-1 ${
-                          editedData.twoFactorEnabled ? "right-1" : "left-1"
-                        } w-4 h-4 bg-white rounded-full transition-all`}
-                      />
-                    </button>
-                  ) : (
-                    <span
-                      className={`${
-                        profileData.twoFactorEnabled
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {profileData.twoFactorEnabled ? "Enabled" : "Disabled"}
-                    </span>
-                  )}
-                </div>
-
-                {/* Account Status */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Network className="mr-3 text-gray-600" />
                     <span>Account Status</span>
                   </div>
-                  {isEditing ? (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => toggleSwitch("isActive")}
-                        className={`toggle-switch ${
-                          editedData.isActive ? "bg-green-500" : "bg-gray-300"
-                        } relative inline-block w-12 h-6 rounded-full`}
-                      >
-                        <span
-                          className={`dot absolute top-1 ${
-                            editedData.isActive ? "right-1" : "left-1"
-                          } w-4 h-4 bg-white rounded-full transition-all`}
-                        />
-                      </button>
-                      <span>{editedData.isActive ? "Active" : "Inactive"}</span>
-                    </div>
-                  ) : (
-                    <span
-                      className={`${
-                        profileData.isActive ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {profileData.isActive ? "Active" : "Inactive"}
-                    </span>
-                  )}
+                  <span
+                    className={`${
+                      profileData.isActive ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {profileData.isActive ? "Active" : "Inactive"}
+                  </span>
                 </div>
 
-                {/* Login Information */}
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <Clock className="mr-3 text-gray-600" />
@@ -334,58 +223,6 @@ const MyProfile: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Security Questions */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4 border-b pb-2 flex items-center">
-                <FileText className="mr-2 text-gray-600" />
-                Security Questions
-              </h2>
-              {(profileData.securityQuestions || []).length > 0 ? (
-                profileData.securityQuestions.map((sq, index) => (
-                  <div key={index} className="space-y-2 mb-4">
-                    <InputField
-                      label={`Security Question ${index + 1}`}
-                      name={`securityQuestion-${index}`}
-                      value={
-                        isEditing
-                          ? editedData.securityQuestions?.[index]?.question ||
-                            ""
-                          : sq.question
-                      }
-                      onChange={(e) =>
-                        handleSecurityQuestionChange(
-                          index,
-                          "question",
-                          e.target.value
-                        )
-                      }
-                      disabled={!isEditing}
-                    />
-                    <InputField
-                      label="Answer"
-                      name={`securityAnswer-${index}`}
-                      type="password"
-                      value={
-                        isEditing
-                          ? editedData.securityQuestions?.[index]?.answer || ""
-                          : ""
-                      }
-                      onChange={(e) =>
-                        handleSecurityQuestionChange(
-                          index,
-                          "answer",
-                          e.target.value
-                        )
-                      }
-                      disabled={!isEditing}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No security questions set</p>
-              )}
             </div>
 
             {/* Additional Account Details */}
@@ -410,47 +247,10 @@ const MyProfile: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Save Changes Button */}
-          {isEditing && (
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={handleSaveChanges}
-                className="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
-              >
-                Save Changes
-                <Save className="ml-2 w-5 h-5" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
   )
 }
-
-// Reusable Input Field Component
-const InputField: React.FC<InputFieldProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  disabled = false,
-  type = "text",
-}) => (
-  <div>
-    <label className="block text-gray-700 font-medium mb-2">{label}</label>
-    <input
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      className={`w-full px-3 py-2 border rounded-md ${
-        disabled ? "bg-gray-100 text-gray-500" : "bg-white"
-      }`}
-    />
-  </div>
-)
 
 export default MyProfile

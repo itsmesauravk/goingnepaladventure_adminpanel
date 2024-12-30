@@ -244,10 +244,7 @@ const AddBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
           <div className="space-y-4">
             <Label className="text-lg font-semibold">Blog Content</Label>
             <Editor
-              apiKey={
-                process.env.NEXT_PUBLIC_TINYMCE_API_KEY ||
-                "3o1sg5ivlfql4w6odven9ndmucyy0xbtv42n11e7tbn8whp6"
-              }
+              apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
               onInit={(evt, editor) => {
                 editorRef.current = editor
               }}
