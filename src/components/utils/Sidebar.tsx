@@ -15,18 +15,6 @@ import {
 } from "lucide-react"
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -53,7 +41,6 @@ import {
   PlanTripContext,
   RequestsMailsContext,
 } from "./ContextProvider"
-import { title } from "process"
 import axios from "axios"
 import { toast } from "sonner"
 import Cookies from "js-cookie"
@@ -61,14 +48,10 @@ import LogoutModal from "../home/LogoutAlert"
 
 export function AppSidebar() {
   const pathname = usePathname()
-
   const planTripContext = useContext(PlanTripContext)
   const requestsMailsContext = useContext(RequestsMailsContext)
-
   const { adminInfo } = useContext(AdminDetailsContext)!
-
   const router = useRouter()
-
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   if (!planTripContext) {
@@ -79,15 +62,16 @@ export function AppSidebar() {
       "RequestsMailsContext must be used within a RequestsMailsProvider"
     )
   }
+
   const { pendingData } = planTripContext
   const { pendingQuoteData, pendingCustomizeData } = requestsMailsContext
-
   const pendingPlanTripData = pendingData
   const pendingDataCount = pendingQuoteData + pendingCustomizeData
 
-  const resource = pathname.split("/")[1]
+  const isActive = (url: string) => {
+    return pathname === url || pathname.startsWith(url + "/")
+  }
 
-  // Menu items.
   const items = [
     {
       title: "Home",
@@ -125,7 +109,6 @@ export function AppSidebar() {
       icon: Bus,
       notificationCount: pendingData,
     },
-
     {
       title: "Requests & Mails",
       url: "/requests-mails",
@@ -168,11 +151,7 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader>
-          {/* <SidebarMenu> */}
-          {/* <SidebarMenuItem> */}
           <Image src="/going.png" alt="Logo" width={140} height={140} />
-          {/* </SidebarMenuItem>
-        </SidebarMenu> */}
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -185,12 +164,9 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <Link
-                        className={`mt-2  hover:text-primary ${
-                          resource &&
-                          resource === item.title.toLocaleLowerCase()
-                            ? "bg-secondary text-white"
-                            : ""
-                        } `}
+                        className={`mt-2 hover:text-primary ${
+                          isActive(item.url) ? "bg-primary text-white" : ""
+                        }`}
                         href={item.url}
                       >
                         <item.icon />
