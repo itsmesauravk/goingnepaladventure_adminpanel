@@ -7,7 +7,7 @@ import { Loader } from "../loading/Loader"
 import { useRouter } from "next/navigation"
 
 const AddClient = () => {
-  const [formData, setFormData] = useState({
+  const [formUserData, setFormUserData] = useState({
     userName: "",
     userEmail: "",
     userPhone: "",
@@ -15,13 +15,14 @@ const AddClient = () => {
     userCountry: "",
     userCompany: "",
   })
+  const [country, setCountry] = useState("")
 
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData((prevData) => ({
+    setFormUserData((prevData) => ({
       ...prevData,
       [name]: value,
     }))
@@ -31,9 +32,17 @@ const AddClient = () => {
     e.preventDefault()
     try {
       setLoading(true)
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL_DEV}/users/add`,
-        formData,
+        {
+          userName: formUserData.userName,
+          userEmail: formUserData.userEmail,
+          userPhone: formUserData.userPhone,
+          userAddress: formUserData.userAddress,
+          userCountry: country.trim().toLowerCase(),
+          userCompany: formUserData.userCompany,
+        },
         {
           withCredentials: true,
         }
@@ -82,7 +91,7 @@ const AddClient = () => {
               type="text"
               id="userName"
               name="userName"
-              value={formData.userName}
+              value={formUserData.userName}
               required
               onChange={handleChange}
               placeholder="Enter user's name"
@@ -101,7 +110,7 @@ const AddClient = () => {
               type="email"
               id="userEmail"
               name="userEmail"
-              value={formData.userEmail}
+              value={formUserData.userEmail}
               onChange={handleChange}
               placeholder="Enter user's email"
               required
@@ -120,7 +129,7 @@ const AddClient = () => {
               type="number"
               id="userPhone"
               name="userPhone"
-              value={formData.userPhone}
+              value={formUserData.userPhone}
               onChange={handleChange}
               placeholder="Enter user's phone number"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -138,7 +147,7 @@ const AddClient = () => {
               type="text"
               id="userCompany"
               name="userCompany"
-              value={formData.userCompany}
+              value={formUserData.userCompany}
               onChange={handleChange}
               placeholder="Enter user's company"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -156,8 +165,8 @@ const AddClient = () => {
               type="text"
               id="userCountry"
               name="userCountry"
-              value={formData.userCountry}
-              onChange={handleChange}
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
               placeholder="Enter user's country"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
@@ -174,7 +183,7 @@ const AddClient = () => {
               type="text"
               id="userAddress"
               name="userAddress"
-              value={formData.userAddress}
+              value={formUserData.userAddress}
               onChange={handleChange}
               placeholder="Enter user's address"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"

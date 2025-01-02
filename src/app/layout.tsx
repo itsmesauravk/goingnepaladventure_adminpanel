@@ -40,6 +40,8 @@ export default function RootLayout({
   const isLoginPage = pathname === "/login"
   const isForgotPasswordPage = pathname === "/forgot-password"
   const startPage = pathname === "/"
+  const isVerifyPage = pathname === "/verify"
+  const isChangePasswordPage = pathname === "/change-password"
 
   return (
     <html lang="en">
@@ -51,12 +53,16 @@ export default function RootLayout({
             <AdminDetailsProvider>
               <Providers />
               <SidebarProvider>
-                {!isLoginPage && !isForgotPasswordPage && !startPage && (
-                  <>
-                    <AppSidebar />
-                    <SidebarTrigger />
-                  </>
-                )}
+                {!isLoginPage &&
+                  !isForgotPasswordPage &&
+                  !startPage &&
+                  !isVerifyPage &&
+                  !isChangePasswordPage && (
+                    <>
+                      <AppSidebar />
+                      <SidebarTrigger />
+                    </>
+                  )}
 
                 {children}
                 <Analytics />

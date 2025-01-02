@@ -44,7 +44,7 @@ const LoginForm: React.FC = () => {
       if (response.data.success) {
         toast.success(response.data.message)
         Cookies.set("token", response.data.accessToken)
-        Cookies.set("refreshToken", response.data.refreshToken)
+        // Cookies.set("refreshToken", response.data.refreshToken)
         setTimeout(() => {
           router.push("/home")
         }, 500)
