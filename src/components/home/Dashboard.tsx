@@ -346,84 +346,6 @@ const AdminDashboard = () => {
             </Card>
           </div>
 
-          {/* Monthly Trends Chart */}
-          {/* <Card className="bg-white border-none shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-slate-900">
-                Monthly Request Analysis
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="planTrips" fill="#2563eb" name="Plan Trips" />
-                  <Bar dataKey="quotes" fill="#16a34a" name="Quotes" />
-                  <Bar dataKey="customize" fill="#9333ea" name="Customize" />
-                  <Line
-                    type="monotone"
-                    dataKey="planTrips"
-                    stroke="#1e40af"
-                    name="Trend"
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card> */}
-
-          <Card className="bg-white border-none shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-slate-900">
-                Monthly Request Analysis
-              </CardTitle>
-              {/* Year filter dropdown */}
-              <div className="mt-2">
-                <label
-                  htmlFor="year-select"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Select Year:
-                </label>
-                <select
-                  id="year-select"
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="ml-2 p-2 border rounded"
-                >
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={mergedData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="planTrips" fill="#2563eb" name="Plan Trips" />
-                  <Bar dataKey="quotes" fill="#16a34a" name="Quotes" />
-                  <Bar dataKey="customize" fill="#9333ea" name="Customize" />
-                  <Line
-                    type="monotone"
-                    dataKey="planTrips"
-                    stroke="#1e40af"
-                    name="Trend"
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
           {/* Request Status Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="bg-white border-none shadow-sm">
@@ -558,6 +480,57 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Monthly Trends Chart */}
+
+          <Card className="bg-white border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-slate-900">
+                Monthly Request Analysis
+              </CardTitle>
+              {/* Year filter dropdown */}
+              <div className="mt-2">
+                <label
+                  htmlFor="year-select"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Select Year:
+                </label>
+                <select
+                  id="year-select"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="ml-2 p-2 border rounded"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={mergedData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="planTrips" fill="#2563eb" name="Plan Trips" />
+                  <Bar dataKey="quotes" fill="#16a34a" name="Quotes" />
+                  <Bar dataKey="customize" fill="#9333ea" name="Customize" />
+                  <Line
+                    type="monotone"
+                    dataKey="planTrips"
+                    stroke="#1e40af"
+                    name="Trend"
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>

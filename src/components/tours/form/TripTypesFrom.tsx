@@ -67,6 +67,7 @@ const TripTypeForm: React.FC<TripTypeSelectProps> = ({
   const onTripTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedType = tripTypes.find((type) => type.title === e.target.value)
 
+    console.log(selectedType)
     if (selectedType) {
       handleTripTypeChange({
         id: selectedType._id,

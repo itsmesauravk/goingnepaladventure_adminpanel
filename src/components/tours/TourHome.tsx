@@ -53,6 +53,20 @@ const TourHome: React.FC = () => {
     string | null
   >(null)
 
+  const [allTripTypes, setAllTripTypes] = useState<
+    [
+      {
+        _id: string
+        title: string
+      }
+    ]
+  >([
+    {
+      _id: "",
+      title: "",
+    },
+  ])
+
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
 
   // Fetch tours data with filters
@@ -99,8 +113,23 @@ const TourHome: React.FC = () => {
     }
   }
 
+  //get trip types
+  const getTripTypes = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/trips-and-tours/get?select=title`
+      )
+      if (response.data.success) {
+        setAllTripTypes(response.data.data)
+      }
+    } catch (error) {
+      console.log("Failed to fetch trip types")
+    }
+  }
+
   useEffect(() => {
     getTourLocation()
+    getTripTypes()
   }, [])
 
   const handleSwitchChange = async (
@@ -208,10 +237,12 @@ const TourHome: React.FC = () => {
             }}
           >
             <option value="">All Trip Types</option>
-            <option value="Adventure">Adventure</option>
-            <option value="Cultural">Cultural</option>
-            <option value="Historical">Historical</option>
-            <option value="Nature">Nature</option>
+
+            {allTripTypes.map((trip) => (
+              <option key={trip._id} value={trip.title}>
+                {trip.title}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -99,6 +99,7 @@ const AddWellnessForm: React.FC = () => {
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [video, setVideo] = useState<File | null>(null)
+  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -287,6 +288,9 @@ const AddWellnessForm: React.FC = () => {
   const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
     setVideo(file)
+    if (file) {
+      setPreviewVideo(URL.createObjectURL(file))
+    }
   }
   const removeVideo = () => {
     setVideo(null)
@@ -675,6 +679,7 @@ const AddWellnessForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
+                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
                 removeVideo={removeVideo}
               />

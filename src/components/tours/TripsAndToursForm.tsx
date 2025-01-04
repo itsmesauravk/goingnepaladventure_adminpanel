@@ -30,6 +30,7 @@ import {
 import { toast } from "sonner"
 import { Loader } from "../loading/Loader"
 import axios from "axios"
+import { useRouter } from "next/navigation"
 
 // Define type for Trip/Tour
 interface TripTour {
@@ -56,6 +57,7 @@ const TripsAndToursManagement: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
+  const router = useRouter()
   // Fetch Trips and Tours
   const fetchTripsTours = async () => {
     try {
@@ -191,7 +193,14 @@ const TripsAndToursManagement: React.FC = () => {
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-4"
+            onClick={() => {
+              router.back()
+            }}
+          >
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <h1 className="text-2xl font-bold">Trips And Tours Management</h1>

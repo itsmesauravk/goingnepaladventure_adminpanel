@@ -105,6 +105,7 @@ const EditTourForm: React.FC = () => {
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [video, setVideo] = useState<File | null>(null)
+  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -159,10 +160,8 @@ const EditTourForm: React.FC = () => {
     meal: string
     startingPoint: string
     endingPoint: string
-    selectedTripType: {
-      id: string
-      title: string
-    }
+    tripTypeId: string
+    tripType: string
     itineraries: Itinerary[]
     selectedSeasons: string[]
     inclusives: string[]
@@ -190,7 +189,8 @@ const EditTourForm: React.FC = () => {
     meal: "",
     startingPoint: "",
     endingPoint: "",
-    selectedTripType: { id: "", title: "" },
+    tripTypeId: "",
+    tripType: "",
     itineraries: [],
     selectedSeasons: [],
     inclusives: [],
@@ -357,6 +357,9 @@ const EditTourForm: React.FC = () => {
   const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
     setVideo(file)
+    if (file) {
+      setPreviewVideo(URL.createObjectURL(file))
+    }
   }
   const removeVideo = () => {
     setVideo(null)
@@ -455,7 +458,10 @@ const EditTourForm: React.FC = () => {
         setLocation(trekData.location)
         setArrivalLocation(trekData.arrivalLocation)
         setDepartureLocation(trekData.departureLocation)
-        setSelectedTripType(trekData.tripType)
+        setSelectedTripType({
+          id: trekData.tripTypeId,
+          title: trekData.tripType,
+        })
         setMinGroupSize(trekData.groupSize.min)
         setMaxGroupSize(trekData.groupSize.max)
         setMeal(trekData.meal)
@@ -474,7 +480,7 @@ const EditTourForm: React.FC = () => {
         // setImages(trekData.images)
         setPreviews(trekData.images)
         if (trekData.video) {
-          setVideo(trekData.video)
+          setPreviewVideo(trekData.video)
         }
       }
     } catch (error) {
@@ -509,6 +515,31 @@ const EditTourForm: React.FC = () => {
     if (location !== originalTourData.location) {
       formData.append("location", location)
     }
+
+    if (maxAltitude !== originalTourData.maxAltitude) {
+      formData.append("maxAltitude", maxAltitude.toString())
+    }
+
+    if (tourLanguage !== originalTourData.tourLanguage) {
+      formData.append("tourLanguage", tourLanguage)
+    }
+
+    if (suitableAge !== originalTourData.suitableAge) {
+      formData.append("suitableAge", suitableAge)
+    }
+
+    if (selectedTripType.id !== originalTourData.tripTypeId) {
+      formData.append("tripType", JSON.stringify(selectedTripType))
+    }
+
+    if (arrivalLocation !== originalTourData.arrivalLocation) {
+      formData.append("arrivalLocation", arrivalLocation)
+    }
+
+    if (departureLocation !== originalTourData.departureLocation) {
+      formData.append("departureLocation", departureLocation)
+    }
+
     if (minDays !== originalTourData.minDays) {
       formData.append("minDays", minDays.toString())
     }
@@ -544,12 +575,14 @@ const EditTourForm: React.FC = () => {
     ) {
       formData.append("accommodations", JSON.stringify(accommodations))
     }
+
     if (
       JSON.stringify(selectedSeasons) !==
       JSON.stringify(originalTourData.selectedSeasons)
     ) {
-      formData.append("selectedSeasons", JSON.stringify(selectedSeasons))
+      formData.append("bestSeason", JSON.stringify(selectedSeasons))
     }
+
     if (
       JSON.stringify(highlights) !== JSON.stringify(originalTourData.highlights)
     ) {
@@ -895,6 +928,7 @@ const EditTourForm: React.FC = () => {
               />
               <VideoUpload
                 video={video}
+                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
                 removeVideo={removeVideo}
               />

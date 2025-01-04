@@ -135,6 +135,7 @@ const EditWellnessForm: React.FC = () => {
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
   const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
   const [videoToDelete, setVideoToDelete] = useState(false)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
 
   const [originalTrekData, setOriginalTrekData] = useState<{
     name: string
@@ -251,12 +252,12 @@ const EditWellnessForm: React.FC = () => {
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseFloat(e.target.value))
   }
-  // thumbnail
+
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0]
-    if (file) {
+    if (file && file instanceof File) {
       setThumbnailPreview(URL.createObjectURL(file))
       setThumbnail(file)
     }
@@ -374,6 +375,9 @@ const EditWellnessForm: React.FC = () => {
   const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
     setVideo(file)
+    if (file) {
+      setVideoPreview(URL.createObjectURL(file))
+    }
   }
   const removeVideo = () => {
     setVideo(null)
@@ -492,7 +496,7 @@ const EditWellnessForm: React.FC = () => {
         // setImages(trekData.images)
         setPreviews(trekData.images)
         if (trekData.video) {
-          setVideo(trekData.video)
+          setVideoPreview(trekData.video)
         }
       }
     } catch (error) {
@@ -673,11 +677,6 @@ const EditWellnessForm: React.FC = () => {
     setImagesToDelete((prev) => [...prev, imageUrl])
     setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
   }
-
-  // const handleThumbnailDelete = () => {
-  //   setThumbnailToDelete(true)
-  //   setThumbnailPreview(null)
-  // }
 
   const handleVideoDelete = () => {
     setVideoToDelete(true)
@@ -934,6 +933,7 @@ const EditWellnessForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
+                preview={videoPreview || ""}
                 handleVideoChange={handleVideoChange}
                 removeVideo={handleVideoDelete}
               />

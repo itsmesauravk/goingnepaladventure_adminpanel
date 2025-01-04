@@ -12,6 +12,7 @@ import { Switch } from "../ui/switch"
 import { get } from "http"
 import HomeLoading from "../home/HomeLoading"
 import { toast } from "sonner"
+import { count } from "console"
 
 interface Wellness {
   _id: string
@@ -39,7 +40,7 @@ const WellnessHome: React.FC = () => {
   const [search, setSearch] = useState<string>("")
   const [category, setCategory] = useState<string>("")
   const [sort, setSort] = useState<string>("")
-  const [visibility, setVisibility] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("all")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedWellnessToDelete, setSelectedWellnessToDelete] = useState<
     string | null
@@ -56,7 +57,7 @@ const WellnessHome: React.FC = () => {
             page,
             limit,
             search,
-            category,
+            country: category,
             sort,
             visibility,
           },
@@ -170,10 +171,10 @@ const WellnessHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="">All Categories</option>
-            <option value="Spa">Spa</option>
-            <option value="Yoga">Yoga</option>
-            <option value="Meditation">Meditation</option>
+            <option value="">All Country</option>
+            <option value="Nepal">Nepal</option>
+            <option value="Bhutan">Bhutan</option>
+            <option value="Tibet">Tibet</option>
           </select>
         </div>
 

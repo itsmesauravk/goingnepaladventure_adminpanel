@@ -169,7 +169,7 @@ const BlogHome: React.FC = () => {
               setPage(1)
             }}
           >
-            <option value="all">Visibility</option>
+            <option value="all">Visibility (all)</option>
             <option value="isNewBlog">New</option>
             <option value="notNewBlog" className="text-blue-600">
               Not New
