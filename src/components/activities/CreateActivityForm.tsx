@@ -23,8 +23,8 @@ const CreateActivityForm: React.FC = () => {
     price: "",
     country: "",
     location: "",
-    groupSizeMin: "",
-    groupSizeMax: "",
+    groupSizeMin: "0",
+    groupSizeMax: "0",
     seasons: {
       spring: false,
       summer: false,
@@ -198,28 +198,70 @@ const CreateActivityForm: React.FC = () => {
 
     const formDataToSubmit = new FormData()
 
+    if (!formData.title) {
+      toast.warning("Title is required")
+      return
+    }
     formDataToSubmit.append("title", formData.title)
+    if (!formData.price) {
+      toast.warning("Price is required")
+      return
+    }
     formDataToSubmit.append("price", formData.price)
+    if (!formData.country) {
+      toast.warning("Country is required")
+      return
+    }
     formDataToSubmit.append("country", formData.country)
+    if (!formData.location) {
+      toast.warning("Location is required")
+      return
+    }
     formDataToSubmit.append("location", formData.location)
+    if (!formData.groupSizeMin) {
+      toast.warning("Minimum group size is required")
+      return
+    }
     formDataToSubmit.append("groupSizeMin", formData.groupSizeMin)
+    if (!formData.groupSizeMax) {
+      toast.warning("Maximum group size is required")
+      return
+    }
     formDataToSubmit.append("groupSizeMax", formData.groupSizeMax)
+    if (!formData.overview) {
+      toast.warning("Overview is required")
+      return
+    }
     formDataToSubmit.append("overview", formData.overview)
+    if (!formData.seasons) {
+      toast.warning("Best season is required")
+      return
+    }
     formDataToSubmit.append("bestSeason", JSON.stringify(bestSeasons))
+    if (!formData.serviceIncludes) {
+      toast.warning("Service includes is required")
+      return
+    }
     formDataToSubmit.append(
       "serviceIncludes",
       JSON.stringify(formData.serviceIncludes)
     )
+    if (!formData.thingsToKnow) {
+      toast.warning("Things to know is required")
+      return
+    }
     formDataToSubmit.append(
       "thingsToKnow",
       JSON.stringify(formData.thingsToKnow)
     )
     formDataToSubmit.append("FAQs", JSON.stringify(formData.FAQs))
 
-    // Append thumbnail
-    if (formData.thumbnail) {
-      formDataToSubmit.append("thumbnail", formData.thumbnail)
+    if (!formData.thumbnail) {
+      toast.warning("Thumbnail is required")
+      return
     }
+
+    formDataToSubmit.append("thumbnail", formData.thumbnail)
 
     // Append gallery images
     formData.gallery.forEach((file) => {
@@ -665,6 +707,7 @@ const CreateActivityForm: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
+              onClick={handleSubmit}
               className="w-full text-white text-lg bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-indigo-700"
             >
               {loading ? "Creating, Please Wait..." : "Create Activity"}

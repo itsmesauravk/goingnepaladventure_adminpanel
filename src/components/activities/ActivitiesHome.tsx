@@ -44,6 +44,7 @@ const ActivitiesHome: React.FC = () => {
     string | null
   >(null)
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+  const [token, setToken] = useState<string | null>(null)
 
   // Fetch activities data with filters
   const getActivities = async () => {
@@ -114,7 +115,7 @@ const ActivitiesHome: React.FC = () => {
           `${process.env.NEXT_PUBLIC_API_URL_DEV}/activities/delete-activity/${selectedActivityToDelete}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
             withCredentials: true,
           }
@@ -135,6 +136,11 @@ const ActivitiesHome: React.FC = () => {
       setDeleteModalOpen(false)
     }
   }
+
+  useEffect(() => {
+    const token = Cookies.get("token") || null
+    setToken(token)
+  }, [])
 
   useEffect(() => {
     const searchData = setTimeout(() => {

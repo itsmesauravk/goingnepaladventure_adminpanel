@@ -5,6 +5,7 @@ import axios from "axios"
 import { toast } from "sonner"
 import { Loader } from "../loading/Loader"
 import { useRouter } from "next/navigation"
+import { countries } from "./Contries"
 
 const AddClient = () => {
   const [formUserData, setFormUserData] = useState({
@@ -80,6 +81,7 @@ const AddClient = () => {
         className="space-y-6 bg-white rounded-lg shadow-sm border p-6"
       >
         <div className="grid md:grid-cols-2 gap-6">
+          {/* name  */}
           <div className="space-y-2">
             <label
               htmlFor="userName"
@@ -98,7 +100,7 @@ const AddClient = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
-
+          {/* email  */}
           <div className="space-y-2">
             <label
               htmlFor="userEmail"
@@ -117,7 +119,7 @@ const AddClient = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
-
+          {/* phone  */}
           <div className="space-y-2">
             <label
               htmlFor="userPhone"
@@ -135,7 +137,7 @@ const AddClient = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
-
+          {/* company  */}
           <div className="space-y-2">
             <label
               htmlFor="userCompany"
@@ -149,27 +151,42 @@ const AddClient = () => {
               name="userCompany"
               value={formUserData.userCompany}
               onChange={handleChange}
+              required
               placeholder="Enter user's company"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
           </div>
+          {/* country  */}
+          <div className=" items-center  space-y-2">
+            <div>
+              <label
+                htmlFor="userAddress"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Select Country
+              </label>
 
-          <div className="space-y-2">
+              <select
+                id="userCountry"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select a country
+                </option>
+                {countries.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
             <label
               htmlFor="userCountry"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-lg font-semibold text-primary w-full "
             >
-              Country
+              {country}
             </label>
-            <input
-              type="text"
-              id="userCountry"
-              name="userCountry"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="Enter user's country"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-            />
           </div>
 
           <div className="space-y-2 md:col-span-2">
