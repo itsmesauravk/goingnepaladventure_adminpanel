@@ -98,7 +98,7 @@ const AddWellnessForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
+  const [video, setVideo] = useState<string>("")
   const [previewVideo, setPreviewVideo] = useState<string | null>(null)
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
@@ -195,6 +195,10 @@ const AddWellnessForm: React.FC = () => {
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
   }
+  //video
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
+  }
   // arrival location
   const handleArrivalLocationChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -284,17 +288,7 @@ const AddWellnessForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setPreviewVideo(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -679,9 +673,7 @@ const AddWellnessForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
-                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
               />
             </div>
           </div>

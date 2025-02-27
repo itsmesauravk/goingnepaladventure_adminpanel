@@ -41,6 +41,7 @@ import ArrivalLocation from "./form/ArrivalLocation"
 import { FaEye } from "react-icons/fa6"
 import { json } from "stream/consumers"
 import { toast } from "sonner"
+import DiscountInput from "../trekkings/addForm/DiscountInput"
 
 interface FAQ {
   question: string
@@ -84,6 +85,7 @@ const EditTourForm: React.FC = () => {
   const [tourLanguage, setTourLanguage] = useState<string>("")
   const [suitableAge, setSuitableAge] = useState<string>("")
   const [price, setPrice] = useState<number>(0)
+  const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [country, setCountry] = useState("")
@@ -104,8 +106,8 @@ const EditTourForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
-  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
+  const [video, setVideo] = useState<string>("")
+
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -146,6 +148,7 @@ const EditTourForm: React.FC = () => {
     tourLanguage: string
     suitableAge: string
     price: number
+    discount: number
     thumbnail: string | File
     accommodations: string[]
     country: string
@@ -175,6 +178,7 @@ const EditTourForm: React.FC = () => {
     tourLanguage: "",
     suitableAge: "",
     price: 0,
+    discount: 0,
     thumbnail: "",
     accommodations: [],
     country: "",
@@ -246,6 +250,9 @@ const EditTourForm: React.FC = () => {
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseFloat(e.target.value))
   }
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDiscount(parseFloat(e.target.value))
+  }
   // thumbnail
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -270,6 +277,10 @@ const EditTourForm: React.FC = () => {
   // location
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
+  }
+  //video
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
   }
   // arrival location
   const handleArrivalLocationChange = (
@@ -353,17 +364,7 @@ const EditTourForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setPreviewVideo(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -448,6 +449,7 @@ const EditTourForm: React.FC = () => {
         setTourViews(trekData.viewsCount)
         setName(trekData.name)
         setPrice(trekData.price)
+        setDiscount(trekData.discount)
         setThumbnailPreview(trekData.thumbnail)
         setCountry(trekData.country)
         setMinDays(trekData.days.min)
@@ -480,7 +482,7 @@ const EditTourForm: React.FC = () => {
         // setImages(trekData.images)
         setPreviews(trekData.images)
         if (trekData.video) {
-          setPreviewVideo(trekData.video)
+          setVideo(trekData.video)
         }
       }
     } catch (error) {
@@ -508,6 +510,9 @@ const EditTourForm: React.FC = () => {
     }
     if (price !== originalTourData.price) {
       formData.append("price", price.toString())
+    }
+    if (discount !== originalTourData.discount) {
+      formData.append("discount", discount.toString())
     }
     if (country !== originalTourData.country) {
       formData.append("country", country)
@@ -632,7 +637,7 @@ const EditTourForm: React.FC = () => {
         }
       })
     }
-    if (video instanceof File) {
+    if (video) {
       formData.append("video", video)
     }
 
@@ -705,6 +710,10 @@ const EditTourForm: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <PriceInput value={price} onChange={handlePriceChange} />
+                <DiscountInput
+                  value={discount}
+                  onChange={handleDiscountChange}
+                />
                 <CountrySelect
                   country={country}
                   handleCountryChange={handleCountryChange}
@@ -928,9 +937,7 @@ const EditTourForm: React.FC = () => {
               />
               <VideoUpload
                 video={video}
-                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
               />
             </div>
           </div>

@@ -33,6 +33,7 @@ import axios from "axios"
 import { FaArrowLeft } from "react-icons/fa6"
 import { Loader } from "../loading/Loader"
 import TrekPdfForm from "./addForm/TrekPdfForm"
+import DiscountInput from "./addForm/DiscountInput"
 
 interface FAQ {
   question: string
@@ -72,6 +73,7 @@ const AddTrekForm: React.FC = () => {
   const [accommodations, setAccommodations] = useState<string[]>([""])
   const [name, setName] = useState("")
   const [price, setPrice] = useState<number>(0)
+  const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [trekPdf, setTrekPdf] = useState<string | File>("")
@@ -91,8 +93,8 @@ const AddTrekForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
-  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
+  const [video, setVideo] = useState<string>("")
+
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -142,6 +144,9 @@ const AddTrekForm: React.FC = () => {
   // price
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseFloat(e.target.value))
+  }
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDiscount(parseFloat(e.target.value))
   }
   // thumbnail
   const handleThumbnailChange = (
@@ -194,6 +199,9 @@ const AddTrekForm: React.FC = () => {
   // location
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
+  }
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
   }
   // difficulty
   const handleDifficultyChange = (
@@ -271,17 +279,7 @@ const AddTrekForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setPreviewVideo(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -357,6 +355,7 @@ const AddTrekForm: React.FC = () => {
 
     formData.append("name", name)
     formData.append("price", price.toString())
+    formData.append("discount", discount.toString())
     formData.append("thumbnail", thumbnail as File)
     formData.append("trekPdf", trekPdf as File)
     formData.append("country", country)
@@ -453,6 +452,10 @@ const AddTrekForm: React.FC = () => {
               {/* Pricing, Country, Difficulty */}
               <div className="grid grid-cols-1 gap-4">
                 <PriceInput value={price} onChange={handlePriceChange} />
+                <DiscountInput
+                  value={discount}
+                  onChange={handleDiscountChange}
+                />
                 <CountrySelect
                   country={country}
                   handleCountryChange={handleCountryChange}
@@ -659,9 +662,7 @@ const AddTrekForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
-                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
               />
             </div>
           </div>

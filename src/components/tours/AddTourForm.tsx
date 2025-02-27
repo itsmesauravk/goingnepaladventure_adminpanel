@@ -37,6 +37,7 @@ import SuitableAge from "./form/SuitableAge"
 import ThingsToKnow from "./form/ThingsToKnow"
 import ArrivalLocation from "./form/ArrivalLocation"
 import Link from "next/link"
+import DiscountInput from "../trekkings/addForm/DiscountInput"
 
 interface FAQ {
   question: string
@@ -63,12 +64,12 @@ interface Itinerary {
   links: Link[]
 }
 
-interface Itinerary {
-  day: number
-  title: string
-  details: string
-  links: Link[]
-}
+// interface Itinerary {
+//   day: number
+//   title: string
+//   details: string
+//   links: Link[]
+// }
 
 const AddTourForm: React.FC = () => {
   const route = useRouter()
@@ -80,6 +81,7 @@ const AddTourForm: React.FC = () => {
   const [tourLanguage, setTourLanguage] = useState<string>("")
   const [suitableAge, setSuitableAge] = useState<string>("")
   const [price, setPrice] = useState<number>(0)
+  const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [country, setCountry] = useState("")
@@ -101,8 +103,8 @@ const AddTourForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
-  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
+  const [video, setVideo] = useState<string>("")
+
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -173,6 +175,10 @@ const AddTourForm: React.FC = () => {
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseFloat(e.target.value))
   }
+  // discount
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDiscount(parseFloat(e.target.value))
+  }
   // thumbnail
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -186,6 +192,11 @@ const AddTourForm: React.FC = () => {
   // country
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(event.target.value)
+  }
+  //video
+  // location
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
   }
   // trekking days
   const handleMinDaysChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -232,8 +243,8 @@ const AddTourForm: React.FC = () => {
   ) => {
     setEndingPoint(event.target.value)
   }
-  // best seasons
 
+  // best seasons
   const handleSeasonChange = (season: string) => {
     setSelectedSeasons(
       (prev) =>
@@ -280,17 +291,7 @@ const AddTourForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setPreviewVideo(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -369,6 +370,7 @@ const AddTourForm: React.FC = () => {
     formData.append("tourLanguage", tourLanguage)
     formData.append("suitableAge", suitableAge)
     formData.append("price", price.toString())
+    formData.append("discount", discount.toString())
     formData.append("thumbnail", thumbnail as File)
     formData.append("country", country)
     formData.append("location", location)
@@ -399,7 +401,7 @@ const AddTourForm: React.FC = () => {
     )
 
     if (video) {
-      formData.append("video", video) // Attach video file
+      formData.append("video", video)
     }
 
     try {
@@ -476,6 +478,7 @@ const AddTourForm: React.FC = () => {
             {/* First Row: Price, Country, Location */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <PriceInput value={price} onChange={handlePriceChange} />
+              <DiscountInput value={discount} onChange={handleDiscountChange} />
               <CountrySelect
                 country={country}
                 handleCountryChange={handleCountryChange}
@@ -684,9 +687,7 @@ const AddTourForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
-                preview={previewVideo || ""}
                 handleVideoChange={handleVideoChange}
-                removeVideo={removeVideo}
               />
             </div>
           </div>

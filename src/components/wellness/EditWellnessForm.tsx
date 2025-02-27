@@ -101,7 +101,7 @@ const EditWellnessForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
+  const [video, setVideo] = useState<string>("")
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -277,6 +277,10 @@ const EditWellnessForm: React.FC = () => {
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
   }
+  //video
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
+  }
   // arrival location
   const handleArrivalLocationChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -371,17 +375,7 @@ const EditWellnessForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setVideoPreview(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -495,9 +489,7 @@ const EditWellnessForm: React.FC = () => {
         setNote(trekData.note)
         // setImages(trekData.images)
         setPreviews(trekData.images)
-        if (trekData.video) {
-          setVideoPreview(trekData.video)
-        }
+        setVideo(trekData.video)
       }
     } catch (error) {
       setLoading(false)
@@ -637,7 +629,7 @@ const EditWellnessForm: React.FC = () => {
         }
       })
     }
-    if (video instanceof File) {
+    if (video !== originalTrekData.video) {
       formData.append("video", video)
     }
 
@@ -676,11 +668,6 @@ const EditWellnessForm: React.FC = () => {
   const handleImageDelete = (imageUrl: string) => {
     setImagesToDelete((prev) => [...prev, imageUrl])
     setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
-  }
-
-  const handleVideoDelete = () => {
-    setVideoToDelete(true)
-    setVideo(null)
   }
 
   return (
@@ -933,9 +920,7 @@ const EditWellnessForm: React.FC = () => {
             <div className="mt-6">
               <VideoUpload
                 video={video}
-                preview={videoPreview || ""}
                 handleVideoChange={handleVideoChange}
-                removeVideo={handleVideoDelete}
               />
             </div>
           </div>

@@ -38,6 +38,7 @@ import { toast } from "sonner"
 import ImageUploadEdit from "./addForm/ImageUploadEdit"
 
 import Cookies from "js-cookie"
+import DiscountInput from "./addForm/DiscountInput"
 
 interface FAQ {
   question: string
@@ -77,6 +78,7 @@ const EditTrekForm: React.FC = () => {
   const [accommodations, setAccommodations] = useState<string[]>([""])
   const [name, setName] = useState("")
   const [price, setPrice] = useState<number>(0)
+  const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [trekPdf, setTrekPdf] = useState<string | File>("")
@@ -96,8 +98,8 @@ const EditTrekForm: React.FC = () => {
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([])
   const [images, setImages] = useState<(string | File)[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [video, setVideo] = useState<File | null>(null)
-  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
+  const [video, setVideo] = useState<string>("")
+
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: "", answer: "" }])
   const [highlights, setHighlights] = useState<Highlight[]>([
     { content: "", links: [{ text: "", url: "" }] },
@@ -138,6 +140,7 @@ const EditTrekForm: React.FC = () => {
   const [originalTrekData, setOriginalTrekData] = useState<{
     name: string
     price: number
+    discount: number
     thumbnail: string
     trekPdf: string
     country: string
@@ -168,6 +171,7 @@ const EditTrekForm: React.FC = () => {
   }>({
     name: "",
     price: 0,
+    discount: 0,
     thumbnail: "",
     trekPdf: "",
     country: "",
@@ -228,6 +232,9 @@ const EditTrekForm: React.FC = () => {
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseFloat(e.target.value))
   }
+  const handleDisountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDiscount(parseFloat(e.target.value))
+  }
   // thumbnail
   const handleThumbnailChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -278,6 +285,10 @@ const EditTrekForm: React.FC = () => {
   // location
   const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLocation(event.target.value)
+  }
+  //video
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(event.target.value)
   }
   // difficulty
   const handleDifficultyChange = (
@@ -354,17 +365,7 @@ const EditTrekForm: React.FC = () => {
       previews.forEach((preview) => URL.revokeObjectURL(preview))
     }
   }, [])
-  // video
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    setVideo(file)
-    if (file) {
-      setPreviewVideo(URL.createObjectURL(file))
-    }
-  }
-  const removeVideo = () => {
-    setVideo(null)
-  }
+
   // faq
   const addFAQ = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -451,6 +452,7 @@ const EditTrekForm: React.FC = () => {
         setViews(trekData.viewsCount)
         setPreviews(trekData.viewsCount)
         setPrice(trekData.price)
+        setDiscount(trekData.discount)
         setThumbnailPreview(trekData.thumbnail)
         setAccommodations(trekData.accommodation)
         setCountry(trekData.country)
@@ -477,9 +479,7 @@ const EditTrekForm: React.FC = () => {
         setNote(trekData.note)
         // setImages(trekData.images)
         setPreviews(trekData.images)
-        if (trekData.video) {
-          setPreviewVideo(trekData.video)
-        }
+        setVideo(trekData.video)
       }
     } catch (error) {
       setLoading(false)
@@ -505,6 +505,9 @@ const EditTrekForm: React.FC = () => {
     }
     if (price !== originalTrekData.price) {
       formData.append("price", price.toString())
+    }
+    if (discount !== originalTrekData.discount) {
+      formData.append("discount", discount.toString())
     }
     if (country !== originalTrekData.country) {
       formData.append("country", country)
@@ -619,7 +622,7 @@ const EditTrekForm: React.FC = () => {
         }
       })
     }
-    if (video instanceof File) {
+    if (video) {
       formData.append("video", video)
     }
 
@@ -658,16 +661,6 @@ const EditTrekForm: React.FC = () => {
   const handleImageDelete = (imageUrl: string) => {
     setImagesToDelete((prev) => [...prev, imageUrl])
     setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
-  }
-
-  // const handleThumbnailDelete = () => {
-  //   setThumbnailToDelete(true)
-  //   setThumbnailPreview(null)
-  // }
-
-  const handleVideoDelete = () => {
-    setVideoToDelete(true)
-    setVideo(null)
   }
 
   return (
@@ -710,6 +703,11 @@ const EditTrekForm: React.FC = () => {
 
               <div className="grid grid-cols-1 gap-4">
                 <PriceInput value={price} onChange={handlePriceChange} />
+                <DiscountInput
+                  value={discount}
+                  onChange={handleDisountChange}
+                />
+
                 <CountrySelect
                   country={country}
                   handleCountryChange={handleCountryChange}
@@ -905,10 +903,8 @@ const EditTrekForm: React.FC = () => {
             />
             <div className="mt-6">
               <VideoUpload
-                preview={previewVideo || ""}
                 video={video}
                 handleVideoChange={handleVideoChange}
-                removeVideo={handleVideoDelete}
               />
             </div>
           </div>

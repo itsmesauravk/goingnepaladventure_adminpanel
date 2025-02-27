@@ -98,7 +98,7 @@ const TripsAndToursManagement: React.FC = () => {
     e.preventDefault()
 
     // Basic validation
-    if (!title.trim()) {
+    if (!title.trim()) { 
       toast.error("Title is required")
       return
     }
