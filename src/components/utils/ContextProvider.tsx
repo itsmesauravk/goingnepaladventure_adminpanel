@@ -81,6 +81,7 @@ const RequestsMailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
     </RequestsMailsContext.Provider>
   )
 }
+
 //third context
 const AdminDetailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
   const [adminInfo, setAdminInfo] = useState<{

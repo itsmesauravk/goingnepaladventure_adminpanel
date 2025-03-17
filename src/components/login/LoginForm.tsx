@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
         // Cookies.set("refreshToken", response.data.refreshToken)
         setTimeout(() => {
           router.push("/home")
-        }, 500)
+        }, 200)
       } else {
         // Handle failed login attempt
         toast.error(response.data.message || "Invalid email or password.")

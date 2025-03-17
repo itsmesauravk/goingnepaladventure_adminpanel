@@ -125,6 +125,7 @@ export function AppSidebar() {
   //auth check
   const validateLogin = async () => {
     const token = Cookies.get("token")
+    console.log("first token", token)
     if (!token) {
       router.push("/login")
       return
