@@ -71,6 +71,7 @@ const TrekkingHome: React.FC = () => {
             visibility,
             location,
           },
+          withCredentials: true,
         }
       )
       if (response.data.success) {
