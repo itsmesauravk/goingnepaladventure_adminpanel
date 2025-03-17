@@ -1,6 +1,9 @@
 import axios from "axios"
 
 export async function verifyToken(token: string): Promise<boolean> {
+  if (!token) {
+    return false
+  }
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate`,

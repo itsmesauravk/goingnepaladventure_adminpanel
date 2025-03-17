@@ -123,35 +123,35 @@ export function AppSidebar() {
   ]
 
   //auth check
-  const validateLogin = async () => {
-    const token = Cookies.get("token")
-    console.log("first token", token)
-    if (!token) {
-      router.push("/login")
-      return
-    }
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      if (response.data.success) {
-        return true
-      } else {
-        router.push("/login")
-        return
-      }
-    } catch (error) {
-      router.push("/login")
-      return
-    }
-  }
+  // const validateLogin = async () => {
+  //   const token = Cookies.get("token")
+  //   console.log("first token", token)
+  //   if (!token) {
+  //     router.push("/login")
+  //     return
+  //   }
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate`,
+  //       {
+  //         withCredentials: true,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     )
+  //     if (response.data.success) {
+  //       return true
+  //     } else {
+  //       router.push("/login")
+  //       return
+  //     }
+  //   } catch (error) {
+  //     router.push("/login")
+  //     return
+  //   }
+  // }
 
   const logoutHandler = async () => {
     try {
@@ -178,9 +178,9 @@ export function AppSidebar() {
     }
   }
 
-  useEffect(() => {
-    validateLogin()
-  }, [])
+  // useEffect(() => {
+  //   validateLogin()
+  // }, [])
 
   return (
     <>
