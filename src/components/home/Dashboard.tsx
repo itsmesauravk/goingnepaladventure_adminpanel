@@ -81,7 +81,7 @@ const AdminDashboard = () => {
         )
         setMonthlyCountsPlanTrip(dashboardStats.monthlyCountsPlanTrip)
         setMonthlyCountsRequestMails(dashboardStats.monthlyCountsRequestMails)
-        setPendingBookingData(dashboardStats.booking.pending)
+        setPendingBookingData(dashboardStats?.booking?.pending || 0)
       } else {
         setError("Failed to fetch dashboard data")
       }
@@ -114,8 +114,6 @@ const AdminDashboard = () => {
       console.error(error)
     }
   }
-
-  console.log(" pending booking count", stats?.booking?.pending)
 
   useEffect(() => {
     const currentHour = new Date().getHours()
