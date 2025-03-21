@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/utils/Sidebar"
 import { Providers } from "./providers"
 import {
   AdminDetailsProvider,
+  BookingProvider,
   PlanTripProvider,
   RequestsMailsProvider,
 } from "@/components/utils/ContextProvider"
@@ -46,30 +47,33 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
-        <PlanTripProvider>
-          <RequestsMailsProvider>
-            <AdminDetailsProvider>
-              <Providers />
-              <SidebarProvider>
-                {!isLoginPage &&
-                  !isForgotPasswordPage &&
-                  !startPage &&
-                  !isVerifyPage &&
-                  !isChangePasswordPage && (
-                    <>
-                      <AppSidebar />
-                      <SidebarTrigger />
-                    </>
-                  )}
+        <BookingProvider>
+          <PlanTripProvider>
+            <RequestsMailsProvider>
+              <AdminDetailsProvider>
+                <Providers />
+                <SidebarProvider>
+                  {!isLoginPage &&
+                    !isForgotPasswordPage &&
+                    !startPage &&
+                    !isVerifyPage &&
+                    !isChangePasswordPage && (
+                      <>
+                        <AppSidebar />
+                        <SidebarTrigger />
+                      </>
+                    )}
 
-                {children}
-                <Analytics />
-              </SidebarProvider>
-            </AdminDetailsProvider>
-          </RequestsMailsProvider>
-        </PlanTripProvider>
+                  {children}
+                  <Analytics />
+                </SidebarProvider>
+              </AdminDetailsProvider>
+            </RequestsMailsProvider>
+          </PlanTripProvider>
+        </BookingProvider>
       </body>
     </html>
   )

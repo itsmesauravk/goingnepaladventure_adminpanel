@@ -12,6 +12,7 @@ import {
   Sailboat,
   Users2Icon,
   Mails,
+  NotebookTextIcon,
 } from "lucide-react"
 
 import {
@@ -38,6 +39,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
 import {
   AdminDetailsContext,
+  BookingContext,
   PlanTripContext,
   RequestsMailsContext,
 } from "./ContextProvider"
@@ -50,6 +52,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const planTripContext = useContext(PlanTripContext)
   const requestsMailsContext = useContext(RequestsMailsContext)
+  const bookingContext = useContext(BookingContext)!
   const { adminInfo } = useContext(AdminDetailsContext)!
   const router = useRouter()
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
@@ -64,6 +67,7 @@ export function AppSidebar() {
   }
 
   const { pendingData } = planTripContext
+  const { pendingBookingData } = bookingContext
   const { pendingQuoteData, pendingCustomizeData } = requestsMailsContext
   const pendingPlanTripData = pendingData
   const pendingDataCount = pendingQuoteData + pendingCustomizeData
@@ -110,6 +114,12 @@ export function AppSidebar() {
       notificationCount: pendingData,
     },
     {
+      title: "Bookings",
+      url: "/bookings",
+      icon: NotebookTextIcon,
+      pendingBookingData: pendingBookingData,
+    },
+    {
       title: "Requests & Mails",
       url: "/requests-mails",
       icon: Mails,
@@ -121,37 +131,6 @@ export function AppSidebar() {
       icon: Users2Icon,
     },
   ]
-
-  //auth check
-  // const validateLogin = async () => {
-  //   const token = Cookies.get("token")
-  //   console.log("first token", token)
-  //   if (!token) {
-  //     router.push("/login")
-  //     return
-  //   }
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/validate`,
-  //       {
-  //         withCredentials: true,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     )
-  //     if (response.data.success) {
-  //       return true
-  //     } else {
-  //       router.push("/login")
-  //       return
-  //     }
-  //   } catch (error) {
-  //     router.push("/login")
-  //     return
-  //   }
-  // }
 
   const logoutHandler = async () => {
     try {
@@ -177,10 +156,6 @@ export function AppSidebar() {
       console.log(error)
     }
   }
-
-  // useEffect(() => {
-  //   validateLogin()
-  // }, [])
 
   return (
     <>
@@ -214,6 +189,11 @@ export function AppSidebar() {
                         {item.pendingData && pendingDataCount > 0 && (
                           <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                             {pendingDataCount}
+                          </span>
+                        )}
+                        {item.pendingBookingData && pendingBookingData > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            {pendingBookingData}
                           </span>
                         )}
                       </Link>

@@ -13,6 +13,10 @@ interface PlanTripContextType {
   pendingData: number
   setPendingData: Dispatch<SetStateAction<number>>
 }
+interface BookingContextType {
+  pendingBookingData: number
+  setPendingBookingData: Dispatch<SetStateAction<number>>
+}
 
 interface RequestsMailsType {
   pendingQuoteData: number
@@ -23,6 +27,9 @@ interface RequestsMailsType {
 
 // Props for the Provider
 interface PlanTripProviderProps {
+  children: ReactNode
+}
+interface BookingProviderProps {
   children: ReactNode
 }
 
@@ -47,6 +54,7 @@ interface AdminDetails {
 // Create Context
 
 export const PlanTripContext = createContext<PlanTripContextType | null>(null)
+export const BookingContext = createContext<BookingContextType | null>(null)
 export const RequestsMailsContext = createContext<RequestsMailsType | null>(
   null
 )
@@ -60,6 +68,19 @@ const PlanTripProvider: FC<PlanTripProviderProps> = ({ children }) => {
     <PlanTripContext.Provider value={{ pendingData, setPendingData }}>
       {children}
     </PlanTripContext.Provider>
+  )
+}
+
+//booking context
+const BookingProvider: FC<BookingProviderProps> = ({ children }) => {
+  const [pendingBookingData, setPendingBookingData] = useState<number>(0)
+
+  return (
+    <BookingContext.Provider
+      value={{ pendingBookingData, setPendingBookingData }}
+    >
+      {children}
+    </BookingContext.Provider>
   )
 }
 
@@ -103,4 +124,9 @@ const AdminDetailsProvider: FC<PlanTripProviderProps> = ({ children }) => {
   )
 }
 
-export { PlanTripProvider, RequestsMailsProvider, AdminDetailsProvider }
+export {
+  PlanTripProvider,
+  RequestsMailsProvider,
+  AdminDetailsProvider,
+  BookingProvider,
+}

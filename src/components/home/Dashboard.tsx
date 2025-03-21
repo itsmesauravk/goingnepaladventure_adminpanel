@@ -27,11 +27,13 @@ import {
   AlertTriangle,
   Sailboat,
   TicketsPlane,
+  NotebookTextIcon,
 } from "lucide-react"
 import axios from "axios"
 import Cookies from "js-cookie"
 import {
   AdminDetailsContext,
+  BookingContext,
   PlanTripContext,
   RequestsMailsContext,
 } from "../utils/ContextProvider"
@@ -48,6 +50,7 @@ const AdminDashboard = () => {
   const { setPendingQuoteData, setPendingCustomizeData } =
     useContext(RequestsMailsContext)!
   const { setPendingData } = useContext(PlanTripContext)!
+  const { setPendingBookingData } = useContext(BookingContext)!
 
   const [monthlyCountsPlanTrip, setMonthlyCountsPlanTrip] = useState<any[]>([])
   const [monthlyCountsRequestMails, setMonthlyCountsRequestMails] = useState<
@@ -78,6 +81,7 @@ const AdminDashboard = () => {
         )
         setMonthlyCountsPlanTrip(dashboardStats.monthlyCountsPlanTrip)
         setMonthlyCountsRequestMails(dashboardStats.monthlyCountsRequestMails)
+        setPendingBookingData(dashboardStats.booking.pending)
       } else {
         setError("Failed to fetch dashboard data")
       }
@@ -110,6 +114,8 @@ const AdminDashboard = () => {
       console.error(error)
     }
   }
+
+  console.log(" pending booking count", stats?.booking?.pending)
 
   useEffect(() => {
     const currentHour = new Date().getHours()
@@ -341,6 +347,20 @@ const AdminDashboard = () => {
                 <h3 className="text-lg font-medium text-slate-900">Blogs</h3>
                 <p className="text-3xl font-bold text-yellow-600 mt-2">
                   {stats?.blog?.total || 0}
+                </p>
+              </CardContent>
+            </Card>
+            {/* booking  */}
+            <Card className="bg-white border-none shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <NotebookTextIcon className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-slate-900">Bookings</h3>
+                <p className="text-3xl font-bold text-blue-600 mt-2">
+                  {stats?.booking?.total || 0}
                 </p>
               </CardContent>
             </Card>
