@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useState, useEffect } from "react"
 import { toast } from "sonner"
+import { signIn } from "next-auth/react"
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("")
@@ -31,26 +32,43 @@ const LoginForm: React.FC = () => {
       return
     }
 
+    // try {
+    //   setLoading(true)
+    // const response = await axios.post(
+    //   `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/login`,
+    //   { email, password },
+    //   {
+    //     withCredentials: true,
+    //   }
+    // )
+
+    // if (response.data.success) {
+    //   toast.success(response.data.message)
+    //   Cookies.set("token", response.data.accessToken)
+    //   // Cookies.set("refreshToken", response.data.refreshToken)
+    //   setTimeout(() => {
+    //     router.push("/home")
+    //   }, 200)
+    // } else {
+    //   // Handle failed login attempt
+    //   toast.error(response.data.message || "Invalid email or password.")
+    // }
+
     try {
       setLoading(true)
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/login`,
-        { email, password },
-        {
-          withCredentials: true,
-        }
-      )
 
-      if (response.data.success) {
-        toast.success(response.data.message)
-        Cookies.set("token", response.data.accessToken)
-        // Cookies.set("refreshToken", response.data.refreshToken)
-        setTimeout(() => {
-          router.push("/home")
-        }, 200)
-      } else {
-        // Handle failed login attempt
-        toast.error(response.data.message || "Invalid email or password.")
+      const result = await signIn("credentials", {
+        identifier: email,
+        password: password,
+        redirect: false,
+        callbackUrl: "/",
+      })
+
+      if (result?.error) {
+        setError(result.error)
+        return
+      } else if (result?.url) {
+        router.push(result?.url)
       }
     } catch (error: any) {
       // Network or server errors

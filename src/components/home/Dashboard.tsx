@@ -38,10 +38,11 @@ import {
   RequestsMailsContext,
 } from "../utils/ContextProvider"
 import HomeLoading from "./HomeLoading"
+import { useSession } from "next-auth/react"
 
 const AdminDashboard = () => {
   const [greet, setGreet] = useState("")
-  const [adminProfile, setAdminProfile] = useState<any>(null)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [stats, setStats] = useState<any>(null)
@@ -56,6 +57,8 @@ const AdminDashboard = () => {
   const [monthlyCountsRequestMails, setMonthlyCountsRequestMails] = useState<
     any[]
   >([])
+
+  const { data: session } = useSession()
 
   const fetchDashboardData = async () => {
     setLoading(true)
@@ -95,25 +98,25 @@ const AdminDashboard = () => {
 
   const token = Cookies.get("token")
 
-  const fetchAdminProfile = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/profile`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+  // const fetchAdminProfile = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/profile`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     )
 
-      if (response.data.success) {
-        setAdminProfile(response.data.data)
-        setAdminInfo(response.data.data)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //     if (response.data.success) {
+  //       setAdminProfile(response.data.data)
+  //       setAdminInfo(response.data.data)
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   useEffect(() => {
     const currentHour = new Date().getHours()
@@ -125,7 +128,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const initializeDashboard = async () => {
       await fetchDashboardData()
-      await fetchAdminProfile()
+      // await fetchAdminProfile()
     }
 
     initializeDashboard()
@@ -211,7 +214,7 @@ const AdminDashboard = () => {
               <h1 className="text-2xl font-bold text-slate-800">
                 {greet},{" "}
                 <span className="text-primary text-3xl">
-                  {adminInfo.fullName}
+                  {session?.user?.name}
                 </span>
               </h1>
               <p className="text-slate-600 mt-1">

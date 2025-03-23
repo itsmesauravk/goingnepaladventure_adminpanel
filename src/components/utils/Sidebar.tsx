@@ -47,6 +47,7 @@ import axios from "axios"
 import { toast } from "sonner"
 import Cookies from "js-cookie"
 import LogoutModal from "../home/LogoutAlert"
+import { signOut, useSession } from "next-auth/react"
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -71,6 +72,8 @@ export function AppSidebar() {
   const { pendingQuoteData, pendingCustomizeData } = requestsMailsContext
   const pendingPlanTripData = pendingData
   const pendingDataCount = pendingQuoteData + pendingCustomizeData
+
+  const { data: session } = useSession()
 
   const isActive = (url: string) => {
     return pathname === url || pathname.startsWith(url + "/")
@@ -132,30 +135,30 @@ export function AppSidebar() {
     },
   ]
 
-  const logoutHandler = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      if (response.data.success) {
-        toast.success(response.data.message)
-        Cookies.remove("token")
-        Cookies.remove("refreshToken")
-        router.push("/login")
-      } else {
-        toast.error(response.data.message)
-      }
-    } catch (error) {
-      toast.error("Something went wrong")
-      console.log(error)
-    }
-  }
+  // const logoutHandler = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/logout`,
+  //       {
+  //         withCredentials: true,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     )
+  //     if (response.data.success) {
+  //       toast.success(response.data.message)
+  //       Cookies.remove("token")
+  //       Cookies.remove("refreshToken")
+  //       router.push("/login")
+  //     } else {
+  //       toast.error(response.data.message)
+  //     }
+  //   } catch (error) {
+  //     toast.error("Something went wrong")
+  //     console.log(error)
+  //   }
+  // }
 
   return (
     <>
@@ -210,7 +213,7 @@ export function AppSidebar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton className="text-lg font-semibold h-16 mb-6">
-                    <User2 /> {adminInfo?.fullName}
+                    <User2 /> {session?.user?.name}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -236,7 +239,7 @@ export function AppSidebar() {
       <LogoutModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
-        onConfirm={logoutHandler}
+        onConfirm={() => signOut()}
       />
     </>
   )

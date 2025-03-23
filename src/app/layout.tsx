@@ -14,6 +14,7 @@ import {
   RequestsMailsProvider,
 } from "@/components/utils/ContextProvider"
 import { usePathname } from "next/navigation"
+import { Provider } from "@/providers/Providers"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -50,30 +51,32 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
-        <BookingProvider>
-          <PlanTripProvider>
-            <RequestsMailsProvider>
-              <AdminDetailsProvider>
-                <Providers />
-                <SidebarProvider>
-                  {!isLoginPage &&
-                    !isForgotPasswordPage &&
-                    !startPage &&
-                    !isVerifyPage &&
-                    !isChangePasswordPage && (
-                      <>
-                        <AppSidebar />
-                        <SidebarTrigger />
-                      </>
-                    )}
+        <Provider>
+          <BookingProvider>
+            <PlanTripProvider>
+              <RequestsMailsProvider>
+                <AdminDetailsProvider>
+                  <Providers />
+                  <SidebarProvider>
+                    {!isLoginPage &&
+                      !isForgotPasswordPage &&
+                      !startPage &&
+                      !isVerifyPage &&
+                      !isChangePasswordPage && (
+                        <>
+                          <AppSidebar />
+                          <SidebarTrigger />
+                        </>
+                      )}
 
-                  {children}
-                  <Analytics />
-                </SidebarProvider>
-              </AdminDetailsProvider>
-            </RequestsMailsProvider>
-          </PlanTripProvider>
-        </BookingProvider>
+                    {children}
+                    <Analytics />
+                  </SidebarProvider>
+                </AdminDetailsProvider>
+              </RequestsMailsProvider>
+            </PlanTripProvider>
+          </BookingProvider>
+        </Provider>
       </body>
     </html>
   )
