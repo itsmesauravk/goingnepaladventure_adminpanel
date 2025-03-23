@@ -39,6 +39,8 @@ import ImageUploadEdit from "./addForm/ImageUploadEdit"
 
 import Cookies from "js-cookie"
 import DiscountInput from "./addForm/DiscountInput"
+import AddBookingPrice from "../common/AddBookingPrice"
+import UpdateBookingPrice from "../common/EditBookingPrice"
 
 interface FAQ {
   question: string
@@ -70,6 +72,17 @@ interface Itinerary {
   title: string
   details: string
   links: Link[]
+}
+
+interface BookingPriceInterface {
+  adventureId: string
+  adventureType: string
+  pricePerPerson: string
+  discount: string
+  soloFourStar: string
+  soloFiveStar: string
+  standardFourStar: string
+  standardFiveStar: string
 }
 
 const EditTrekForm: React.FC = () => {
@@ -134,8 +147,26 @@ const EditTrekForm: React.FC = () => {
   const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
   const [videoToDelete, setVideoToDelete] = useState(false)
 
+  const [addBookingPriceOpen, setAddBookingPriceOpen] = useState<boolean>(false)
+  const [editBookingPriceOpen, setEditBookingPriceOpen] =
+    useState<boolean>(false)
+
   const slugId = useParams()
   const slug = slugId.slug
+
+  const [bookingPriceData, setBookingPriceData] =
+    useState<BookingPriceInterface>({
+      adventureId: "",
+      adventureType: "",
+      pricePerPerson: "",
+      discount: "",
+      soloFourStar: "",
+      soloFiveStar: "",
+      standardFourStar: "",
+      standardFiveStar: "",
+    })
+  const [availableBookingPrice, setAvailableBookingPrice] =
+    useState<boolean>(false)
 
   const [originalTrekData, setOriginalTrekData] = useState<{
     name: string
@@ -446,6 +477,7 @@ const EditTrekForm: React.FC = () => {
       if (response.data.success) {
         setLoading(false)
         const trekData = response.data.data
+
         setOriginalTrekData(trekData)
         setTrekId(trekData._id)
         setName(trekData.name)
@@ -487,9 +519,37 @@ const EditTrekForm: React.FC = () => {
     }
   }
 
+  //for getting price data
+  const handleGetBookingPriceData = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/booking/get-single-booking-price/${trekId}/Trekking`
+      )
+
+      if (response.data.success) {
+        setLoading(false)
+        const bookingPriceData = response.data.data
+        setBookingPriceData(bookingPriceData)
+        setAvailableBookingPrice(true)
+      } else {
+        setLoading(false)
+        setAvailableBookingPrice(false)
+      }
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+      setAvailableBookingPrice(false)
+    }
+  }
+
   useEffect(() => {
     handleGetTrekData()
   }, [])
+
+  useEffect(() => {
+    handleGetBookingPriceData()
+  }, [trekId])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -497,7 +557,7 @@ const EditTrekForm: React.FC = () => {
     const formData = new FormData()
 
     // Add trek ID
-    formData.append("trekId", trekId) // Make sure you have trekId from your route params
+    formData.append("trekId", trekId)
 
     // Add basic fields only if they've changed from original data
     if (name !== originalTrekData.name) {
@@ -663,8 +723,15 @@ const EditTrekForm: React.FC = () => {
     setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
   }
 
+  const handleAddBookingPrice = () => {
+    setAddBookingPriceOpen(!addBookingPriceOpen)
+  }
+  const handleEditBookingPrice = () => {
+    setEditBookingPriceOpen(!editBookingPriceOpen)
+  }
+
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-8">
+    <div className="relative min-h-screen w-full bg-gray-50 p-8">
       <div className="max-w-full mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
         {/* Header Section */}
         <div className="bg-primary text-white p-6 flex items-center justify-between">
@@ -677,13 +744,51 @@ const EditTrekForm: React.FC = () => {
                 <FaArrowLeft size={24} />
               </button>
               <h1 className="text-3xl font-bold">Edit Trek - {name}</h1>
+              <div className="flex gap-2 mr-4 items-center">
+                <FaEye />
+                <span>{views} views</span>
+              </div>
             </div>
             <div className="flex items-center space-x-2 ml-4">
-              <FaEye />
-              <span>{views} views</span>
+              {availableBookingPrice ? (
+                <Button
+                  type="button"
+                  onClick={handleEditBookingPrice}
+                  className="bg-blue-700 hover:bg-blue-800"
+                >
+                  Edit Booking Price
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleAddBookingPrice}
+                  className="bg-green-700 hover:bg-green-800"
+                >
+                  Add Booking Price
+                </Button>
+              )}
             </div>
           </div>
         </div>
+
+        {/* for add booking price component */}
+        {!availableBookingPrice && addBookingPriceOpen && (
+          <div className="absolute top-36 left-2/3 z-100 ">
+            <AddBookingPrice adventureType="Trekking" adventureId={trekId} />
+          </div>
+        )}
+        {/* for edit booking price component */}
+        {availableBookingPrice && editBookingPriceOpen && (
+          <div className="absolute top-36 left-2/3 z-100 ">
+            <UpdateBookingPrice
+              adventureType="Trekking"
+              adventureId={trekId}
+              bookingPriceDetails={bookingPriceData}
+            />
+          </div>
+        )}
+
+        {/* Main Content */}
 
         <form
           typeof="multipart/form-data"

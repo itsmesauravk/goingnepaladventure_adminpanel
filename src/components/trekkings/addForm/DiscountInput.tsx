@@ -10,19 +10,16 @@ const DiscountInput: React.FC<DiscountInputProps> = ({ value, onChange }) => (
   <div className="mb-4">
     <h2 className="text-lg text-primary font-semibold ">Discount (in %)</h2>
 
-    <div className="relative rounded-md shadow-sm">
-      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-        $
-      </span>
+    <div className=" rounded-md shadow-sm">
       <input
         type="number"
-        id="price"
-        name="price"
+        id="discount"
+        name="discount"
         value={value}
         required
         onChange={onChange}
         className="border border-gray-300 rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        placeholder="Enter price"
+        placeholder="Enter discount (in %)"
         min={0}
       />
     </div>
