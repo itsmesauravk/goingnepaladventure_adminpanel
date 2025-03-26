@@ -41,6 +41,7 @@ import Cookies from "js-cookie"
 import DiscountInput from "./addForm/DiscountInput"
 import AddBookingPrice from "../common/AddBookingPrice"
 import UpdateBookingPrice from "../common/EditBookingPrice"
+import { PenBoxIcon, Trash2Icon } from "lucide-react"
 
 interface FAQ {
   question: string
@@ -74,16 +75,7 @@ interface Itinerary {
   links: Link[]
 }
 
-interface BookingPriceInterface {
-  adventureId: string
-  adventureType: string
-  pricePerPerson: string
-  discount: string
-  soloFourStar: string
-  soloFiveStar: string
-  standardFourStar: string
-  standardFiveStar: string
-}
+import { BookingPriceInterface } from "../utils/types"
 
 const EditTrekForm: React.FC = () => {
   const route = useRouter()
@@ -156,12 +148,15 @@ const EditTrekForm: React.FC = () => {
 
   const [bookingPriceData, setBookingPriceData] =
     useState<BookingPriceInterface>({
+      _id: "",
       adventureId: "",
       adventureType: "",
       pricePerPerson: "",
       discount: "",
       soloFourStar: "",
       soloFiveStar: "",
+      singleSupplementaryFourStar: "",
+      singleSupplementaryFiveStar: "",
       standardFourStar: "",
       standardFiveStar: "",
     })
@@ -276,32 +271,7 @@ const EditTrekForm: React.FC = () => {
       setThumbnail(file)
     }
   }
-  // trek pdf
-  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setTrekPdfPreview(URL.createObjectURL(file))
-      setTrekPdf(file)
-    }
-    if (file) {
-      const sizeInMB = file.size / (1024 * 1024) // Convert bytes to MB
-      setPdfFileSize(sizeInMB)
 
-      if (sizeInMB > maxSizeMB) {
-        alert(
-          `File size exceeds ${maxSizeMB} MB. Please upload a smaller file.`
-        )
-        setTrekPdf("")
-        return
-      }
-
-      if (file.type === "application/pdf") {
-        setTrekPdfPreview(URL.createObjectURL(file))
-      } else {
-        alert("Please select a valid PDF file.")
-      }
-    }
-  }
   // country
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(event.target.value)
@@ -513,43 +483,22 @@ const EditTrekForm: React.FC = () => {
         setPreviews(trekData.images)
         setVideo(trekData.video)
       }
-    } catch (error) {
-      setLoading(false)
-      console.log(error)
-    }
-  }
-
-  //for getting price data
-  const handleGetBookingPriceData = async () => {
-    try {
-      setLoading(true)
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/booking/get-single-booking-price/${trekId}/Trekking`
-      )
-
-      if (response.data.success) {
-        setLoading(false)
-        const bookingPriceData = response.data.data
-        setBookingPriceData(bookingPriceData)
+      //  for booking price details
+      if (response.data.bookingDetails !== null) {
+        setBookingPriceData(response.data.bookingDetails)
         setAvailableBookingPrice(true)
       } else {
-        setLoading(false)
         setAvailableBookingPrice(false)
       }
     } catch (error) {
       setLoading(false)
       console.log(error)
-      setAvailableBookingPrice(false)
     }
   }
 
   useEffect(() => {
     handleGetTrekData()
   }, [])
-
-  useEffect(() => {
-    handleGetBookingPriceData()
-  }, [trekId])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -729,6 +678,34 @@ const EditTrekForm: React.FC = () => {
   const handleEditBookingPrice = () => {
     setEditBookingPriceOpen(!editBookingPriceOpen)
   }
+  const handleDeleteBookingPrice = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete the booking price?"
+    )
+    if (!confirmDelete) return
+    try {
+      setLoading(true)
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/booking/delete-booking-price/${bookingPriceData?._id}`
+      )
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Booking Price Removed")
+        setLoading(false)
+        setAvailableBookingPrice(false)
+      } else {
+        toast.error(
+          response.data.message ||
+            "Unable to Delete Booking Price, Please Try Again!"
+        )
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      toast.error("Error occurred while deleting the booking price.")
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="relative min-h-screen w-full bg-gray-50 p-8">
@@ -751,13 +728,24 @@ const EditTrekForm: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2 ml-4">
               {availableBookingPrice ? (
-                <Button
-                  type="button"
-                  onClick={handleEditBookingPrice}
-                  className="bg-blue-700 hover:bg-blue-800"
-                >
-                  Edit Booking Price
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    onClick={handleEditBookingPrice}
+                    className="bg-blue-700 hover:bg-blue-800"
+                  >
+                    <PenBoxIcon className="w-6 h-6" />
+                    Edit Booking Price
+                  </Button>
+                  {/* delete  */}
+                  <Button
+                    type="button"
+                    onClick={() => handleDeleteBookingPrice()}
+                    className="bg-red-700 hover:bg-red-800"
+                  >
+                    <Trash2Icon className="w-6 h-6" /> Delete Price
+                  </Button>
+                </>
               ) : (
                 <Button
                   type="button"

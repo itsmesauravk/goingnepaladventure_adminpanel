@@ -1,6 +1,7 @@
 import axios from "axios"
 import React, { useState, FC } from "react"
 import { toast } from "sonner"
+import { BookingPriceInterface } from "../utils/types"
 
 interface AddBookingPriceProps {
   adventureType: string
@@ -14,6 +15,8 @@ interface FormData {
   discount: string
   soloFourStar: string
   soloFiveStar: string
+  singleSupplementaryFourStar: string
+  singleSupplementaryFiveStar: string
   standardFourStar: string
   standardFiveStar: string
 }
@@ -35,6 +38,8 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
     discount: "0", // Default value
     soloFourStar: "",
     soloFiveStar: "",
+    singleSupplementaryFourStar: "",
+    singleSupplementaryFiveStar: "",
     standardFourStar: "",
     standardFiveStar: "",
   })
@@ -78,6 +83,8 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
         discount: "0",
         soloFourStar: "",
         soloFiveStar: "",
+        singleSupplementaryFourStar: "",
+        singleSupplementaryFiveStar: "",
         standardFourStar: "",
         standardFiveStar: "",
       })
@@ -174,6 +181,50 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
                 id="soloFiveStar"
                 name="soloFiveStar"
                 value={formData.soloFiveStar}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        {/*Single Supplementary Section */}
+        <div className="mt-6 mb-6 border-t pt-4">
+          <h3 className="text-xl font-semibold mb-4">
+            Single Supplementary Prices
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 mb-2"
+                htmlFor="singleSupplementaryFourStar"
+              >
+                Solo 4★ ($) *
+              </label>
+              <input
+                type="number"
+                id="singleSupplementaryFourStar"
+                name="singleSupplementaryFourStar"
+                value={formData.singleSupplementaryFourStar}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 mb-2"
+                htmlFor="singleSupplementaryFiveStar"
+              >
+                Solo 5★ ($) *
+              </label>
+              <input
+                type="number"
+                id="singleSupplementaryFiveStar"
+                name="singleSupplementaryFiveStar"
+                value={formData.singleSupplementaryFiveStar}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required

@@ -42,6 +42,10 @@ import { FaEye } from "react-icons/fa6"
 import { json } from "stream/consumers"
 import { toast } from "sonner"
 import DiscountInput from "../trekkings/addForm/DiscountInput"
+import { BookingPriceInterface } from "../utils/types"
+import { PenBoxIcon, Trash2Icon } from "lucide-react"
+import AddBookingPrice from "../common/AddBookingPrice"
+import UpdateBookingPrice from "../common/EditBookingPrice"
 
 interface FAQ {
   question: string
@@ -141,6 +145,27 @@ const EditTourForm: React.FC = () => {
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
   const [thumbnailToDelete, setThumbnailToDelete] = useState(false)
   const [videoToDelete, setVideoToDelete] = useState(false)
+
+  const [bookingPriceData, setBookingPriceData] =
+    useState<BookingPriceInterface>({
+      _id: "",
+      adventureId: "",
+      adventureType: "",
+      pricePerPerson: "",
+      discount: "",
+      soloFourStar: "",
+      soloFiveStar: "",
+      singleSupplementaryFourStar: "",
+      singleSupplementaryFiveStar: "",
+      standardFourStar: "",
+      standardFiveStar: "",
+    })
+  const [availableBookingPrice, setAvailableBookingPrice] =
+    useState<boolean>(false)
+
+  const [addBookingPriceOpen, setAddBookingPriceOpen] = useState<boolean>(false)
+  const [editBookingPriceOpen, setEditBookingPriceOpen] =
+    useState<boolean>(false)
 
   const [originalTourData, setOriginalTourData] = useState<{
     name: string
@@ -485,6 +510,10 @@ const EditTourForm: React.FC = () => {
           setVideo(trekData.video)
         }
       }
+      if (response.data.bookingDetails !== null) {
+        setBookingPriceData(response.data.bookingPrice)
+        setAvailableBookingPrice(true)
+      }
     } catch (error) {
       setLoading(false)
       console.log(error)
@@ -672,27 +701,109 @@ const EditTourForm: React.FC = () => {
     }
   }
 
+  //for booking price update
+  const handleAddBookingPrice = () => {
+    setAddBookingPriceOpen(!addBookingPriceOpen)
+  }
+  const handleEditBookingPrice = () => {
+    setEditBookingPriceOpen(!editBookingPriceOpen)
+  }
+  const handleDeleteBookingPrice = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete the booking price?"
+    )
+    if (!confirmDelete) return
+    try {
+      setLoading(true)
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/booking/delete-booking-price/${bookingPriceData?._id}`
+      )
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Booking Price Removed")
+        setLoading(false)
+        setAvailableBookingPrice(false)
+      } else {
+        toast.error(
+          response.data.message ||
+            "Unable to Delete Booking Price, Please Try Again!"
+        )
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      toast.error("Error occurred while deleting the booking price.")
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-8 w-full">
       <div className="max-w-full mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 flex items-center justify-between">
           <div className="flex w-full items-center justify-between ">
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={() => route.back()}
-                className="hover:bg-opacity-80 p-2 rounded-full transition-colors"
+                className="hover:bg-blue-700 p-2 rounded-full transition-colors"
               >
                 <FaArrowLeft size={24} />
               </button>
               <h1 className="text-3xl font-bold">Edit Tour - {name}</h1>
+              <div className="flex gap-2 mr-4 items-center">
+                <FaEye />
+                <span>{tourViews} views</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 text-lg ">
-              <FaEye />
-              <span>{tourViews} views</span>
+            <div className="flex items-center space-x-2 ml-4">
+              {availableBookingPrice ? (
+                <>
+                  <Button
+                    type="button"
+                    onClick={handleEditBookingPrice}
+                    className="bg-blue-700 hover:bg-blue-800"
+                  >
+                    <PenBoxIcon className="w-6 h-6" />
+                    Edit Booking Price
+                  </Button>
+                  {/* delete  */}
+                  <Button
+                    type="button"
+                    onClick={() => handleDeleteBookingPrice()}
+                    className="bg-red-700 hover:bg-red-800"
+                  >
+                    <Trash2Icon className="w-6 h-6" /> Delete Price
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleAddBookingPrice}
+                  className="bg-purple-700 hover:bg-purple-800"
+                >
+                  Add Booking Price
+                </Button>
+              )}
             </div>
           </div>
         </div>
+        {/* for add booking price component */}
+        {!availableBookingPrice && addBookingPriceOpen && (
+          <div className="absolute top-36 left-2/3 z-100 ">
+            <AddBookingPrice adventureType="Tour" adventureId={tourId} />
+          </div>
+        )}
+        {/* for edit booking price component */}
+        {availableBookingPrice && editBookingPriceOpen && (
+          <div className="absolute top-36 left-2/3 z-100 ">
+            <UpdateBookingPrice
+              adventureType="Tour"
+              adventureId={tourId}
+              bookingPriceDetails={bookingPriceData}
+            />
+          </div>
+        )}
 
         <form
           typeof="multipart/form-data"
