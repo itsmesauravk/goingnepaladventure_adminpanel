@@ -29,6 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import axios from "axios"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import MailSendForm from "../planTrip/MailSendForm"
+import BookingMailSend from "./BookingMailSend"
 
 interface Booking {
   _id: string
@@ -56,6 +58,12 @@ const SingleBookingView: React.FC<SingleBookingViewProps> = ({ id }) => {
   const [booking, setBooking] = useState<Booking | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const router = useRouter()
+
+  const [sendMail, setSendMail] = useState<number>(0)
+
+  const handleChangeSendMail = (value: number) => {
+    setSendMail((prev) => prev + 1)
+  }
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -148,8 +156,8 @@ const SingleBookingView: React.FC<SingleBookingViewProps> = ({ id }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen flex bg-gray-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
         <h1 className=" flex gap-4 items-center text-3xl font-bold mb-6">
           <ArrowLeftIcon className="h-8 w-8" onClick={() => router.back()} />
           Booking Details
@@ -324,6 +332,14 @@ const SingleBookingView: React.FC<SingleBookingViewProps> = ({ id }) => {
           </div>
         </Card>
       </div>
+
+      {/* form for mail  */}
+      <BookingMailSend
+        id={booking._id}
+        email={booking.email}
+        name={booking.fullName}
+        onChange={handleChangeSendMail}
+      />
     </div>
   )
 }
