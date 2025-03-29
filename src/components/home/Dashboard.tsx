@@ -228,9 +228,7 @@ const AdminDashboard = () => {
                     <Users className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-600">
-                      Total Users
-                    </p>
+                    <p className="text-sm font-medium text-slate-600">Cients</p>
                     <p className="text-2xl font-bold text-slate-900">
                       {stats?.usersCount || 0}
                     </p>

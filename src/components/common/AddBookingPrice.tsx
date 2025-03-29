@@ -1,7 +1,6 @@
 import axios from "axios"
 import React, { useState, FC } from "react"
 import { toast } from "sonner"
-import { BookingPriceInterface } from "../utils/types"
 
 interface AddBookingPriceProps {
   adventureType: string
@@ -11,10 +10,11 @@ interface AddBookingPriceProps {
 interface FormData {
   adventureType: string
   adventureId: string
-  pricePerPerson: string
-  discount: string
+
+  solo: string
   soloFourStar: string
   soloFiveStar: string
+  singleSupplementary: string
   singleSupplementaryFourStar: string
   singleSupplementaryFiveStar: string
   standardFourStar: string
@@ -34,10 +34,11 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
   const [formData, setFormData] = useState<FormData>({
     adventureType,
     adventureId,
-    pricePerPerson: "",
-    discount: "0", // Default value
+
+    solo: "",
     soloFourStar: "",
     soloFiveStar: "",
+    singleSupplementary: "",
     singleSupplementaryFourStar: "",
     singleSupplementaryFiveStar: "",
     standardFourStar: "",
@@ -79,10 +80,10 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
       setFormData({
         adventureType,
         adventureId,
-        pricePerPerson: "",
-        discount: "0",
+        solo: "",
         soloFourStar: "",
         soloFiveStar: "",
+        singleSupplementary: "",
         singleSupplementaryFourStar: "",
         singleSupplementaryFiveStar: "",
         standardFourStar: "",
@@ -115,41 +116,24 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="pricePerPerson">
-            Price Per Person ($) *
-          </label>
-          <input
-            type="number"
-            id="pricePerPerson"
-            name="pricePerPerson"
-            value={formData.pricePerPerson}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="discount">
-            Discount (%)
-          </label>
-          <input
-            type="number"
-            id="discount"
-            name="discount"
-            value={formData.discount}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
         {/* Solo Accommodation Section */}
         <div className="mt-6 mb-6 border-t pt-4">
-          <h3 className="text-xl font-semibold mb-4">
-            Solo Accommodation Prices
-          </h3>
+          <h3 className="text-xl font-semibold mb-4">Solo Prices</h3>
 
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2" htmlFor="solo">
+              Solo Price ($) *
+            </label>
+            <input
+              type="number"
+              id="solo"
+              name="solo"
+              value={formData.solo}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
               <label
@@ -193,6 +177,22 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
           <h3 className="text-xl font-semibold mb-4">
             Single Supplementary Prices
           </h3>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 mb-2"
+              htmlFor="singleSupplementary"
+            >
+              Single Supplementary
+            </label>
+            <input
+              type="number"
+              id="singleSupplementary"
+              name="singleSupplementary"
+              value={formData.singleSupplementary}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
@@ -200,7 +200,7 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
                 className="block text-gray-700 mb-2"
                 htmlFor="singleSupplementaryFourStar"
               >
-                Solo 4★ ($) *
+                Single Supplementary 4★ ($) *
               </label>
               <input
                 type="number"
@@ -218,7 +218,7 @@ const AddBookingPrice: FC<AddBookingPriceProps> = ({
                 className="block text-gray-700 mb-2"
                 htmlFor="singleSupplementaryFiveStar"
               >
-                Solo 5★ ($) *
+                Single Supplementary 5★ ($) *
               </label>
               <input
                 type="number"
