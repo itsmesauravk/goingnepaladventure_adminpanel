@@ -32,28 +32,6 @@ const LoginForm: React.FC = () => {
       return
     }
 
-    // try {
-    //   setLoading(true)
-    // const response = await axios.post(
-    //   `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/login`,
-    //   { email, password },
-    //   {
-    //     withCredentials: true,
-    //   }
-    // )
-
-    // if (response.data.success) {
-    //   toast.success(response.data.message)
-    //   Cookies.set("token", response.data.accessToken)
-    //   // Cookies.set("refreshToken", response.data.refreshToken)
-    //   setTimeout(() => {
-    //     router.push("/home")
-    //   }, 200)
-    // } else {
-    //   // Handle failed login attempt
-    //   toast.error(response.data.message || "Invalid email or password.")
-    // }
-
     try {
       setLoading(true)
 
@@ -72,7 +50,7 @@ const LoginForm: React.FC = () => {
       }
     } catch (error: any) {
       // Network or server errors
-      console.error(error)
+      // console.error(error)
       toast.error(
         error.response?.data?.message || "An error occurred. Please try again."
       )
