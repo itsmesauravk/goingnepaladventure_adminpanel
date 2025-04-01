@@ -41,7 +41,7 @@ import Cookies from "js-cookie"
 import DiscountInput from "./addForm/DiscountInput"
 import AddBookingPrice from "../common/AddBookingPrice"
 import UpdateBookingPrice from "../common/EditBookingPrice"
-import { PenBoxIcon, Trash2Icon } from "lucide-react"
+import { PenBoxIcon, Trash2Icon, XIcon } from "lucide-react"
 
 interface FAQ {
   question: string
@@ -152,11 +152,14 @@ const EditTrekForm: React.FC = () => {
       adventureId: "",
       adventureType: "",
       solo: "",
+      soloThreeStar: "",
       soloFourStar: "",
       soloFiveStar: "",
       singleSupplementary: "",
+      singleSupplementaryThreeStar: "",
       singleSupplementaryFourStar: "",
       singleSupplementaryFiveStar: "",
+      standardThreeStar: "",
       standardFourStar: "",
       standardFiveStar: "",
     })
@@ -752,7 +755,15 @@ const EditTrekForm: React.FC = () => {
                   onClick={handleAddBookingPrice}
                   className="bg-green-700 hover:bg-green-800"
                 >
-                  Add Booking Price
+                  {addBookingPriceOpen ? (
+                    <>
+                      <XIcon className="w-6 h-6" /> Close Booking Price
+                    </>
+                  ) : (
+                    <>
+                      <PenBoxIcon className="w-6 h-6" /> Add Booking Price
+                    </>
+                  )}
                 </Button>
               )}
             </div>
@@ -761,7 +772,7 @@ const EditTrekForm: React.FC = () => {
 
         {/* for add booking price component */}
         {!availableBookingPrice && addBookingPriceOpen && (
-          <div className="absolute top-36 left-2/3 z-100 ">
+          <div className="absolute top-36 left-1/2 z-100 ">
             <AddBookingPrice adventureType="Trekking" adventureId={trekId} />
           </div>
         )}

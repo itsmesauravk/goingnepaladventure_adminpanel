@@ -43,7 +43,7 @@ import { json } from "stream/consumers"
 import { toast } from "sonner"
 import DiscountInput from "../trekkings/addForm/DiscountInput"
 import { BookingPriceInterface } from "../utils/types"
-import { PenBoxIcon, Trash2Icon } from "lucide-react"
+import { PenBoxIcon, Trash2Icon, XIcon } from "lucide-react"
 import AddBookingPrice from "../common/AddBookingPrice"
 import UpdateBookingPrice from "../common/EditBookingPrice"
 
@@ -152,11 +152,14 @@ const EditTourForm: React.FC = () => {
       adventureId: "",
       adventureType: "",
       solo: "",
+      soloThreeStar: "",
       soloFourStar: "",
       soloFiveStar: "",
       singleSupplementary: "",
+      singleSupplementaryThreeStar: "",
       singleSupplementaryFourStar: "",
       singleSupplementaryFiveStar: "",
+      standardThreeStar: "",
       standardFourStar: "",
       standardFiveStar: "",
     })
@@ -782,7 +785,15 @@ const EditTourForm: React.FC = () => {
                   onClick={handleAddBookingPrice}
                   className="bg-purple-700 hover:bg-purple-800"
                 >
-                  Add Booking Price
+                  {addBookingPriceOpen ? (
+                    <>
+                      <XIcon className="w-6 h-6" /> Close Booking Price
+                    </>
+                  ) : (
+                    <>
+                      <PenBoxIcon className="w-6 h-6" /> Add Booking Price
+                    </>
+                  )}
                 </Button>
               )}
             </div>

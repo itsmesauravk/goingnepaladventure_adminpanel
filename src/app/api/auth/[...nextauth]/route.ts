@@ -37,8 +37,6 @@ const handler = NextAuth({
             }
           )
 
-          console.log(res.data)
-
           // Extract data from the updated response structure
           const { jwt, data } = res.data
 

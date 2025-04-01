@@ -10,12 +10,14 @@ import {
   Key,
   FileText,
   RefreshCw,
+  Save,
 } from "lucide-react"
 
 import axios from "axios"
 import Cookies from "js-cookie"
 
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 // Type definitions for the profile data
 interface SecurityQuestion {
@@ -41,10 +43,15 @@ interface ProfileData {
   updatedAt: string
   profilePicture: string | null
 }
+import { sessionData } from "../utils/types"
+import { toast } from "sonner"
 
 const MyProfile: React.FC = () => {
   const router = useRouter()
   const [hideView, setHideView] = useState<Boolean>(true)
+  const [isEditing, setIsEditing] = useState<boolean>(true)
+  const [isSaving, setIsSaving] = useState<boolean>(false)
+
   // Initial state with more robust default values
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "N/A",
@@ -68,17 +75,20 @@ const MyProfile: React.FC = () => {
     profilePicture: null,
   })
 
-  const token = Cookies.get("token")
+  const { data: sessionData } = useSession()
+
+  const session = sessionData as unknown as sessionData
+
+  const userId = session?.user?.id
 
   const getUserProfile = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/profile?s=a`,
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/profile?id=${userId}&s=a`,
         {
           withCredentials: true,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       )
@@ -99,11 +109,51 @@ const MyProfile: React.FC = () => {
     }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setProfileData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true)
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL_DEV}/admin/update`,
+        {
+          id: userId,
+          fullName: profileData.fullName,
+          phoneNumber: profileData.phoneNumber,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+
+      if (response.data.success) {
+        // Refresh profile data
+        getUserProfile()
+        toast.success("Profile updated successfully")
+      } else {
+        toast.error(response.data.message || "Failed to update profile")
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      toast.error("An error occurred while updating your profile")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   useEffect(() => {
-    if (token) {
+    if (userId) {
       getUserProfile()
     }
-  }, [token])
+  }, [userId])
 
   return (
     <div className="w-full bg-gray-100 p-6">
@@ -131,12 +181,21 @@ const MyProfile: React.FC = () => {
           </div>
           <div>
             <button
-              onClick={() => {
-                router.push("/my-account/edit-profile")
-              }}
-              className="bg-white text-primary font-semibold px-4 py-2 rounded-full shadow-md"
+              onClick={handleSaveChanges}
+              disabled={isSaving}
+              className=" text-white bg-green-600 font-semibold px-4 py-2 rounded-full shadow-md flex items-center"
             >
-              Edit Profile
+              {isSaving ? (
+                <>
+                  <RefreshCw className="mr-2 w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 w-4 h-4" />
+                  Save Changes
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -157,9 +216,10 @@ const MyProfile: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="fullName"
                     value={profileData.fullName}
-                    disabled
-                    className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500"
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border rounded-md bg-white text-gray-800"
                   />
                 </div>
                 <div>
@@ -179,9 +239,11 @@ const MyProfile: React.FC = () => {
                   </label>
                   <input
                     type="tel"
-                    value={profileData.phoneNumber || "Not provided"}
-                    disabled
-                    className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500"
+                    name="phoneNumber"
+                    value={profileData.phoneNumber || ""}
+                    onChange={handleInputChange}
+                    placeholder="Enter your phone number"
+                    className="w-full px-3 py-2 border rounded-md bg-white text-gray-800"
                   />
                 </div>
               </div>

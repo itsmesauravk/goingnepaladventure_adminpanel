@@ -7,11 +7,14 @@ interface BookingPriceDetails {
   adventureId: string
 
   solo: string
+  soloThreeStar: string
   soloFourStar: string
   soloFiveStar: string
   singleSupplementary: string
+  singleSupplementaryThreeStar: string
   singleSupplementaryFourStar: string
   singleSupplementaryFiveStar: string
+  standardThreeStar: string
   standardFourStar: string
   standardFiveStar: string
 }
@@ -27,11 +30,14 @@ interface FormData {
   adventureId: string
 
   solo: string
+  soloThreeStar: string
   soloFourStar: string
   soloFiveStar: string
   singleSupplementary: string
+  singleSupplementaryThreeStar: string
   singleSupplementaryFourStar: string
   singleSupplementaryFiveStar: string
+  standardThreeStar: string
   standardFourStar: string
   standardFiveStar: string
 }
@@ -52,11 +58,14 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
     adventureId,
 
     solo: "",
+    soloThreeStar: "",
     soloFourStar: "",
     soloFiveStar: "",
     singleSupplementary: "",
+    singleSupplementaryThreeStar: "",
     singleSupplementaryFourStar: "",
     singleSupplementaryFiveStar: "",
+    standardThreeStar: "",
     standardFourStar: "",
     standardFiveStar: "",
   })
@@ -74,13 +83,17 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
         adventureType,
         adventureId,
         solo: bookingPriceDetails.solo || "",
+        soloThreeStar: bookingPriceDetails.soloThreeStar || "",
         soloFourStar: bookingPriceDetails.soloFourStar || "",
         soloFiveStar: bookingPriceDetails.soloFiveStar || "",
         singleSupplementary: bookingPriceDetails.singleSupplementary || "",
+        singleSupplementaryThreeStar:
+          bookingPriceDetails.singleSupplementaryThreeStar || "",
         singleSupplementaryFourStar:
           bookingPriceDetails.singleSupplementaryFourStar || "",
         singleSupplementaryFiveStar:
           bookingPriceDetails.singleSupplementaryFiveStar || "",
+        standardThreeStar: bookingPriceDetails.standardThreeStar || "",
         standardFourStar: bookingPriceDetails.standardFourStar || "",
         standardFiveStar: bookingPriceDetails.standardFiveStar || "",
       })
@@ -106,13 +119,17 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
           adventureType,
           adventureId,
           solo: details.solo || "",
+          soloThreeStar: details.soloThreeStar || "",
           soloFourStar: details.soloFourStar || "",
           soloFiveStar: details.soloFiveStar || "",
           singleSupplementary: details.singleSupplementary || "",
+          singleSupplementaryThreeStar:
+            details.singleSupplementaryThreeStar || "",
           singleSupplementaryFourStar:
             details.singleSupplementaryFourStar || "",
           singleSupplementaryFiveStar:
             details.singleSupplementaryFiveStar || "",
+          standardThreeStar: details.standardThreeStar || "",
           standardFourStar: details.standardFourStar || "",
           standardFiveStar: details.standardFiveStar || "",
         })
@@ -211,7 +228,24 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
                 required
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 mb-2"
+                  htmlFor="soloThreeStar"
+                >
+                  Solo 3★ ($) *
+                </label>
+                <input
+                  type="number"
+                  id="soloThreeStar"
+                  name="soloThreeStar"
+                  value={formData.soloThreeStar}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
               <div className="mb-4">
                 <label
                   className="block text-gray-700 mb-2"
@@ -254,24 +288,25 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
             <h3 className="text-xl font-semibold mb-4">
               Single Supplimentary Prices
             </h3>
-            {/* <div className="mb-4">
-              <label
-                className="block text-gray-700 mb-2"
-                htmlFor="singleSupplementary"
-              >
-                Single Supplementary Price ($) *
-              </label>
-              <input
-                type="number"
-                id="singleSupplementary"
-                name="singleSupplementary"
-                value={formData.singleSupplementary}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div> */}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 mb-2"
+                  htmlFor="singleSupplementaryThreeStar"
+                >
+                  Single Supplementary 3★ ($) *
+                </label>
+                <input
+                  type="number"
+                  id="singleSupplementaryThreeStar"
+                  name="singleSupplementaryThreeStar"
+                  value={formData.singleSupplementaryThreeStar}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
               <div className="mb-4">
                 <label
                   className="block text-gray-700 mb-2"
@@ -283,7 +318,7 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
                   type="number"
                   id="singleSupplementaryFourStar"
                   name="singleSupplementaryFourStar"
-                  value={formData.singleSupplementaryFiveStar}
+                  value={formData.singleSupplementaryFourStar}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -316,7 +351,24 @@ const UpdateBookingPrice: FC<UpdateBookingPriceProps> = ({
               Standard Accommodation Prices
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 mb-2"
+                  htmlFor="standardThreeStar"
+                >
+                  Standard 4★ ($) *
+                </label>
+                <input
+                  type="number"
+                  id="standardThreeStar"
+                  name="standardThreeStar"
+                  value={formData.standardThreeStar}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
               <div className="mb-4">
                 <label
                   className="block text-gray-700 mb-2"

@@ -10,12 +10,13 @@ const VideoUpload: React.FC<VideoInputPros> = ({
   handleVideoChange,
 }) => (
   <div className="mb-4">
-    <h2 className="text-lg font-semibold text-primary">Video (URL)</h2>
+    <h2 className="text-lg font-semibold text-primary">
+      Video (URL) (optional)
+    </h2>
     <input
       type="text"
       id="video"
       name="video"
-      required
       value={video}
       onChange={handleVideoChange}
       className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

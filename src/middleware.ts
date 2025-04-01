@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
     "/plan-trip",
     "/requests-mails",
     "/users-info",
+    "/my-account",
   ]
 
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -43,6 +44,8 @@ export const config = {
     "/plan-trip/:path*",
     "/requests-mails/:path*",
     "/users-info/:path*",
+    "/my-account/:path*",
+    "/my-account/edit-profile/:path*",
     "/login", // Include login in matcher
     "/forgot-password", // Include forgot-password in matcher
   ],

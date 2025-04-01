@@ -154,6 +154,20 @@ const SingleBookingView: React.FC<SingleBookingViewProps> = ({ id }) => {
       </Card>
     )
   }
+  const giveRouteName = (data: string) => {
+    switch (data) {
+      case "trek":
+        return "trekking"
+      case "tour":
+        return "tours"
+      case "activity":
+        return "activities"
+      case "wellness":
+        return "wellness"
+      default:
+        return ""
+    }
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-50 py-8 px-4">
@@ -295,9 +309,9 @@ const SingleBookingView: React.FC<SingleBookingViewProps> = ({ id }) => {
                         <Link
                           href={`${
                             process.env.NEXT_PUBLIC_USER_URL_PROD
-                          }/${booking.adventureType.toLowerCase()}/${
-                            booking.adventureSlug
-                          }`}
+                          }/${giveRouteName(
+                            booking.adventureType.toLowerCase()
+                          )}/${booking.adventureSlug}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 underline ml-4"
