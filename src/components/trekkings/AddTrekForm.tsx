@@ -34,6 +34,7 @@ import { FaArrowLeft } from "react-icons/fa6"
 import { Loader } from "../loading/Loader"
 import TrekPdfForm from "./addForm/TrekPdfForm"
 import DiscountInput from "./addForm/DiscountInput"
+import RouteMapImageForm from "./addForm/RouteMapImageFrom"
 
 interface FAQ {
   question: string
@@ -76,6 +77,10 @@ const AddTrekForm: React.FC = () => {
   const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [routeMapImage, setRouteMapImage] = useState<string | File>("")
+  const [routeMapImagePreview, setRouteMapImagePreview] = useState<
+    string | null
+  >(null)
   const [trekPdf, setTrekPdf] = useState<string | File>("")
   const [trekPdfPreview, setTrekPdfPreview] = useState<string | null>(null)
   const [pdfFileSize, setPdfFileSize] = useState<number | null>(null)
@@ -158,30 +163,14 @@ const AddTrekForm: React.FC = () => {
       setThumbnail(file)
     }
   }
-  // trek pdf
-  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // route map image
+  const handleRouteMapImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
     if (file) {
-      setTrekPdfPreview(URL.createObjectURL(file))
-      setTrekPdf(file)
-    }
-    if (file) {
-      const sizeInMB = file.size / (1024 * 1024) // Convert bytes to MB
-      setPdfFileSize(sizeInMB)
-
-      if (sizeInMB > maxSizeMB) {
-        alert(
-          `File size exceeds ${maxSizeMB} MB. Please upload a smaller file.`
-        )
-        setTrekPdf("")
-        return
-      }
-
-      if (file.type === "application/pdf") {
-        setTrekPdfPreview(URL.createObjectURL(file))
-      } else {
-        alert("Please select a valid PDF file.")
-      }
+      setRouteMapImagePreview(URL.createObjectURL(file))
+      setRouteMapImage(file)
     }
   }
 
@@ -357,6 +346,7 @@ const AddTrekForm: React.FC = () => {
     formData.append("price", price.toString())
     formData.append("discount", discount.toString())
     formData.append("thumbnail", thumbnail as File)
+    formData.append("routemapimage", routeMapImage as File)
     formData.append("trekPdf", trekPdf as File)
     formData.append("country", country)
     formData.append("location", location)
@@ -468,11 +458,15 @@ const AddTrekForm: React.FC = () => {
             </div>
 
             {/* Thumbnail */}
-            <div className="mt-6">
+            <div className="flex mt-6">
               <ThumbnailInput
                 preview={thumbnailPreview}
                 handleImageChange={handleThumbnailChange}
               />
+              {/* <RouteMapImageForm
+                preview={routeMapImagePreview}
+                handleImageChange={handleRouteMapImageChange}
+              /> */}
             </div>
 
             {/* trek pdf */}
