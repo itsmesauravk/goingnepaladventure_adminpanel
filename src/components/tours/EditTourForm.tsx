@@ -969,17 +969,18 @@ const EditTourForm: React.FC = () => {
                 Add Highlight
               </Button>
             </div>
-            {highlights.map((highlight, index) => (
-              <HighlightForm
-                key={index}
-                index={index}
-                highlight={highlight}
-                updateHighlight={(updatedHighlight) =>
-                  updateHighlights(index, updatedHighlight)
-                }
-                removeHighlight={() => removeHighlight(index)}
-              />
-            ))}
+            {highlights &&
+              highlights.map((highlight, index) => (
+                <HighlightForm
+                  key={index}
+                  index={index}
+                  highlight={highlight}
+                  updateHighlight={(updatedHighlight) =>
+                    updateHighlights(index, updatedHighlight)
+                  }
+                  removeHighlight={() => removeHighlight(index)}
+                />
+              ))}
           </div>
 
           {/* Itineraries Section */}
@@ -996,17 +997,18 @@ const EditTourForm: React.FC = () => {
                 Add Itinerary
               </Button>
             </div>
-            {itineraries.map((itinerary, index) => (
-              <ItineraryForm
-                key={index}
-                index={index}
-                itinerary={itinerary}
-                updateItinerary={(updatedItinerary) =>
-                  updateItineraries(index, updatedItinerary)
-                }
-                removeItinerary={() => removeItinerary(index)}
-              />
-            ))}
+            {itineraries &&
+              itineraries.map((itinerary, index) => (
+                <ItineraryForm
+                  key={index}
+                  index={index}
+                  itinerary={itinerary}
+                  updateItinerary={(updatedItinerary) =>
+                    updateItineraries(index, updatedItinerary)
+                  }
+                  removeItinerary={() => removeItinerary(index)}
+                />
+              ))}
           </div>
 
           {/* FAQs Section */}

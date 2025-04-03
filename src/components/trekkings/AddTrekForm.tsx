@@ -458,15 +458,15 @@ const AddTrekForm: React.FC = () => {
             </div>
 
             {/* Thumbnail */}
-            <div className="flex mt-6">
+            <div className="flex gap-20 mt-6">
               <ThumbnailInput
                 preview={thumbnailPreview}
                 handleImageChange={handleThumbnailChange}
               />
-              {/* <RouteMapImageForm
+              <RouteMapImageForm
                 preview={routeMapImagePreview}
                 handleImageChange={handleRouteMapImageChange}
-              /> */}
+              />
             </div>
 
             {/* trek pdf */}

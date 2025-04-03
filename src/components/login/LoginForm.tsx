@@ -2,7 +2,7 @@
 
 import Cookies from "js-cookie"
 import axios from "axios"
-import { Loader2 } from "lucide-react"
+import { EyeClosedIcon, EyeIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useState, useEffect } from "react"
@@ -14,6 +14,7 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [viewPassword, setViewPassword] = useState(false)
 
   const router = useRouter()
 
@@ -91,22 +92,35 @@ const LoginForm: React.FC = () => {
           </div>
 
           {/* Password Field */}
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label
               htmlFor="password"
               className="block text-gray-700 font-medium mb-2"
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-primary"
-              required
-            />
+            <div className="relative w-full">
+              <input
+                type={viewPassword ? "text" : "password"}
+                id="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 pr-10 border border-gray-300 rounded focus:outline-none focus:border-primary"
+                required
+              />
+              <div
+                onClick={() => setViewPassword(!viewPassword)}
+                className={`absolute inset-y-0 right-3 flex items-center cursor-pointer`}
+              >
+                {/* Eye Icon for Password Visibility */}
+                {viewPassword ? (
+                  <EyeIcon className="w-6 h-6" />
+                ) : (
+                  <EyeClosedIcon className="w-6 h-6 " />
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Error Message */}

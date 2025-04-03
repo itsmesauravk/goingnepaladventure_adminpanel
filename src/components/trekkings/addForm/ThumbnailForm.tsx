@@ -13,7 +13,7 @@ const ThumbnailInput: React.FC<ThumbnailInputProps> = ({
 }) => (
   <div className="mb-4">
     <h2 className="text-lg text-primary font-semibold ">Thumbnail</h2>
-    <div className="flex gap-10">
+    <div className="flex flex-col gap-10">
       <div>
         <label
           htmlFor="thumbnail"
@@ -30,6 +30,9 @@ const ThumbnailInput: React.FC<ThumbnailInputProps> = ({
         />
       </div>
       <div>
+        {!preview && (
+          <p className="italic text-gray-500">No preview available.</p>
+        )}
         {preview && (
           <div className="mt-4 flex items-center justify-center">
             <Image
