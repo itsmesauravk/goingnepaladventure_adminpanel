@@ -36,6 +36,7 @@ import { Loader } from "../loading/Loader"
 import TrekPdfForm from "./addForm/TrekPdfForm"
 import { toast } from "sonner"
 import ImageUploadEdit from "./addForm/ImageUploadEdit"
+import RouteMapImageForm from "./addForm/RouteMapImageFrom"
 
 import Cookies from "js-cookie"
 import DiscountInput from "./addForm/DiscountInput"
@@ -86,6 +87,10 @@ const EditTrekForm: React.FC = () => {
   const [discount, setDiscount] = useState<number>(0)
   const [thumbnail, setThumbnail] = useState<string | File>("")
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [routeMapImage, setRouteMapImage] = useState<string | File>("")
+  const [routeMapImagePreview, setRouteMapImagePreview] = useState<
+    string | null
+  >(null)
   const [trekPdf, setTrekPdf] = useState<string | File>("")
   const [trekPdfPreview, setTrekPdfPreview] = useState<string | null>(null)
   const [pdfFileSize, setPdfFileSize] = useState<number | null>(null)
@@ -171,6 +176,7 @@ const EditTrekForm: React.FC = () => {
     price: number
     discount: number
     thumbnail: string
+    routeMapImage: string
     trekPdf: string
     country: string
     days: { min: number; max: number }
@@ -202,6 +208,7 @@ const EditTrekForm: React.FC = () => {
     price: 0,
     discount: 0,
     thumbnail: "",
+    routeMapImage: "",
     trekPdf: "",
     country: "",
     days: { min: 0, max: 0 },
@@ -272,6 +279,16 @@ const EditTrekForm: React.FC = () => {
     if (file) {
       setThumbnailPreview(URL.createObjectURL(file))
       setThumbnail(file)
+    }
+  }
+  // route map image
+  const handleRouteMapImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setRouteMapImagePreview(URL.createObjectURL(file))
+      setRouteMapImage(file)
     }
   }
 
@@ -459,6 +476,7 @@ const EditTrekForm: React.FC = () => {
         setPrice(trekData.price)
         setDiscount(trekData.discount)
         setThumbnailPreview(trekData.thumbnail)
+        setRouteMapImagePreview(trekData.routeMapImage)
         setAccommodations(trekData.accommodation)
         setCountry(trekData.country)
         setMinDays(trekData.days.min)
@@ -623,6 +641,9 @@ const EditTrekForm: React.FC = () => {
     // Handle new file uploads
     if (thumbnail instanceof File) {
       formData.append("thumbnail", thumbnail)
+    }
+    if (routeMapImage instanceof File) {
+      formData.append("routemapimage", routeMapImage)
     }
     if (trekPdf instanceof File) {
       formData.append("trekPdf", trekPdf)
@@ -823,10 +844,14 @@ const EditTrekForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="flex gap-20 mt-6">
               <ThumbnailInput
                 preview={thumbnailPreview}
                 handleImageChange={handleThumbnailChange}
+              />
+              <RouteMapImageForm
+                preview={routeMapImagePreview}
+                handleImageChange={handleRouteMapImageChange}
               />
             </div>
           </div>

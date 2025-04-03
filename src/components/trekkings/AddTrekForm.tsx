@@ -35,6 +35,7 @@ import { Loader } from "../loading/Loader"
 import TrekPdfForm from "./addForm/TrekPdfForm"
 import DiscountInput from "./addForm/DiscountInput"
 import RouteMapImageForm from "./addForm/RouteMapImageFrom"
+import { toast } from "sonner"
 
 interface FAQ {
   question: string
@@ -393,15 +394,16 @@ const AddTrekForm: React.FC = () => {
       )
 
       if (response.data.success) {
-        alert(response.data.message)
+        toast.success(response.data.message || "Trek added successfully!")
+
         setLoading(false)
         route.push("/trekkings")
       } else {
-        alert(response.data.message)
+        toast.error(response.data.message || "Failed to add trek.")
         setLoading(false)
       }
     } catch (error) {
-      alert("Error occurred while submitting the form.")
+      toast.error("An error occurred. Please try again.")
       setLoading(false)
     }
   }
