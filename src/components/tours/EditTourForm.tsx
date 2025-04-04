@@ -644,7 +644,7 @@ const EditTourForm: React.FC = () => {
 
     // Handle FAQs
     if (JSON.stringify(faqs) !== JSON.stringify(originalTourData.faqs)) {
-      formData.append("faqs", JSON.stringify(faqs))
+      formData.append("faq", JSON.stringify(faqs))
     }
 
     // Handle file deletions
