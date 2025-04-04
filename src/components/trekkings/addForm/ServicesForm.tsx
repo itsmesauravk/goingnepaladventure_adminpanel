@@ -4,45 +4,69 @@ import { Input } from "@/components/ui/input"
 import { Trash2 } from "lucide-react"
 
 interface ServicesProps {
-  inclusives: string[]
-  exclusives: string[]
+  inclusives?: string[]
+  exclusives?: string[]
   onUpdateInclusives: (newInclusives: string[]) => void
   onUpdateExclusives: (newExclusives: string[]) => void
 }
 
 const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
-  inclusives,
-  exclusives,
+  inclusives = [],
+  exclusives = [],
   onUpdateInclusives,
   onUpdateExclusives,
 }) => {
   const handleAddInclusive = () => {
-    onUpdateInclusives([...inclusives, ""])
+    onUpdateInclusives([...(Array.isArray(inclusives) ? inclusives : []), ""])
   }
 
   const handleRemoveInclusive = (index: number) => {
+    if (!Array.isArray(inclusives)) {
+      onUpdateInclusives([])
+      return
+    }
+
     const updated = [...inclusives]
     updated.splice(index, 1)
     onUpdateInclusives(updated)
   }
 
   const handleUpdateInclusive = (index: number, value: string) => {
+    if (!Array.isArray(inclusives)) {
+      const newList = []
+      newList[index] = value
+      onUpdateInclusives(newList)
+      return
+    }
+
     const updated = [...inclusives]
     updated[index] = value
     onUpdateInclusives(updated)
   }
 
   const handleAddExclusive = () => {
-    onUpdateExclusives([...exclusives, ""])
+    onUpdateExclusives([...(Array.isArray(exclusives) ? exclusives : []), ""])
   }
 
   const handleRemoveExclusive = (index: number) => {
+    if (!Array.isArray(exclusives)) {
+      onUpdateExclusives([])
+      return
+    }
+
     const updated = [...exclusives]
     updated.splice(index, 1)
     onUpdateExclusives(updated)
   }
 
   const handleUpdateExclusive = (index: number, value: string) => {
+    if (!Array.isArray(exclusives)) {
+      const newList = []
+      newList[index] = value
+      onUpdateExclusives(newList)
+      return
+    }
+
     const updated = [...exclusives]
     updated[index] = value
     onUpdateExclusives(updated)
@@ -54,29 +78,30 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
         Services
       </h2>
 
-      <div className="mb-4  border p-2 rounded-md border-primary">
+      <div className="mb-4 border p-2 rounded-md border-primary">
         {/* Inclusives Section */}
-        <div className="mb-4 ">
+        <div className="mb-4">
           <h3 className="text-lg font-medium mb-2 text-primary">Inclusive</h3>
-          {inclusives.map((inclusive, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
-              <Input
-                type="text"
-                placeholder="Add Inclusive Service"
-                value={inclusive}
-                required
-                onChange={(e) => handleUpdateInclusive(index, e.target.value)}
-                className="flex-grow"
-              />
-              <Button
-                type="button"
-                variant={"destructive"}
-                onClick={() => handleRemoveInclusive(index)}
-              >
-                <Trash2 size={18} />
-              </Button>
-            </div>
-          ))}
+          {Array.isArray(inclusives) &&
+            inclusives.map((inclusive, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <Input
+                  type="text"
+                  placeholder="Add Inclusive Service"
+                  value={inclusive || ""}
+                  required
+                  onChange={(e) => handleUpdateInclusive(index, e.target.value)}
+                  className="flex-grow"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleRemoveInclusive(index)}
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </div>
+            ))}
           <Button
             type="button"
             onClick={handleAddInclusive}
@@ -89,25 +114,26 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
         {/* Exclusives Section */}
         <div>
           <h3 className="text-lg font-medium mb-2 text-primary">Exclusive</h3>
-          {exclusives.map((exclusive, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
-              <Input
-                type="text"
-                placeholder="Add Exclusive Service"
-                value={exclusive}
-                required
-                onChange={(e) => handleUpdateExclusive(index, e.target.value)}
-                className="flex-grow"
-              />
-              <Button
-                type="button"
-                variant={"destructive"}
-                onClick={() => handleRemoveExclusive(index)}
-              >
-                <Trash2 size={18} />
-              </Button>
-            </div>
-          ))}
+          {Array.isArray(exclusives) &&
+            exclusives.map((exclusive, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <Input
+                  type="text"
+                  placeholder="Add Exclusive Service"
+                  value={exclusive || ""}
+                  required
+                  onChange={(e) => handleUpdateExclusive(index, e.target.value)}
+                  className="flex-grow"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleRemoveExclusive(index)}
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </div>
+            ))}
           <Button
             type="button"
             onClick={handleAddExclusive}
