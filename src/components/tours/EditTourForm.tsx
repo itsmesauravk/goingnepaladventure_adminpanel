@@ -179,6 +179,7 @@ const EditTourForm: React.FC = () => {
     discount: number
     thumbnail: string | File
     accommodations: string[]
+    thingsToKnow: string[]
     country: string
     minDays: number
     maxDays: number
@@ -209,6 +210,7 @@ const EditTourForm: React.FC = () => {
     discount: 0,
     thumbnail: "",
     accommodations: [],
+    thingsToKnow: [],
     country: "",
     minDays: 1,
     maxDays: 1,
@@ -611,6 +613,13 @@ const EditTourForm: React.FC = () => {
       JSON.stringify(originalTourData.accommodations)
     ) {
       formData.append("accommodations", JSON.stringify(accommodations))
+    }
+    // things to know
+    if (
+      JSON.stringify(thingsToKnow) !==
+      JSON.stringify(originalTourData.thingsToKnow)
+    ) {
+      formData.append("thingsToKnow", JSON.stringify(thingsToKnow))
     }
 
     if (
