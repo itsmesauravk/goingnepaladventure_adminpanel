@@ -47,7 +47,7 @@ const TrekkingHome: React.FC = () => {
   const [search, setSearch] = useState<string>("")
   const [difficulty, setDifficulty] = useState<string>("")
   const [sort, setSort] = useState<string>("")
-  const [visibility, setVisibility] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("all")
   const [allLocations, setAllLocations] = useState<string[]>([])
   const [location, setLocation] = useState<string>("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)

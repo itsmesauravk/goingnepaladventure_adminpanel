@@ -47,7 +47,7 @@ const TourHome: React.FC = () => {
   const [region, setRegion] = useState<string>("")
   const [allRegions, setAllRegions] = useState<string[]>([])
   const [sort, setSort] = useState<string>("")
-  const [visibility, setVisibility] = useState<string>("")
+  const [visibility, setVisibility] = useState<string>("all")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTourToDelete, setSelectedTourToDelete] = useState<
     string | null
