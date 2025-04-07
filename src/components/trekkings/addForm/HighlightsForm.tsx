@@ -53,6 +53,9 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
 
   return (
     <div className="mb-4  border p-2 rounded-md border-primary pb-4">
+      <label className="text-md italic text-gray-500">
+        Highlight {index + 1}
+      </label>
       <div className="flex items-center justify-between">
         <Input
           type="text"
@@ -60,7 +63,7 @@ const HighlightForm: React.FC<HighlightChildProps> = ({
           placeholder="Highlight Content"
           value={highlight.content}
           onChange={(e) => updateContent(e.target.value)}
-          className="flex-grow"
+          className="flex-grow bg-white"
         />
         <Button
           type="button"

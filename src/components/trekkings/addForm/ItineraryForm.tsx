@@ -61,14 +61,17 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
   return (
     <div className="mb-4 border p-2 rounded-md border-primary pb-4">
       <h2 className="text-lg font-bold mb-2">Day {itinerary.day}</h2>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col ">
+        <label className="text-md italic text-gray-500 mt-4">Title</label>
         <Input
           type="text"
           placeholder="Title"
+          className="bg-white"
           value={itinerary.title}
           onChange={(e) => updateField("title", e.target.value)}
           required
         />
+        <label className="text-md italic text-gray-500 mt-4">Details</label>
 
         <textarea
           className="w-full p-2 border border-gray-300 rounded-md"
@@ -88,14 +91,14 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
                 placeholder="Key (text)"
                 value={link.text}
                 onChange={(e) => updateLink(linkIndex, "text", e.target.value)}
-                className="flex-grow mr-2"
+                className="flex-grow mr-2 bg-white"
               />
               <Input
                 type="text"
                 placeholder="Value (url)"
                 value={link.url}
                 onChange={(e) => updateLink(linkIndex, "url", e.target.value)}
-                className="flex-grow mr-2 "
+                className="flex-grow mr-2 bg-white"
               />
               <Button
                 type="button"
@@ -123,7 +126,7 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
       <Input
         type="text"
         placeholder="Accommodation"
-        required
+        className="bg-white"
         value={itinerary.accommodations}
         onChange={(e) => updateField("accommodations", e.target.value)}
       />
@@ -133,8 +136,8 @@ const ItineraryForm: React.FC<ItineraryChildProps> = ({
       <Input
         type="text"
         placeholder="Meals"
+        className="bg-white"
         value={itinerary.meals}
-        required
         onChange={(e) => updateField("meals", e.target.value)}
       />
 

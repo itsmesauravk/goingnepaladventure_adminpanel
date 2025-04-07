@@ -17,14 +17,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => (
   <div>
     <h2 className="text-lg font-semibold text-primary mb-2 mt-3">
-      Upload Images (up to 10)
+      Upload Images (up to 4)
     </h2>
     <input
       type="file"
       accept="image/*"
       multiple
       onChange={handleImageChange}
-      disabled={images.length >= 10}
+      disabled={images.length >= 3}
       className="mb-4 border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
     <div className="flex flex-wrap gap-4 mt-4">

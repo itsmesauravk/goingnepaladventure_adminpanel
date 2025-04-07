@@ -37,7 +37,7 @@ const ActivitiesHome: React.FC = () => {
   const [limit, setLimit] = useState<number>(8)
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>("")
-  const [sort, setSort] = useState<string>("-date")
+  const [sort, setSort] = useState<string>("-createdAt")
   const [visibility, setVisibility] = useState<string>("all")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedActivityToDelete, setSelectedActivityToDelete] = useState<

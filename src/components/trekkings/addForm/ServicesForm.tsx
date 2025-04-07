@@ -91,7 +91,7 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
                   value={inclusive || ""}
                   required
                   onChange={(e) => handleUpdateInclusive(index, e.target.value)}
-                  className="flex-grow"
+                  className="flex-grow bg-white"
                 />
                 <Button
                   type="button"
@@ -123,7 +123,7 @@ const InclusiveExclusiveServicesForm: React.FC<ServicesProps> = ({
                   value={exclusive || ""}
                   required
                   onChange={(e) => handleUpdateExclusive(index, e.target.value)}
-                  className="flex-grow"
+                  className="flex-grow bg-white"
                 />
                 <Button
                   type="button"

@@ -553,13 +553,6 @@ const AddTrekForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-blue-700">
                 Highlights
               </h2>
-              <Button
-                type="button"
-                onClick={addHighlight}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add Highlight
-              </Button>
             </div>
             {highlights.map((highlight, index) => (
               <HighlightForm
@@ -572,6 +565,13 @@ const AddTrekForm: React.FC = () => {
                 removeHighlight={() => removeHighlight(index)}
               />
             ))}
+            <Button
+              type="button"
+              onClick={addHighlight}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add Highlight
+            </Button>
           </div>
 
           {/* Itineraries Section */}
@@ -580,13 +580,6 @@ const AddTrekForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-blue-700">
                 Itineraries
               </h2>
-              <Button
-                type="button"
-                onClick={addItinerary}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add Itinerary
-              </Button>
             </div>
             {itineraries.map((itinerary, index) => (
               <ItineraryForm
@@ -599,19 +592,19 @@ const AddTrekForm: React.FC = () => {
                 removeItinerary={() => removeItinerary(index)}
               />
             ))}
+            <Button
+              type="button"
+              onClick={addItinerary}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add Itinerary
+            </Button>
           </div>
 
           {/* FAQs Section */}
           <div className="bg-gray-100 rounded-lg p-6">
             <div className="flex justify-between items-center mb-6 border-b pb-3">
               <h2 className="text-2xl font-semibold text-blue-700">FAQs</h2>
-              <Button
-                type="button"
-                onClick={addFAQ}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add FAQ
-              </Button>
             </div>
             {faqs.map((faq, index) => (
               <FAQForm
@@ -622,6 +615,13 @@ const AddTrekForm: React.FC = () => {
                 removeFAQ={() => removeFAQ(index)}
               />
             ))}
+            <Button
+              type="button"
+              onClick={addFAQ}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add FAQ
+            </Button>
           </div>
 
           {/* Services */}

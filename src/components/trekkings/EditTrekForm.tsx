@@ -472,7 +472,7 @@ const EditTrekForm: React.FC = () => {
         setTrekId(trekData._id)
         setName(trekData.name)
         setViews(trekData.viewsCount)
-        setPreviews(trekData.viewsCount)
+
         setPrice(trekData.price)
         setDiscount(trekData.discount)
         setThumbnailPreview(trekData.thumbnail)
@@ -500,8 +500,10 @@ const EditTrekForm: React.FC = () => {
         setOtherEssentials(trekData.packingList.otherEssentials)
         setFaqs(trekData.faq)
         setNote(trekData.note)
-        // setImages(trekData.images)
-        setPreviews(trekData.images)
+        if (trekData.images && trekData.images.length > 0) {
+          // setImages(trekData.images) // Initialize images with strings (URLs)
+          setPreviews(trekData.images) // Initialize previews with the same URLs
+        }
         setVideo(trekData.video)
       }
       //  for booking price details
@@ -691,9 +693,14 @@ const EditTrekForm: React.FC = () => {
   }
 
   //  helper functions for handling image deletions
+  // const handleImageDelete = (imageUrl: string) => {
+  //   setImagesToDelete((prev) => [...prev, imageUrl])
+  //   setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
+  // }
   const handleImageDelete = (imageUrl: string) => {
     setImagesToDelete((prev) => [...prev, imageUrl])
     setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
+    setImages((prev) => prev.filter((image) => image !== imageUrl)) // Keep images array in sync
   }
 
   const handleAddBookingPrice = () => {
@@ -927,13 +934,6 @@ const EditTrekForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-blue-700">
                 Highlights
               </h2>
-              <Button
-                type="button"
-                onClick={addHighlight}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add Highlight
-              </Button>
             </div>
             {highlights &&
               highlights.map((highlight, index) => (
@@ -947,6 +947,13 @@ const EditTrekForm: React.FC = () => {
                   removeHighlight={() => removeHighlight(index)}
                 />
               ))}
+            <Button
+              type="button"
+              onClick={addHighlight}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add Highlight
+            </Button>
           </div>
 
           {/* Itineraries Section */}
@@ -955,13 +962,6 @@ const EditTrekForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-blue-700">
                 Itineraries
               </h2>
-              <Button
-                type="button"
-                onClick={addItinerary}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add Itinerary
-              </Button>
             </div>
             {itineraries &&
               itineraries.map((itinerary, index) => (
@@ -975,19 +975,19 @@ const EditTrekForm: React.FC = () => {
                   removeItinerary={() => removeItinerary(index)}
                 />
               ))}
+            <Button
+              type="button"
+              onClick={addItinerary}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add Itinerary
+            </Button>
           </div>
 
           {/* FAQs Section */}
           <div className="bg-gray-100 rounded-lg p-6">
             <div className="flex justify-between items-center mb-6 border-b pb-3">
               <h2 className="text-2xl font-semibold text-blue-700">FAQs</h2>
-              <Button
-                type="button"
-                onClick={addFAQ}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Add FAQ
-              </Button>
             </div>
             {faqs.map((faq, index) => (
               <FAQForm
@@ -998,6 +998,13 @@ const EditTrekForm: React.FC = () => {
                 removeFAQ={() => removeFAQ(index)}
               />
             ))}
+            <Button
+              type="button"
+              onClick={addFAQ}
+              className="bg-blue-500 hover:bg-blue-600 text-white mt-4"
+            >
+              Add FAQ
+            </Button>
           </div>
 
           {/* Services Section */}

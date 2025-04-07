@@ -27,17 +27,21 @@ const FAQForm: React.FC<FAQChildProps> = ({
 
   return (
     <div className="mb-4  border p-2 rounded-md border-primary pb-4">
-      <h2 className="text-lg font-bold mb-2">FAQ {index + 1}</h2>
-      <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-bold ">FAQ {index + 1}</h2>
+      <div className="flex flex-col ">
+        <label className="text-md italic text-gray-500 mt-4">Question</label>
         <Input
           type="text"
           placeholder="Question"
+          className="bg-white"
           value={faq.question}
           onChange={(e) => updateField("question", e.target.value)}
         />
+        <label className="text-md italic text-gray-500 mt-4">Answer</label>
         <Input
           type="text"
           placeholder="Answer"
+          className="bg-white"
           value={faq.answer}
           onChange={(e) => updateField("answer", e.target.value)}
         />

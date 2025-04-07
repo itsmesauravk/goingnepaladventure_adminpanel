@@ -154,6 +154,8 @@ const EditWellnessForm: React.FC = () => {
     bestSeason: string[]
     startingPoint: string
     endingPoint: string
+    arrivalLocation: string
+    departureLocation: string
     overview: string
     trekHighlights: Highlight[]
     itinerary: Itinerary[]
@@ -182,6 +184,8 @@ const EditWellnessForm: React.FC = () => {
     meal: "",
     startingPoint: "",
     endingPoint: "",
+    arrivalLocation: "",
+    departureLocation: "",
     bestSeason: [],
     overview: "",
     trekHighlights: [{ content: "", links: [{ text: "", url: "" }] }],
@@ -542,6 +546,12 @@ const EditWellnessForm: React.FC = () => {
     if (endingPoint !== originalTrekData.endingPoint) {
       formData.append("endingPoint", endingPoint)
     }
+    if (arrivalLocation !== originalTrekData.arrivalLocation) {
+      formData.append("arrivalLocation", arrivalLocation)
+    }
+    if (departureLocation !== originalTrekData.departureLocation) {
+      formData.append("departureLocation", departureLocation)
+    }
     if (meal !== originalTrekData.meal) {
       formData.append("meal", meal)
     }
@@ -558,7 +568,7 @@ const EditWellnessForm: React.FC = () => {
       formData.append("maxAltitude", maxAltitude.toString())
     }
     if (tourLanguage !== originalTrekData.tourLanguage) {
-      formData.append("tourLanguage", tourLanguage)
+      formData.append("language", tourLanguage)
     }
     if (suitableAge !== originalTrekData.suitableAge) {
       formData.append("suitableAge", suitableAge)
@@ -581,7 +591,13 @@ const EditWellnessForm: React.FC = () => {
       JSON.stringify(highlights) !==
       JSON.stringify(originalTrekData.trekHighlights)
     ) {
-      formData.append("trekHighlights", JSON.stringify(highlights))
+      formData.append("highlights", JSON.stringify(highlights))
+    }
+    if (
+      JSON.stringify(thingsToKnow) !==
+      JSON.stringify(originalTrekData.thingsToKnow)
+    ) {
+      formData.append("thingsToKnow", JSON.stringify(thingsToKnow))
     }
     if (
       JSON.stringify(itineraries) !== JSON.stringify(originalTrekData.itinerary)

@@ -76,7 +76,7 @@ const PackagingForm: React.FC<PackagingProps> = ({
   ]
 
   return (
-    <div className="mb-6">
+    <div className="mb-4">
       <h2 className="text-xl font-semibold mb-4">Packaging</h2>
 
       <div className="border p-2 rounded-md border-primary">
@@ -90,7 +90,6 @@ const PackagingForm: React.FC<PackagingProps> = ({
                     type="text"
                     placeholder={`Add ${title} Item`}
                     value={item || ""}
-                    required
                     onChange={(e) =>
                       handleUpdateItem(list, updater, index, e.target.value)
                     }

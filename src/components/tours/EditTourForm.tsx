@@ -46,6 +46,7 @@ import { BookingPriceInterface } from "../utils/types"
 import { PenBoxIcon, Trash2Icon, XIcon } from "lucide-react"
 import AddBookingPrice from "../common/AddBookingPrice"
 import UpdateBookingPrice from "../common/EditBookingPrice"
+import ImageUploadEdit from "../trekkings/addForm/ImageUploadEdit"
 
 interface FAQ {
   question: string
@@ -201,6 +202,7 @@ const EditTourForm: React.FC = () => {
     overview: string
     note: string
     faqs: FAQ[]
+    video: string
   }>({
     name: "",
     maxAltitude: 0,
@@ -232,6 +234,7 @@ const EditTourForm: React.FC = () => {
     overview: "",
     note: "",
     faqs: [],
+    video: "",
   })
 
   // Event handlers
@@ -510,7 +513,9 @@ const EditTourForm: React.FC = () => {
         setFaqs(trekData.faq)
         setNote(trekData.note)
         // setImages(trekData.images)
-        setPreviews(trekData.images)
+        if (trekData.images) {
+          setPreviews(trekData.images)
+        }
         if (trekData.video) {
           setVideo(trekData.video)
         }
@@ -612,7 +617,7 @@ const EditTourForm: React.FC = () => {
       JSON.stringify(accommodations) !==
       JSON.stringify(originalTourData.accommodations)
     ) {
-      formData.append("accommodations", JSON.stringify(accommodations))
+      formData.append("accommodation", JSON.stringify(accommodations))
     }
     // things to know
     if (
@@ -638,7 +643,7 @@ const EditTourForm: React.FC = () => {
       JSON.stringify(itineraries) !==
       JSON.stringify(originalTourData.itineraries)
     ) {
-      formData.append("itineraries", JSON.stringify(itineraries))
+      formData.append("itinerary", JSON.stringify(itineraries))
     }
     if (
       JSON.stringify(inclusives) !== JSON.stringify(originalTourData.inclusives)
@@ -678,7 +683,7 @@ const EditTourForm: React.FC = () => {
         }
       })
     }
-    if (video) {
+    if (video !== originalTourData.video) {
       formData.append("video", video)
     }
 
@@ -747,6 +752,12 @@ const EditTourForm: React.FC = () => {
       toast.error("Error occurred while deleting the booking price.")
       setLoading(false)
     }
+  }
+
+  const handleImageDelete = (imageUrl: string) => {
+    setImagesToDelete((prev) => [...prev, imageUrl])
+    setPreviews((prev) => prev.filter((preview) => preview !== imageUrl))
+    setImages((prev) => prev.filter((image) => image !== imageUrl)) // Keep images array in sync
   }
 
   return (
@@ -970,13 +981,6 @@ const EditTourForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-tourPrimary">
                 Highlights
               </h2>
-              <Button
-                type="button"
-                onClick={addHighlight}
-                className="bg-tourPrimary hover:bg-opacity-90 text-white"
-              >
-                Add Highlight
-              </Button>
             </div>
             {highlights &&
               highlights.map((highlight, index) => (
@@ -990,6 +994,13 @@ const EditTourForm: React.FC = () => {
                   removeHighlight={() => removeHighlight(index)}
                 />
               ))}
+            <Button
+              type="button"
+              onClick={addHighlight}
+              className="bg-tourPrimary hover:bg-opacity-90 text-white mt-4"
+            >
+              Add Highlight
+            </Button>
           </div>
 
           {/* Itineraries Section */}
@@ -998,13 +1009,6 @@ const EditTourForm: React.FC = () => {
               <h2 className="text-2xl font-semibold text-tourPrimary">
                 Itineraries
               </h2>
-              <Button
-                type="button"
-                onClick={addItinerary}
-                className="bg-tourPrimary hover:bg-opacity-90 text-white"
-              >
-                Add Itinerary
-              </Button>
             </div>
             {itineraries &&
               itineraries.map((itinerary, index) => (
@@ -1018,19 +1022,19 @@ const EditTourForm: React.FC = () => {
                   removeItinerary={() => removeItinerary(index)}
                 />
               ))}
+            <Button
+              type="button"
+              onClick={addItinerary}
+              className="bg-tourPrimary hover:bg-opacity-90 text-white mt-4"
+            >
+              Add Itinerary
+            </Button>
           </div>
 
           {/* FAQs Section */}
           <div className="bg-gray-100 rounded-lg p-6">
             <div className="flex justify-between items-center mb-6 border-b pb-3">
               <h2 className="text-2xl font-semibold text-tourPrimary">FAQs</h2>
-              <Button
-                type="button"
-                onClick={addFAQ}
-                className="bg-tourPrimary hover:bg-opacity-90 text-white"
-              >
-                Add FAQ
-              </Button>
             </div>
             {faqs.map((faq, index) => (
               <FAQForm
@@ -1041,6 +1045,13 @@ const EditTourForm: React.FC = () => {
                 removeFAQ={() => removeFAQ(index)}
               />
             ))}
+            <Button
+              type="button"
+              onClick={addFAQ}
+              className="bg-tourPrimary hover:bg-opacity-90 text-white mt-4"
+            >
+              Add FAQ
+            </Button>
           </div>
 
           {/* Services Section */}
@@ -1062,11 +1073,12 @@ const EditTourForm: React.FC = () => {
               Media Upload
             </h2>
             <div className="space-y-6">
-              <ImageUpload
+              <ImageUploadEdit
                 images={images}
                 previews={previews}
                 handleImageChange={handleImageChange}
                 removeImage={removeImage}
+                handleImageDelete={handleImageDelete}
               />
               <VideoUpload
                 video={video}

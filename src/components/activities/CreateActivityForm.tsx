@@ -6,12 +6,26 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Checkbox } from "../ui/checkbox"
-import { Plus, Trash2, ImageIcon, Upload } from "lucide-react"
+import { Plus, Trash2, Upload, Save, Loader2Icon } from "lucide-react"
 import { toast } from "sonner"
 import axios from "axios"
-import { Separator } from "@radix-ui/react-separator"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import Cookies from "js-cookie"
+import { FaArrowLeft } from "react-icons/fa6"
+
+import NameInput from "../trekkings/addForm/NameInputForm"
+import PriceInput from "../trekkings/addForm/PriceInputForm"
+import CountrySelect from "../trekkings/addForm/CountrySelectForm"
+import LocationInput from "../trekkings/addForm/LocationForm"
+import GroupSizeInput from "../trekkings/addForm/GroupSizeForm"
+import FAQForm from "../trekkings/addForm/FaqForm"
+import ThumbnailInput from "../trekkings/addForm/ThumbnailForm"
+import ImageUpload from "../trekkings/addForm/ImagesForm"
+
+interface FAQ {
+  question: string
+  answer: string
+}
 
 const CreateActivityForm: React.FC = () => {
   const router = useRouter()
@@ -138,16 +152,41 @@ const CreateActivityForm: React.FC = () => {
     }))
   }
 
-  const handleFAQChange = (
-    index: number,
-    field: "question" | "answer",
-    value: string
-  ) => {
-    const newFAQs = [...formData.FAQs]
-    newFAQs[index][field] = value
-    setFormData((prev) => ({ ...prev, FAQs: newFAQs }))
+  // Title change
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    setFormData((prev) => ({
+      ...prev,
+      title: value,
+    }))
   }
 
+  // Country change
+  const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target
+    setFormData((prev) => ({
+      ...prev,
+      country: value,
+    }))
+  }
+
+  // Group size change
+  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    setFormData((prev) => ({
+      ...prev,
+      groupSizeMin: value,
+    }))
+  }
+  const handleMaxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    setFormData((prev) => ({
+      ...prev,
+      groupSizeMax: value,
+    }))
+  }
+
+  // FAQ
   const addFAQ = () => {
     setFormData((prev) => ({
       ...prev,
@@ -155,9 +194,21 @@ const CreateActivityForm: React.FC = () => {
     }))
   }
 
+  const updateFAQ = (index: number, updatedFAQ: FAQ) => {
+    const newFAQs = [...formData.FAQs]
+    newFAQs[index] = updatedFAQ
+    setFormData((prev) => ({
+      ...prev,
+      FAQs: newFAQs,
+    }))
+  }
+
   const removeFAQ = (index: number) => {
     const newFAQs = formData.FAQs.filter((_, i) => i !== index)
-    setFormData((prev) => ({ ...prev, FAQs: newFAQs }))
+    setFormData((prev) => ({
+      ...prev,
+      FAQs: newFAQs,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -197,78 +248,33 @@ const CreateActivityForm: React.FC = () => {
     )
 
     const formDataToSubmit = new FormData()
-
-    if (!formData.title) {
-      toast.warning("Title is required")
-      return
-    }
     formDataToSubmit.append("title", formData.title)
-    if (!formData.price) {
-      toast.warning("Price is required")
-      return
-    }
     formDataToSubmit.append("price", formData.price)
-    if (!formData.country) {
-      toast.warning("Country is required")
-      return
-    }
     formDataToSubmit.append("country", formData.country)
-    if (!formData.location) {
-      toast.warning("Location is required")
-      return
-    }
     formDataToSubmit.append("location", formData.location)
-    if (!formData.groupSizeMin) {
-      toast.warning("Minimum group size is required")
-      return
-    }
     formDataToSubmit.append("groupSizeMin", formData.groupSizeMin)
-    if (!formData.groupSizeMax) {
-      toast.warning("Maximum group size is required")
-      return
-    }
     formDataToSubmit.append("groupSizeMax", formData.groupSizeMax)
-    if (!formData.overview) {
-      toast.warning("Overview is required")
-      return
-    }
     formDataToSubmit.append("overview", formData.overview)
-    if (!formData.seasons) {
-      toast.warning("Best season is required")
-      return
-    }
     formDataToSubmit.append("bestSeason", JSON.stringify(bestSeasons))
-    if (!formData.serviceIncludes) {
-      toast.warning("Service includes is required")
-      return
-    }
     formDataToSubmit.append(
       "serviceIncludes",
       JSON.stringify(formData.serviceIncludes)
     )
-    if (!formData.thingsToKnow) {
-      toast.warning("Things to know is required")
-      return
-    }
     formDataToSubmit.append(
       "thingsToKnow",
       JSON.stringify(formData.thingsToKnow)
     )
     formDataToSubmit.append("FAQs", JSON.stringify(formData.FAQs))
 
-    if (!formData.thumbnail) {
-      toast.warning("Thumbnail is required")
-      return
+    if (formData.thumbnail) {
+      formDataToSubmit.append("thumbnail", formData.thumbnail)
     }
-
-    formDataToSubmit.append("thumbnail", formData.thumbnail)
 
     // Append gallery images
     formData.gallery.forEach((file) => {
       formDataToSubmit.append("image", file)
     })
 
-    // Uncomment for actual API submission
     try {
       setLoading(true)
       const response = await axios.post(
@@ -284,193 +290,170 @@ const CreateActivityForm: React.FC = () => {
       )
 
       if (response.data.success) {
-        toast.success(response.data.message)
+        toast.success(response.data.message || "Activity created successfully")
         router.push("/activities")
-        setLoading(false)
       } else {
-        setLoading(false)
-        toast.error(response.data.message)
+        toast.error(response.data.message || "Failed to create activity")
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to create activity")
+      console.error("Error creating activity:", error)
+    } finally {
       setLoading(false)
-      toast.error("Failed to create activity")
-      console.error(error)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4">
-      <form onSubmit={handleSubmit} className=" mx-auto">
-        <Card className="shadow-xl">
-          <CardHeader className="text-center bg-gray-50 rounded-t-xl border-b">
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Create New Activity
+    <div className="w-full min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Header section */}
+      <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 shadow-lg rounded-b-lg">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => router.back()}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-colors"
+            >
+              <FaArrowLeft size={24} />
+            </button>
+            <h1 className="text-3xl font-bold">Create New Activity</h1>
+          </div>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="max-w-6xl mx-auto p-6 space-y-8">
+        {/* Navigation progress indicator */}
+        <div className="flex justify-between items-center mb-8 p-3 bg-white rounded-lg shadow-sm overflow-x-auto">
+          <div className="flex space-x-4">
+            {[
+              "Basic Info",
+              "Location & Group",
+              "Seasons",
+              "Content",
+              "Images",
+            ].map((step, index) => (
+              <a
+                key={index}
+                href={`#section-${index + 1}`}
+                className="px-4 py-2 text-sm font-medium rounded-md bg-teal-50 text-teal-700 hover:bg-teal-100 transition-colors whitespace-nowrap"
+              >
+                {step}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Basic Information Section */}
+        <Card id="section-1" className="border-none shadow-md">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Basic Information
             </CardTitle>
           </CardHeader>
-
-          <CardContent className="p-8 space-y-8">
-            {/* Basic Information Section */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Basic Information
-              </h3>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Activity Title
-                  </label>
-                  <Input
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Enter activity title"
-                    className="border-gray-300 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Price
-                  </label>
-                  <Input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="Enter price"
-                    className="border-gray-300 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Country
-                  </label>
-                  <Input
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    placeholder="Enter country"
-                    className="border-gray-300 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
+          <CardContent className="p-6 bg-white">
+            <div className="grid md:grid-cols-3 gap-6">
+              <NameInput value={formData.title} onChange={handleTitleChange} />
+              <PriceInput
+                value={Number(formData.price)}
+                onChange={handleChange}
+              />
+              <CountrySelect
+                country={formData.country}
+                handleCountryChange={handleCountryChange}
+              />
             </div>
+          </CardContent>
+        </Card>
 
-            <Separator />
+        {/* Location & Group Details */}
+        <Card id="section-2" className="border-none shadow-md">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Location & Group Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 bg-white">
+            <div className="grid md:grid-cols-2 gap-6">
+              <LocationInput
+                location={formData.location}
+                handleLocationChange={handleChange}
+              />
+              <GroupSizeInput
+                minGroupSize={Number(formData.groupSizeMin)}
+                maxGroupSize={Number(formData.groupSizeMax)}
+                handleMinChange={handleMinChange}
+                handleMaxChange={handleMaxChange}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Location & Group Details */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Location & Group Details
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Specific Location
-                  </label>
-                  <Input
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="Enter specific location"
-                    className="border-gray-300 focus:ring-blue-500"
-                    required
+        {/* Seasons */}
+        <Card id="section-3" className="border-none shadow-md">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Best Seasons
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 bg-white">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {Object.keys(formData.seasons).map((season) => (
+                <div
+                  key={season}
+                  className={`flex items-center space-x-2 p-4 rounded-lg border-2 transition-all ${
+                    formData.seasons[season as keyof typeof formData.seasons]
+                      ? "border-teal-500 bg-teal-50"
+                      : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                  }`}
+                >
+                  <Checkbox
+                    checked={
+                      formData.seasons[season as keyof typeof formData.seasons]
+                    }
+                    onCheckedChange={() =>
+                      handleSeasonToggle(
+                        season as keyof typeof formData.seasons
+                      )
+                    }
+                    className="data-[state=checked]:bg-teal-600 text-white"
                   />
+                  <label className="text-sm font-medium capitalize">
+                    {season}
+                  </label>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Min Group Size
-                    </label>
-                    <Input
-                      type="number"
-                      name="groupSizeMin"
-                      value={formData.groupSizeMin}
-                      onChange={handleChange}
-                      placeholder="Min size"
-                      className="border-gray-300 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Max Group Size
-                    </label>
-                    <Input
-                      type="number"
-                      name="groupSizeMax"
-                      value={formData.groupSizeMax}
-                      onChange={handleChange}
-                      placeholder="Max size"
-                      className="border-gray-300 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
+          </CardContent>
+        </Card>
 
-            <Separator />
-
-            {/* Seasons */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Best Seasons
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.keys(formData.seasons).map((season) => (
-                  <div
-                    key={season}
-                    className="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg"
-                  >
-                    <Checkbox
-                      checked={
-                        formData.seasons[
-                          season as keyof typeof formData.seasons
-                        ]
-                      }
-                      onCheckedChange={() =>
-                        handleSeasonToggle(
-                          season as keyof typeof formData.seasons
-                        )
-                      }
-                      className="data-[state=checked]:bg-blue-600 bg-white"
-                    />
-                    <label className="text-sm font-medium">
-                      {season.charAt(0).toUpperCase() + season.slice(1)}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
+        {/* Content Sections */}
+        <Card id="section-4" className="border-none shadow-md">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Activity Content
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 bg-white space-y-8">
             {/* Overview */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Activity Overview
-              </h3>
+              <h4 className="text-lg font-medium text-gray-700 mb-3">
+                Overview
+              </h4>
               <Textarea
                 name="overview"
                 value={formData.overview}
                 onChange={handleChange}
                 placeholder="Provide a detailed overview of the activity..."
-                className="min-h-32 border-gray-300 focus:ring-blue-500"
+                className="min-h-32 border-gray-300 focus:ring-teal-500"
                 required
               />
             </div>
 
-            <Separator />
-
             {/* Service Includes */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              <h4 className="text-lg font-medium text-gray-700 mb-3">
                 Services Included
-              </h3>
-              <div className="space-y-3">
+              </h4>
+              <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                 {formData.serviceIncludes.map((service, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -483,7 +466,7 @@ const CreateActivityForm: React.FC = () => {
                         )
                       }
                       placeholder="Enter included service"
-                      className="border-gray-300 focus:ring-blue-500"
+                      className="border-gray-300 bg-white focus:ring-teal-500"
                     />
                     <Button
                       type="button"
@@ -500,21 +483,19 @@ const CreateActivityForm: React.FC = () => {
                   type="button"
                   variant="outline"
                   onClick={() => addArrayItem("serviceIncludes")}
-                  className="w-full border-dashed"
+                  className="w-full border-dashed bg-white hover:bg-teal-50 hover:border-teal-300"
                 >
                   <Plus size={18} className="mr-2" /> Add Service
                 </Button>
               </div>
             </div>
 
-            <Separator />
-
             {/* Things to Know */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              <h4 className="text-lg font-medium text-gray-700 mb-3">
                 Things to Know
-              </h3>
-              <div className="space-y-3">
+              </h4>
+              <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                 {formData.thingsToKnow.map((thing, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -523,7 +504,7 @@ const CreateActivityForm: React.FC = () => {
                         handleArrayChange("thingsToKnow", index, e.target.value)
                       }
                       placeholder="Enter important information"
-                      className="border-gray-300 focus:ring-blue-500"
+                      className="border-gray-300 bg-white focus:ring-teal-500"
                     />
                     <Button
                       type="button"
@@ -540,180 +521,82 @@ const CreateActivityForm: React.FC = () => {
                   type="button"
                   variant="outline"
                   onClick={() => addArrayItem("thingsToKnow")}
-                  className="w-full border-dashed"
+                  className="w-full border-dashed bg-white hover:bg-teal-50 hover:border-teal-300"
                 >
                   <Plus size={18} className="mr-2" /> Add Information
                 </Button>
               </div>
             </div>
 
-            <Separator />
-
             {/* FAQs */}
             <div>
-              <h3 className="text-xl font-semibold max-w-[500px] text-gray-800 mb-4">
+              <h4 className="text-lg font-medium text-gray-700 mb-3">
                 Frequently Asked Questions
-              </h3>
+              </h4>
               <div className="space-y-4 max-w-[600px]">
                 {formData.FAQs.map((faq, index) => (
-                  <Card key={index} className="bg-gray-50">
-                    <CardContent className="p-4 space-y-3">
-                      <Input
-                        value={faq.question}
-                        onChange={(e) =>
-                          handleFAQChange(index, "question", e.target.value)
-                        }
-                        placeholder="Enter question"
-                        className="border-gray-300 focus:ring-blue-500"
-                      />
-                      <Textarea
-                        value={faq.answer}
-                        onChange={(e) =>
-                          handleFAQChange(index, "answer", e.target.value)
-                        }
-                        placeholder="Enter answer"
-                        className="border-gray-300 focus:ring-blue-500"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeFAQ(index)}
-                        className="w-full"
-                      >
-                        <Trash2 size={18} className="mr-2" /> Remove FAQ
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <FAQForm
+                    key={index}
+                    index={index}
+                    faq={faq}
+                    updateFAQ={(updatedFAQ) => updateFAQ(index, updatedFAQ)}
+                    removeFAQ={() => removeFAQ(index)}
+                  />
                 ))}
                 <Button
                   type="button"
-                  variant="outline"
                   onClick={addFAQ}
-                  className="w-full border-dashed"
+                  className="bg-teal-600 hover:bg-teal-700 text-white mt-4"
                 >
                   <Plus size={18} className="mr-2" /> Add FAQ
                 </Button>
               </div>
             </div>
-
-            <Separator />
-
-            {/* Image Uploads */}
-            <div className="space-y-6">
-              {/* Thumbnail Upload */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  Thumbnail Image
-                </h3>
-                <div className="space-y-4 max-w-[600px]">
-                  <div className="flex items-center justify-center w-full">
-                    <label className="w-full flex flex-col items-center justify-center px-4 py-6 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer hover:bg-gray-100">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="h-12 w-12 text-gray-400 mb-3" />
-                        <p className="mb-2 text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span>
-                        </p>
-                        <p className="text-xs text-gray-500">JPG or JPEG</p>
-                      </div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleThumbnailUpload}
-                        ref={thumbnailInputRef}
-                        className="hidden"
-                        required
-                      />
-                    </label>
-                  </div>
-                  {formData.thumbnailPreview && (
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={formData.thumbnailPreview}
-                        alt="Thumbnail Preview"
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            thumbnail: null,
-                            thumbnailPreview: null,
-                          }))
-                          if (thumbnailInputRef.current)
-                            thumbnailInputRef.current.value = ""
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Gallery Upload */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  Gallery Images
-                </h3>
-                <div className="space-y-4 max-w-[600px]">
-                  <div className="flex items-center justify-center w-full">
-                    <label className="w-full flex flex-col items-center justify-center px-4 py-6 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer hover:bg-gray-100">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="h-12 w-12 text-gray-400 mb-3" />
-                        <p className="mb-2 text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span>
-                        </p>
-                        <p className="text-xs text-gray-500">JPG or JPEG</p>
-                      </div>
-                      <Input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleGalleryUpload}
-                        ref={galleryInputRef}
-                        className="hidden"
-                        required
-                      />
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {formData.galleryPreviews.map((preview, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={preview}
-                          alt={`Gallery Preview ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => removeGalleryImage(index)}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={loading}
-              onClick={handleSubmit}
-              className="w-full text-white text-lg bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-indigo-700"
-            >
-              {loading ? "Creating, Please Wait..." : "Create Activity"}
-            </Button>
           </CardContent>
         </Card>
+
+        {/* Image Uploads */}
+        <Card id="section-5" className="border-none shadow-md">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Activity Images
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 bg-white space-y-6">
+            {/* Thumbnail Upload */}
+            <ThumbnailInput
+              preview={formData.thumbnailPreview}
+              handleImageChange={handleThumbnailUpload}
+            />
+
+            <div className="mt-8">
+              <ImageUpload
+                images={formData.gallery}
+                previews={formData.galleryPreviews}
+                handleImageChange={handleGalleryUpload}
+                removeImage={removeGalleryImage}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Button
+          type="submit"
+          disabled={loading}
+          onClick={handleSubmit}
+          className="px-10 mb-20 py-6 text-white text-lg bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 rounded-lg flex items-center shadow-md"
+        >
+          {loading ? (
+            <>
+              <Loader2Icon className="animate-spin mr-2" size={20} />
+              Creating...
+            </>
+          ) : (
+            <>
+              <Save size={20} className="mr-2" /> Create Activity
+            </>
+          )}
+        </Button>
       </form>
     </div>
   )
