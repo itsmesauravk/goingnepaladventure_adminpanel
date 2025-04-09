@@ -66,6 +66,19 @@ const SingleRequest: React.FC<SingleRequestProps> = ({ requestId }) => {
     setSendMail((prev) => prev + 1)
   }
 
+  const routeTypeHandler = (type: string) => {
+    switch (type) {
+      case "tour":
+        return "tours"
+
+      case "trekking":
+        return "trekking"
+
+      default:
+        return "trekking"
+    }
+  }
+
   useEffect(() => {
     getSingleRequest()
   }, [requestId, sendMail])
@@ -145,7 +158,11 @@ const SingleRequest: React.FC<SingleRequestProps> = ({ requestId }) => {
                       <Link
                         className="text-blue-600 underline"
                         target="_blank"
-                        href={`${process.env.NEXT_PUBLIC_CLIENT_URL_PROD}/${requestDetail.itemType}/${requestDetail.itemSlug}`}
+                        href={`${
+                          process.env.NEXT_PUBLIC_USER_URL_PROD
+                        }/${routeTypeHandler(requestDetail.itemType)}/${
+                          requestDetail.itemSlug
+                        }`}
                       >
                         {requestDetail.itemName}
                       </Link>

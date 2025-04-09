@@ -270,11 +270,11 @@ const EditBlogForm: React.FC<BlogPostProps> = ({ onSubmit }) => {
           <div className="space-y-4">
             <Label className="text-lg font-semibold">Blog Content</Label>
             <Editor
-              apiKey={
-                process.env.NEXT_PUBLIC_TINYMCE_API_KEY 
-              }
+              apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
               onInit={(evt, editor) => {
                 editorRef.current = editor
+                // Force LTR direction when editor initializes
+                editor.getBody().dir = "ltr"
               }}
               initialValue={description}
               onEditorChange={(content) => setDescription(content)}
